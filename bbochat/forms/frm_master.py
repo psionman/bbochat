@@ -3,8 +3,10 @@
 import tkinter as tk
 from tkinter import ttk
 
-from psiutils.constants import PAD,DIALOG_STATUS
-from psiutils.widgets import HAND, sort_treeview
+from psiutils.constants import PAD, DIALOG_STATUS
+from psiutils.widgets import HAND, clickable_widget
+from psiutils.treeview import sort_treeview
+
 
 from constants import MODES, MODE_COLOURS
 
@@ -14,9 +16,13 @@ import text
 from forms.frm_edit import EditFrame
 
 PAIR_TREE_COLUMNS = (
-    ('username1', 'username 1', 100),
-    ('username2', 'username 2', 100),
+    ('username1', 'Opp 1', 100),
+    ('username2', 'Opp 2', 100),
 )
+
+TEXT_WIDTH = 45
+
+CHAT_HEADINGS_COLOUR = 'red'
 
 
 class MasterFrame():
@@ -50,10 +56,6 @@ class MasterFrame():
 
         self.master_frame = self._get_master_frame(master)
         self.master_frame.grid(row=0, column=0, sticky=tk.EW)
-
-        self._populate_pair_tree()
-        index = self.greetings.index(config.last_greeting)
-        self.greetings_listbox.select_set(index)
 
     def _get_master_frame(self, master) -> ttk.Frame:
         frame = ttk.Frame(master)
@@ -123,8 +125,7 @@ class MasterFrame():
         self.greetings_listbox = tk.Listbox(
             frame,
             listvariable=self.greetings_list,
-            height=6,
-            width=40,
+            width=TEXT_WIDTH,
             selectmode=tk.BROWSE,
             cursor=HAND,
         )
@@ -140,15 +141,16 @@ class MasterFrame():
         colour = MODE_COLOURS[MODES['greeting']]
         entry_style = ttk.Style()
         entry_style.configure(
-            'style.TEntry',
+            'greeting.TEntry',
             fieldbackground=colour,
             )
-        entry.configure(style='style.TEntry')
+        entry.configure(style='greeting.TEntry')
         entry.bind("<Key>", lambda e: 'break')
 
         button = ttk.Button(frame, text=text.EDIT,
                             command=self._edit_greetings)
         button.grid(row=4, column=0, pady=PAD)
+        clickable_widget(button)
 
         return frame
 
@@ -163,13 +165,31 @@ class MasterFrame():
         listbox = tk.Listbox(
             frame,
             listvariable=self.valedictions_list,
-            height=6,
-            width=40,
+            width=TEXT_WIDTH,
             selectmode=tk.BROWSE,
             cursor=HAND,
         )
         listbox.grid(row=1, column=0, sticky=tk.NSEW, padx=PAD)
         listbox.bind('<<ListboxSelect>>', self._valediction_selected)
+
+        label = ttk.Label(frame, text='Selected valediction')
+        label.grid(row=2, column=0, pady=PAD)
+
+        entry = ttk.Entry(frame, textvariable=self.valediction)
+        entry.grid(row=3, column=0, sticky=tk.EW, padx=PAD)
+        colour = MODE_COLOURS[MODES['valediction']]
+        entry_style = ttk.Style()
+        entry_style.configure(
+            'valediction.TEntry',
+            fieldbackground=colour,
+            )
+        entry.configure(style='valediction.TEntry')
+        entry.bind("<Key>", lambda e: 'break')
+
+        button = ttk.Button(frame, text=text.EDIT,
+                            command=self._edit_valedictions)
+        button.grid(row=4, column=0, pady=PAD)
+        clickable_widget(button)
 
         return frame
 
@@ -181,18 +201,43 @@ class MasterFrame():
         label = ttk.Label(frame, text='Chat')
         label.grid(row=0, column=0, padx=PAD, pady=PAD)
 
-        listbox = tk.Listbox(
+        self.chat_listbox = tk.Listbox(
             frame,
-            listvariable=self.chat_list,
-            height=20,
-            width=60,
+            width=TEXT_WIDTH,
             selectmode=tk.BROWSE,
             cursor=HAND,
         )
-        listbox.grid(row=1, column=0, sticky=tk.NSEW, padx=PAD)
-        listbox.bind('<<ListboxSelect>>', self._chat_selected)
+        self.chat_listbox.grid(row=1, column=0, sticky=tk.NSEW, padx=PAD)
+        self.chat_listbox.bind('<<ListboxSelect>>', self._chat_selected)
+        self._populate_chat()
+
+        label = ttk.Label(frame, text='Selected chat')
+        label.grid(row=2, column=0, pady=PAD)
+
+        entry = ttk.Entry(frame, textvariable=self.chat_line)
+        entry.grid(row=3, column=0, sticky=tk.EW, padx=PAD)
+        colour = MODE_COLOURS[MODES['chat']]
+        entry_style = ttk.Style()
+        entry_style.configure(
+            'chat.TEntry',
+            fieldbackground=colour,
+            )
+        entry.configure(style='chat.TEntry')
+        entry.bind("<Key>", lambda e: 'break')
+
+        button = ttk.Button(frame, text=text.EDIT,
+                            command=self._edit_chat)
+        button.grid(row=4, column=0, pady=PAD)
+        clickable_widget(button)
 
         return frame
+
+    def _populate_chat(self) -> None:
+        self.chat_listbox.delete('0', tk.END)
+        for chat_text in self.chat:
+            self.chat_listbox.insert(tk.END, chat_text)
+            if '---' in chat_text:
+                self.chat_listbox.itemconfig(tk.END, fg=CHAT_HEADINGS_COLOUR)
 
     def _search(self, event: object = None) -> None:
         pairs = []
@@ -269,7 +314,10 @@ class MasterFrame():
         selection = event.widget.curselection()
         if not selection:
             return
-        self.chat_line.set(self.chat[selection[0]])
+        selected_chat = self.chat[selection[0]]
+        if '---' in selected_chat:
+            return
+        self.chat_line.set(selected_chat)
         self.parent.mode = MODES['chat']
         self.parent.update_clipboard()
 
@@ -277,4 +325,26 @@ class MasterFrame():
         dlg = EditFrame(self, MODES['greeting'], self.greetings)
         self.root.wait_window(dlg.root)
         if dlg.status == DIALOG_STATUS['updated']:
-            ic(dlg.data)
+            self.greetings = dlg.data
+            self.parent.greetings = dlg.data
+            self.parent.save()
+            self.greetings_list.set(dlg.data)
+
+    def _edit_valedictions(self, event: object = None) -> None:
+        dlg = EditFrame(self, MODES['valediction'], self.valedictions)
+        self.root.wait_window(dlg.root)
+        if dlg.status == DIALOG_STATUS['updated']:
+            self.valedictions = dlg.data
+            self.parent.valedictions = dlg.data
+            self.parent.save()
+            self.valedictions_list.set(dlg.data)
+
+    def _edit_chat(self, event: object = None) -> None:
+        dlg = EditFrame(self, MODES['chat'], self.chat)
+        self.root.wait_window(dlg.root)
+        if dlg.status == DIALOG_STATUS['updated']:
+            self.chat = dlg.data
+            self.parent.chat = dlg.data
+            self.parent.save()
+            self.chat_list.set(dlg.data)
+            self._populate_chat()

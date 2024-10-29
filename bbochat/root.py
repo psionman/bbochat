@@ -5,7 +5,8 @@ Tkinter root for BBO Chat.
 
 import tkinter as tk
 
-from psiutils.widgets import get_styles, display_icon
+from psiutils.widgets import get_styles
+from psiutils.utilities import display_icon
 
 from constants import ICON_FILE
 from forms.frm_main import MainFrame

@@ -1,0 +1,13 @@
+# Byte-compiled / optimized / DLL files
+**/__pycache__/
+*.py[cod]
+*$py.class
+
+*.json
+*.txt
+*.csv
+*.toml
+
+.vscode/
+/build
+/data

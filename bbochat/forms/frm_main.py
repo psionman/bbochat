@@ -7,7 +7,7 @@ import clipboard
 
 from psiutils.constants import PAD
 from psiutils.buttons import ButtonFrame, Button, HORIZONTAL
-from psiutils.widgets import display_icon
+from psiutils.utilities import display_icon
 
 from constants import ICON_FILE
 import text
@@ -20,7 +20,7 @@ from main_menu import MainMenu
 from forms.frm_master import MasterFrame
 from forms.frm_partners import PartnerFrame
 
-GEOMETRY = '1300x800'
+GEOMETRY = '1350x800'
 FRAME_TITLE = 'BBO Chat'
 
 
@@ -56,11 +56,13 @@ class MainFrame():
         self.username_2 = tk.StringVar()
         self.name_1 = tk.StringVar()
         self.name_2 = tk.StringVar()
+        self.randomize = tk.BooleanVar(value=config.randomize_name_order)
+
         self.username_1.trace_add('write', self._pair_username_change)
         self.username_2.trace_add('write', self._pair_username_change)
 
         self.greetings_list = tk.StringVar(value=self.greetings)
-        self.greeting = tk.StringVar(value=config.last_greeting)
+        self.greeting = tk.StringVar(value=self.partner.greeting)
         self.valedictions_list = tk.StringVar(value=self.valedictions)
         self.valediction = tk.StringVar(value=config.last_valediction)
         self.chat_list = tk.StringVar(value=self.chat)
@@ -70,6 +72,7 @@ class MainFrame():
         # Partners
         self.partners_list = tk.StringVar(value=self.partners_names)
         self.selected_partner = tk.StringVar(value=config.last_partner)
+        self.partners_name = tk.StringVar(value='')
         self.partners_username = tk.StringVar()
 
         self.button_frame = None
@@ -87,7 +90,7 @@ class MainFrame():
         root.bind('<Control-g>', self._greeting)
         root.bind('<Control-v>', self._valediction)
         root.bind('<Control-c>', self._chat)
-        root.bind('<Control-s>', self._save)
+        root.bind('<Control-s>', self.save)
 
         main_menu = MainMenu(self)
         main_menu.create()
@@ -107,7 +110,7 @@ class MainFrame():
 
     def _main_frame(self, master: tk.Frame) -> ttk.Frame:
         frame = ttk.Frame(master)
-        frame.rowconfigure(3, weight=1)  # Notebook row
+        frame.rowconfigure(4, weight=1)  # Notebook row
         frame.columnconfigure(6, weight=1)
 
         label = ttk.Label(frame, text='Clipboard')
@@ -128,6 +131,10 @@ class MainFrame():
         entry = ttk.Entry(frame, textvariable=self.partners_username,
                           state='readonly')
         entry.grid(row=1, column=1, sticky=tk.W, padx=PAD)
+
+        check_button = tk.Checkbutton(frame, text='Randomize opp\'s names',
+                                      variable=self.randomize)
+        check_button.grid(row=3, column=3, sticky=tk.W)
 
         label = ttk.Label(frame, text='Opponents')
         label.grid(row=1, column=2)
@@ -155,8 +162,8 @@ class MainFrame():
         self.delete_button.grid(row=2, column=5, padx=PAD)
 
         notebook = self._get_notebook(frame)
-        notebook.grid(row=3, column=0, columnspan=9,
-                      sticky=tk.NSEW, padx=PAD, pady=PAD)
+        notebook.grid(row=4, column=0, columnspan=9,
+                      sticky=tk.NSEW, padx=PAD)
         return frame
 
     def _get_notebook(self, master: tk.Frame) -> ttk.Notebook:
@@ -179,11 +186,20 @@ class MainFrame():
         return notebook
 
     def _button_frame(self, master: tk.Frame) -> tk.Frame:
+        style = ttk.Style()
+        style.configure('greeting.TButton', background=MODE_COLOURS['greeting'])
+        style.configure('valediction.TButton',
+                        background=MODE_COLOURS['valediction'])
+        style.configure('chat.TButton', background=MODE_COLOURS['chat'])
+
         buttons = [
-            Button('Greeting', self._greeting, underline=0),
-            Button('Valediction', self._valediction, underline=0),
-            Button('Chat', self._chat, underline=0),
-            Button(text.SAVE, self._save, underline=0, dimmable=True),
+            Button('Greeting', self._greeting, underline=0,
+                   style='greeting.TButton'),
+            Button('Valediction', self._valediction, underline=0,
+                   style='valediction.TButton'),
+            Button('Chat', self._chat, underline=0,
+                   style='chat.TButton'),
+            # Button(text.SAVE, self.save, underline=0, dimmable=True),
             Button(text.EXIT, self.dismiss, tk.E, underline=1),
         ]
         frame = ButtonFrame(master, buttons, HORIZONTAL)
@@ -202,7 +218,7 @@ class MainFrame():
         self.mode = MODES['chat']
         self.update_clipboard()
 
-    def _save(self, event: object = None) -> None:
+    def save(self, event: object = None) -> None:
         self.data_store.partners = self.partners
         self.data_store.players = self.players
         self.data_store.pairs = self.pairs
@@ -210,16 +226,6 @@ class MainFrame():
         self.data_store.valedictions = self.valedictions
         self.data_store.chat = self.chat
         self.data_store.my_name = self.my_name
-        # data = {
-        #     'partners': self.partners,
-        #     'players': self.players,
-        #     'pairs': self.pairs,
-        #     'greetings': self.greetings,
-        #     'valedictions': self.valedictions,
-        #     'my_name': self.my_name,
-        #     'chat': self.chat,
-        # }
-        # save_data(data)
         self.data_store.save()
         self.enable_buttons(False)
 
@@ -254,11 +260,13 @@ class MainFrame():
         clipboard.copy(self.clipboard.get())
 
     def _get_opps(self) -> str:
-        opps = [self.name_1.get(), self.name_2.get()]
-        choice = random.choice([0, 1])
-        opp_1 = opps[choice]
-        choice = (choice + 1) % 2
-        opp_2 = opps[choice]
+        opp_1, opp_2 = self.name_1.get(), self.name_2.get()
+        if self.randomize.get():
+            opps = [self.name_1.get(), self.name_2.get()]
+            choice = random.choice([0, 1])
+            opp_1 = opps[choice]
+            choice = (choice + 1) % 2
+            opp_2 = opps[choice]
         if opp_1 and opp_2:
             return f'{opp_1} and {opp_2}'
         if opp_1:
@@ -277,7 +285,7 @@ class MainFrame():
         if pair not in self.pairs:
             self.pairs.append(Pair(username_1, username_2))
 
-        self._save()
+        self.save()
         self.search.set('')
         self.pair_tree.delete(*self.pair_tree.get_children())
         self.search_entry.focus_set()
@@ -293,7 +301,7 @@ class MainFrame():
 
         pair = Pair(self.username_1.get(), self.username_2.get())
         self.pairs.remove(pair)
-        self._save()
+        self.save()
 
         self.name_1.set('')
         self.name_2.set('')

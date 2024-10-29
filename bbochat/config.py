@@ -8,7 +8,8 @@ DEFAULT_CONFIG = {
     'data_directory': USER_DATA_DIR,
     'last_partner': 'eirikr',
     'last_greeting': 'Hi <opps>: <names>: <system>',
-    'last_valediction': 'Thanks both'
+    'last_valediction': 'Thanks both',
+    'randomize_name_order': True,
 }
 
 
