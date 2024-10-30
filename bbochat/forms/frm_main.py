@@ -210,19 +210,19 @@ class MainFrame():
         frame.enable(False)
         return frame
 
-    def _greeting(self, event: object = None) -> None:
+    def _greeting(self, *args) -> None:
         self.mode = MODES['greeting']
         self.update_clipboard()
 
-    def _valediction(self, event: object = None) -> None:
+    def _valediction(self, *args) -> None:
         self.mode = MODES['valediction']
         self.update_clipboard()
 
-    def _chat(self, event: object = None) -> None:
+    def _chat(self, *args) -> None:
         self.mode = MODES['chat']
         self.update_clipboard()
 
-    def save(self, event: object = None) -> None:
+    def save(self, *args) -> None:
         self.data_store.partners = self.partners
         self.data_store.players = self.players
         self.data_store.pairs = self.pairs
@@ -242,7 +242,7 @@ class MainFrame():
             )
         self.clipboard_entry.configure(style='style.TEntry')
 
-    def update_clipboard(self, event: object = None) -> None:
+    def update_clipboard(self, *args) -> None:
         self._update_mode_colour()
         opps = self._get_opps()
         names = f'{self.partner.name} and {self.my_name}'
@@ -260,7 +260,7 @@ class MainFrame():
         self.clipboard.set(message)
         self.copy_to_clipboard()
 
-    def copy_to_clipboard(self, event: object = None) -> None:
+    def copy_to_clipboard(self, *args) -> None:
         clipboard.copy(self.clipboard.get())
 
     def _get_opps(self) -> str:
@@ -277,7 +277,7 @@ class MainFrame():
             return opp_1
         return opp_2
 
-    def _save_names(self, event: object = None) -> None:
+    def _save_names(self, *args) -> None:
         name_1 = self.name_1.get()
         name_2 = self.name_2.get()
         username_1 = self.username_1.get()
@@ -294,7 +294,7 @@ class MainFrame():
         self.pair_tree.delete(*self.pair_tree.get_children())
         self.search_entry.focus_set()
 
-    def _delete_pair(self, event: object = None) -> None:
+    def _delete_pair(self, *args) -> None:
         response = messagebox.askyesno(
             'Delete pair',
             'Are you sure you wish to delete this pair?',
@@ -345,5 +345,5 @@ class MainFrame():
             return
         self.button_frame.enable(True)
 
-    def dismiss(self, event: object = None) -> None:
+    def dismiss(self, *args) -> None:
         self.root.destroy()

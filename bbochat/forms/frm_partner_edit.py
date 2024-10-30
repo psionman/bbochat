@@ -109,7 +109,7 @@ class PartnerEditFrame():
         frame.enable(False)
         return frame
 
-    def _save(self, event: object = None) -> None:
+    def _save(self, *args) -> None:
         self.partner = Partner()
         self.partner.username = self.username.get()
         self.partner.name = self.name.get()
@@ -125,5 +125,5 @@ class PartnerEditFrame():
         if self.username.get():
             self.button_frame.enable(True)
 
-    def dismiss(self, event: object = None) -> None:
+    def dismiss(self, *args) -> None:
         self.root.destroy()

@@ -248,7 +248,7 @@ class MasterFrame():
             if '---' in chat_text:
                 self.chat_listbox.itemconfig(tk.END, fg=CHAT_HEADINGS_COLOUR)
 
-    def _search(self, event: object = None) -> None:
+    def _search(self, *args) -> None:
         pairs = []
         text = self.search.get()
         for pair in self.pairs:
@@ -290,7 +290,7 @@ class MasterFrame():
             tree.column(col_key, width=col_width, anchor=tk.W)
         return tree
 
-    def _pair_tree_clicked(self, event: object = None) -> None:
+    def _pair_tree_clicked(self, *args) -> None:
         self.selected_item = self.pair_tree.selection()
         values = self.pair_tree.item(self.selected_item)['values']
         if not values:
@@ -330,7 +330,7 @@ class MasterFrame():
         self.parent.mode = MODES['chat']
         self.parent.update_clipboard()
 
-    def _edit_greetings(self, event: object = None) -> None:
+    def _edit_greetings(self, *args) -> None:
         dlg = EditFrame(self, MODES['greeting'], self.greetings)
         self.root.wait_window(dlg.root)
         if dlg.status == DIALOG_STATUS['updated']:
@@ -339,7 +339,7 @@ class MasterFrame():
             self.parent.save()
             self.greetings_list.set(dlg.data)
 
-    def _edit_valedictions(self, event: object = None) -> None:
+    def _edit_valedictions(self, *args) -> None:
         dlg = EditFrame(self, MODES['valediction'], self.valedictions)
         self.root.wait_window(dlg.root)
         if dlg.status == DIALOG_STATUS['updated']:
@@ -348,7 +348,7 @@ class MasterFrame():
             self.parent.save()
             self.valedictions_list.set(dlg.data)
 
-    def _edit_chat(self, event: object = None) -> None:
+    def _edit_chat(self, *args) -> None:
         dlg = EditFrame(self, MODES['chat'], self.chat)
         self.root.wait_window(dlg.root)
         if dlg.status == DIALOG_STATUS['updated']:
@@ -358,14 +358,14 @@ class MasterFrame():
             self.chat_list.set(dlg.data)
             self._populate_chat()
 
-    def _greeting(self, event: object = None) -> None:
+    def _greeting(self, *args) -> None:
         self.parent.mode = MODES['greeting']
         self.parent.update_clipboard()
 
-    def _valediction(self, event: object = None) -> None:
+    def _valediction(self, *args) -> None:
         self.parent.mode = MODES['valediction']
         self.parent.update_clipboard()
 
-    def _chat(self, event: object = None) -> None:
+    def _chat(self, *args) -> None:
         self.parent.mode = MODES['chat']
         self.parent.update_clipboard()

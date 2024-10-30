@@ -70,10 +70,10 @@ class EditFrame():
         frame.enable(False)
         return frame
 
-    def _save(self, event: object = None) -> None:
+    def _save(self, *args) -> None:
         self.status = DIALOG_STATUS['updated']
         self.data = self.text.get('0.0', tk.END).split('\n')
         self.dismiss()
 
-    def dismiss(self, event: object = None) -> None:
+    def dismiss(self, *args) -> None:
         self.root.destroy()

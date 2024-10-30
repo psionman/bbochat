@@ -20,9 +20,7 @@ class NotesFrame():
         self.root = parent.root
         self.partner = parent.partner
 
-        # date = datetime.now( ).strftime('%Y%m%d')
-        # file_name = f'{self.partner.username}_{date}.txt'
-        # path = str(Path(config.notes_path, file_name))
+        # Tk variables
         self.path = tk.StringVar(value='')
 
         self.path.trace_add('write', self._data_changed)
@@ -98,7 +96,6 @@ class NotesFrame():
 
     def _load(self, *args) -> None:
         self.partner = self.parent.partner
-        ic(self.partner)
         date = datetime.now().strftime('%Y%m%d')
         file_name = f'{self.partner.username}_{date}.txt'
         path = str(Path(config.notes_path, file_name))

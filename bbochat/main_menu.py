@@ -63,5 +63,5 @@ class MainMenu():
                  f'Author: {AUTHOR} {SPACES}')
         messagebox.showinfo(title=f'About {APP_TITLE}', message=about)
 
-    def dismiss(self, event: object = None):
+    def dismiss(self, *args):
         self.root.destroy()

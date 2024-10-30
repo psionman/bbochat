@@ -135,7 +135,7 @@ class ConfigFrame():
             enable = True
         enable_buttons(self.buttons, enable)
 
-    def _save_config(self, event: object = None) -> None:
+    def _save_config(self, *args) -> None:
         name_order = self.randomize_name_order.get()
         self.config.config['data_directory'] = self.data_directory.get()
         self.config.config['notes_path'] = self.notes_path.get()
@@ -143,5 +143,5 @@ class ConfigFrame():
         save_config(self.config)
         self.dismiss()
 
-    def dismiss(self, event: object = None) -> None:
+    def dismiss(self, *args) -> None:
         self.root.destroy()
