@@ -6,7 +6,7 @@ from psiutils.buttons import ButtonFrame, Button, HORIZONTAL, enable_buttons
 from psiutils.constants import PAD, PADT
 
 from constants import ICON_FILE
-from config import config, save_config
+from config import get_config, save_config
 import text
 
 GEOMETRY = '700x300'
@@ -25,13 +25,16 @@ class ConfigFrame():
     def __init__(self, parent):
         self.root = tk.Toplevel(parent.root)
         self.parent = parent
+        self.config = get_config()
 
         # tk variables
-        self.data_directory = tk.StringVar(value=config.data_directory)
+        self.data_directory = tk.StringVar(value=self.config.data_directory)
         self.randomize_name_order = tk.BooleanVar(
-            value=config.randomize_name_order)
+            value=self.config.randomize_name_order)
+        self.notes_path = tk.StringVar(value=self.config.notes_path)
 
         self.data_directory.trace_add('write', self._check_value_changed)
+        self.notes_path.trace_add('write', self._check_value_changed)
         self.randomize_name_order.trace_add('write', self._check_value_changed)
 
         self.show()
@@ -73,9 +76,19 @@ class ConfigFrame():
                             command=self._get_data_directory)
         button.grid(row=0, column=3, padx=PAD, pady=PADT)
 
+        label = ttk.Label(frame, text='Notes directory')
+        label.grid(row=1, column=0, sticky=tk.E, pady=PADT)
+
+        entry = ttk.Entry(frame, textvariable=self.notes_path)
+        entry.grid(row=1, column=1, columnspan=2, sticky=tk.EW, padx=PADT)
+
+        button = ttk.Button(frame, text='...',
+                            command=self._get_notes_directory)
+        button.grid(row=1, column=3, padx=PAD, pady=PADT)
+
         check_button = tk.Checkbutton(frame, text='Randomize opp\'s names',
                                       variable=self.randomize_name_order)
-        check_button.grid(row=1, column=1, sticky=tk.W)
+        check_button.grid(row=2, column=1, sticky=tk.W)
 
         return frame
 
@@ -95,12 +108,25 @@ class ConfigFrame():
             initialdir=original_directory,
             parent=self.root,
         )
+        self.data_directory.set(directory)
+        return directory
+
+    def _get_notes_directory(self) -> str:
+        """Return a directory."""
+        original_directory = self.notes_path.get()
+        directory = filedialog.askdirectory(
+            initialdir=original_directory,
+            parent=self.root,
+        )
+        self.notes_path.set(directory)
         return directory
 
     def _value_changed(self) -> bool:
+        name_order = self.config.randomize_name_order
         return (
-            self.data_directory.get() != config.data_directory
-            or self.randomize_name_order.get() != config.randomize_name_order
+            self.data_directory.get() != self.config.data_directory
+            or self.notes_path.get() != self.config.notes_path
+            or self.randomize_name_order.get() != name_order
         )
 
     def _check_value_changed(self, *args) -> None:
@@ -110,9 +136,11 @@ class ConfigFrame():
         enable_buttons(self.buttons, enable)
 
     def _save_config(self, event: object = None) -> None:
-        config.config['data_directory'] = self.data_directory.get()
-        config.config['randomize_name_order'] = self.randomize_name_order.get()
-        save_config(config)
+        name_order = self.randomize_name_order.get()
+        self.config.config['data_directory'] = self.data_directory.get()
+        self.config.config['notes_path'] = self.notes_path.get()
+        self.config.config['randomize_name_order'] = name_order
+        save_config(self.config)
         self.dismiss()
 
     def dismiss(self, event: object = None) -> None:

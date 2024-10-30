@@ -19,6 +19,7 @@ from constants import MODES, MODE_COLOURS
 from main_menu import MainMenu
 from forms.frm_master import MasterFrame
 from forms.frm_partners import PartnerFrame
+from forms.frm_notes import NotesFrame
 
 GEOMETRY = '1350x800'
 FRAME_TITLE = 'BBO Chat'
@@ -169,13 +170,16 @@ class MainFrame():
     def _get_notebook(self, master: tk.Frame) -> ttk.Notebook:
         notebook = ttk.Notebook(master)
 
-        master = MasterFrame(self, notebook)
-        self.pair_tree = master.pair_tree
-        self.search_entry = master.search_entry
-        notebook.add(master.master_frame, text='Master')
+        master_tab = MasterFrame(self, notebook)
+        self.pair_tree = master_tab.pair_tree
+        self.search_entry = master_tab.search_entry
+        notebook.add(master_tab.master_frame, text='Master')
 
-        partners = PartnerFrame(self, notebook)
-        notebook.add(partners.partners_frame, text='Partners')
+        partners_tab = PartnerFrame(self, notebook)
+        notebook.add(partners_tab.partners_frame, text='Partners')
+
+        notes_tab = NotesFrame(self, notebook)
+        notebook.add(notes_tab.notes_frame, text='Notes')
 
         # tab = self._get_partner_tab(notebook)
         # notebook.add(tab, text='Systems')

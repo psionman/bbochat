@@ -6,10 +6,11 @@ from constants import CONFIG_PATH, USER_DATA_DIR
 
 DEFAULT_CONFIG = {
     'data_directory': USER_DATA_DIR,
-    'last_partner': 'eirikr',
-    'last_greeting': 'Hi <opps>: <names>: <system>',
-    'last_valediction': 'Thanks both',
+    'last_partner': '',
+    'last_greeting': '',
+    'last_valediction': '',
     'randomize_name_order': True,
+    'notes_path': '',
 }
 
 
