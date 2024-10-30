@@ -193,12 +193,12 @@ class MainFrame():
         style.configure('chat.TButton', background=MODE_COLOURS['chat'])
 
         buttons = [
-            Button('Greeting', self._greeting, underline=0,
-                   style='greeting.TButton'),
-            Button('Valediction', self._valediction, underline=0,
-                   style='valediction.TButton'),
-            Button('Chat', self._chat, underline=0,
-                   style='chat.TButton'),
+            # Button('Greeting', self._greeting, underline=0,
+            #        style='greeting.TButton'),
+            # Button('Valediction', self._valediction, underline=0,
+            #        style='valediction.TButton'),
+            # Button('Chat', self._chat, underline=0,
+            #        style='chat.TButton'),
             # Button(text.SAVE, self.save, underline=0, dimmable=True),
             Button(text.EXIT, self.dismiss, tk.E, underline=1),
         ]

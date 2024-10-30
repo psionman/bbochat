@@ -6,11 +6,11 @@ from tkinter import ttk
 from psiutils.constants import PAD, DIALOG_STATUS
 from psiutils.widgets import HAND, clickable_widget
 from psiutils.treeview import sort_treeview
+from psiutils.buttons import ButtonFrame, Button, HORIZONTAL
 
 
 from constants import MODES, MODE_COLOURS
 
-from config import config
 import text
 
 from forms.frm_edit import EditFrame
@@ -147,10 +147,13 @@ class MasterFrame():
         entry.configure(style='greeting.TEntry')
         entry.bind("<Key>", lambda e: 'break')
 
-        button = ttk.Button(frame, text=text.EDIT,
-                            command=self._edit_greetings)
-        button.grid(row=4, column=0, pady=PAD)
-        clickable_widget(button)
+        buttons = [
+            Button('Use', self._greeting, style='greeting.TButton'),
+            Button(text.EDIT, self._edit_greetings, underline=0),
+        ]
+
+        button_frame = ButtonFrame(frame, buttons, HORIZONTAL)
+        button_frame.grid(row=4, column=0, pady=PAD)
 
         return frame
 
@@ -186,10 +189,13 @@ class MasterFrame():
         entry.configure(style='valediction.TEntry')
         entry.bind("<Key>", lambda e: 'break')
 
-        button = ttk.Button(frame, text=text.EDIT,
-                            command=self._edit_valedictions)
-        button.grid(row=4, column=0, pady=PAD)
-        clickable_widget(button)
+        buttons = [
+            Button('Use', self._valediction, style='valediction.TButton'),
+            Button(text.EDIT, self._edit_valedictions, underline=0),
+        ]
+
+        button_frame = ButtonFrame(frame, buttons, HORIZONTAL)
+        button_frame.grid(row=4, column=0, pady=PAD)
 
         return frame
 
@@ -225,10 +231,13 @@ class MasterFrame():
         entry.configure(style='chat.TEntry')
         entry.bind("<Key>", lambda e: 'break')
 
-        button = ttk.Button(frame, text=text.EDIT,
-                            command=self._edit_chat)
-        button.grid(row=4, column=0, pady=PAD)
-        clickable_widget(button)
+        buttons = [
+            Button('Use', self._chat, style='chat.TButton'),
+            Button(text.EDIT, self._edit_chat, underline=0),
+        ]
+
+        button_frame = ButtonFrame(frame, buttons, HORIZONTAL)
+        button_frame.grid(row=4, column=0, pady=PAD)
 
         return frame
 
@@ -348,3 +357,15 @@ class MasterFrame():
             self.parent.save()
             self.chat_list.set(dlg.data)
             self._populate_chat()
+
+    def _greeting(self, event: object = None) -> None:
+        self.parent.mode = MODES['greeting']
+        self.parent.update_clipboard()
+
+    def _valediction(self, event: object = None) -> None:
+        self.parent.mode = MODES['valediction']
+        self.parent.update_clipboard()
+
+    def _chat(self, event: object = None) -> None:
+        self.parent.mode = MODES['chat']
+        self.parent.update_clipboard()

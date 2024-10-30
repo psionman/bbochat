@@ -128,6 +128,10 @@ class PartnerFrame():
         self.notes_text.delete('0.0', tk.END)
         self.notes_text.insert('0.0', self.partner.notes)
 
+        self.parent.partner = self.partner
+        self.parent.greeting.set(self.partner.greeting)
+        self.parent.update_clipboard()
+
     def _partner_changed(self, *args) -> None:
         self.button_frame.enable(False)
         notes = self.notes_text.get('0.0', tk.END)
@@ -160,7 +164,8 @@ class PartnerFrame():
         self.partner.system = self.system.get()
         self.partner.greeting = self.greeting.get()
         self.partner.notes = self.notes_text.get(0.0, tk.END)
-        self.partners[self.partner.name] = self.partner
+        self.partners[self.partner.username] = self.partner
+        self._update_partner_values()
         self.parent.save()
         messagebox.showinfo(
             '',
