@@ -6,7 +6,7 @@ import random
 import clipboard
 
 from psiutils.constants import PAD
-from psiutils.buttons import ButtonFrame, Button, HORIZONTAL
+from psiutils.buttons import ButtonFrame, Button
 from psiutils.utilities import display_icon
 
 from constants import ICON_FILE
@@ -42,7 +42,7 @@ class MainFrame():
         self.chat = ds.chat
         self.my_name = ds.my_name
 
-        self.partners_names = sorted([name for name in self.partners.keys()])
+        self.partners_names = sorted(list(self.partners.keys()))
         self.search_pairs = []
         self.pair = []
         self.partner = self.partners[config.last_partner]
@@ -78,6 +78,8 @@ class MainFrame():
 
         self.button_frame = None
         self.show()
+        self.pair_tree = self.master_tab.pair_tree
+        self.search_entry = self.master_tab.search_entry
 
         self._update_mode_colour()
         self._pair_username_change()
@@ -103,7 +105,7 @@ class MainFrame():
         main_frame.grid(row=0, column=0, sticky=tk.NSEW, padx=PAD, pady=PAD)
 
         self.button_frame = self._button_frame(root)
-        self.button_frame.grid(row=8, column=0, columnspan=9,
+        self.button_frame.grid(row=8, column=0, columnspan=3,
                                sticky=tk.EW, padx=PAD, pady=PAD)
 
         sizegrip = ttk.Sizegrip(root)
@@ -170,43 +172,35 @@ class MainFrame():
     def _get_notebook(self, master: tk.Frame) -> ttk.Notebook:
         notebook = ttk.Notebook(master)
 
-        master_tab = MasterFrame(self, notebook)
-        self.pair_tree = master_tab.pair_tree
-        self.search_entry = master_tab.search_entry
-        notebook.add(master_tab.master_frame, text='Master')
+        self.master_tab = MasterFrame(self, notebook)
+        notebook.add(self.master_tab.master_frame, text='Master')
 
         partners_tab = PartnerFrame(self, notebook)
         notebook.add(partners_tab.partners_frame, text='Partners')
 
-        notes_tab = NotesFrame(self, notebook)
-        notebook.add(notes_tab.notes_frame, text='Notes')
-
-        # tab = self._get_partner_tab(notebook)
-        # notebook.add(tab, text='Systems')
-
-        # tab = self._get_partner_tab(notebook)
-        # notebook.add(tab, text='Maintenance')
+        self.notes_tab = NotesFrame(self, notebook)
+        notebook.add(self.notes_tab.notes_frame, text='Notes')
 
         return notebook
 
     def _button_frame(self, master: tk.Frame) -> tk.Frame:
         style = ttk.Style()
-        style.configure('greeting.TButton', background=MODE_COLOURS['greeting'])
+        style.configure('greeting.TButton',
+                        background=MODE_COLOURS['greeting'])
         style.configure('valediction.TButton',
                         background=MODE_COLOURS['valediction'])
         style.configure('chat.TButton', background=MODE_COLOURS['chat'])
 
+        frame = ButtonFrame(master, tk.HORIZONTAL)
         buttons = [
-            # Button('Greeting', self._greeting, underline=0,
-            #        style='greeting.TButton'),
-            # Button('Valediction', self._valediction, underline=0,
-            #        style='valediction.TButton'),
-            # Button('Chat', self._chat, underline=0,
-            #        style='chat.TButton'),
-            # Button(text.SAVE, self.save, underline=0, dimmable=True),
-            Button(text.EXIT, self.dismiss, tk.E, underline=1),
+            Button(
+                frame,
+                text=text.EXIT,
+                command=self.dismiss,
+                sticky=tk.E,
+                underline=1),
         ]
-        frame = ButtonFrame(master, buttons, HORIZONTAL)
+        frame.buttons = buttons
         frame.enable(False)
         return frame
 
@@ -271,10 +265,8 @@ class MainFrame():
             opp_1 = opps[choice]
             choice = (choice + 1) % 2
             opp_2 = opps[choice]
-        if opp_1 and opp_2:
-            return f'{opp_1} and {opp_2}'
         if opp_1:
-            return opp_1
+            return f'{opp_1} and {opp_2}' if opp_2 else opp_1
         return opp_2
 
     def _save_names(self, *args) -> None:
@@ -292,7 +284,10 @@ class MainFrame():
         self.save()
         self.search.set('')
         self.pair_tree.delete(*self.pair_tree.get_children())
+        self.search.set(self.username_1.get())
+        self.master_tab.name_search()
         self.search_entry.focus_set()
+        self.update_clipboard()
 
     def _delete_pair(self, *args) -> None:
         response = messagebox.askyesno(
@@ -337,7 +332,7 @@ class MainFrame():
     def enable_buttons(self, enable: bool = True) -> None:
         if not self.button_frame:
             return
-        if enable is False:
+        if not enable:
             self.button_frame.enable(False)
             return
 

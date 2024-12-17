@@ -4,7 +4,7 @@ import tkinter as tk
 from tkinter import ttk
 
 from psiutils.constants import PAD, DIALOG_STATUS
-from psiutils.buttons import ButtonFrame, Button, HORIZONTAL, enable_buttons
+from psiutils.buttons import ButtonFrame, Button
 
 from constants import ICON_FILE, MODES
 import text
@@ -62,11 +62,21 @@ class EditFrame():
         return frame
 
     def _button_frame(self, master: tk.Frame) -> tk.Frame:
+        frame = ButtonFrame(master, tk.HORIZONTAL)
         buttons = [
-            Button(text.SAVE, self._save, underline=0),
-            Button(text.EXIT, self.dismiss, tk.E, underline=1),
+            Button(
+                frame,
+                text=text.SAVE,
+                command=self._save,
+                underline=0),
+            Button(
+                frame,
+                text=text.EXIT,
+                command=self.dismiss,
+                sticky=tk.E,
+                underline=1),
         ]
-        frame = ButtonFrame(master, buttons, HORIZONTAL)
+        frame.buttons = buttons
         frame.enable(False)
         return frame
 

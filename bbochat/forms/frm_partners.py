@@ -5,7 +5,7 @@ from tkinter import ttk, messagebox
 
 from psiutils.constants import PAD, PADT, DIALOG_STATUS
 from psiutils.widgets import HAND, PsiText, clickable_widget
-from psiutils.buttons import ButtonFrame, Button, VERTICAL
+from psiutils.buttons import ButtonFrame, Button
 
 from config import config, save_config
 import text
@@ -84,26 +84,37 @@ class PartnerFrame():
         combobox.grid(row=2, column=2, sticky=tk.EW, pady=PADT)
         clickable_widget(combobox)
 
-        # label = ttk.Label(frame, text='Notes')
-        # label.grid(row=2, column=1, padx=PAD, sticky=tk.W)
-
         self.notes_text = PsiText(frame, height=18)
         self.notes_text.grid(row=3, column=1, columnspan=4,
                              sticky=tk.NSEW, padx=PAD, pady=PAD)
 
         self.button_frame = self._button_frame(frame)
-        self.button_frame.grid(row=0, column=5, rowspan=9,
+        self.button_frame.grid(row=0, column=5, rowspan=4,
                                sticky=tk.N, padx=PAD, pady=PAD)
 
         return frame
 
     def _button_frame(self, master: tk.Frame) -> tk.Frame:
+        frame = ButtonFrame(master, tk.VERTICAL)
         buttons = [
-            Button(text.NEW, self._new, underline=0),
-            Button(text.DELETE, self._delete, underline=0),
-            Button(text.SAVE, self._save, underline=0, dimmable=False),
+            Button(
+                frame,
+                text=text.NEW,
+                command=self._new,
+                underline=0),
+            Button(
+                frame,
+                text=text.DELETE,
+                command=self._delete,
+                underline=0),
+            Button(
+                frame,
+                text=text.SAVE,
+                command=self._save,
+                underline=0,
+                dimmable=False),
         ]
-        frame = ButtonFrame(master, buttons, VERTICAL)
+        frame.buttons = buttons
         frame.enable(False)
         return frame
 
@@ -111,9 +122,9 @@ class PartnerFrame():
         selection = event.widget.curselection()
         if not selection:
             return
-        partners_names = sorted([username
-                                 for username in self.partners.keys()])
+        partners_names = sorted(list(self.partners.keys()))
         self.partner = self.partners[partners_names[selection[0]]]
+        self.parent.notes_tab.change_partner(self.partner)
         self._update_partner_values()
         config.config['last_partner'] = self.partner.username
         save_config(config)

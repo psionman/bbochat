@@ -22,6 +22,11 @@ ICON_FILE = resolve_path('images/icon.png', __file__)
 # Data
 DATA_FILE = Path(USER_DATA_DIR, 'data.json')
 
+TXT_FILE_TYPES = (
+    ('text files', '*.txt'),
+    ('All files', '*.*')
+)
+
 MODES = {
     'greeting': 0,
     'valediction': 1,

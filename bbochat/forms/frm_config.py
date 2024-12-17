@@ -2,7 +2,7 @@
 import tkinter as tk
 from tkinter import ttk, filedialog
 
-from psiutils.buttons import ButtonFrame, Button, HORIZONTAL, enable_buttons
+from psiutils.buttons import ButtonFrame, Button, enable_buttons
 from psiutils.constants import PAD, PADT
 
 from constants import ICON_FILE
@@ -93,11 +93,22 @@ class ConfigFrame():
         return frame
 
     def _button_frame(self, master: tk.Frame) -> tk.Frame:
+        frame = ButtonFrame(master, tk.HORIZONTAL)
         self.buttons = [
-            Button([text.SAVE], self._save_config, underline=0, dimmable=True),
-            Button(text.EXIT, self.dismiss, tk.E, underline=1),
+            Button(
+                frame,
+                text=text.SAVE,
+                command=self._save_config,
+                underline=0,
+                dimmable=True),
+            Button(
+                frame,
+                text=text.EXIT,
+                command=self.dismiss,
+                sticky=tk.E,
+                underline=1),
         ]
-        frame = ButtonFrame(master, self.buttons, HORIZONTAL)
+        frame.buttons = self.buttons
         frame.enable(False)
         return frame
 
@@ -130,9 +141,7 @@ class ConfigFrame():
         )
 
     def _check_value_changed(self, *args) -> None:
-        enable = False
-        if self._value_changed():
-            enable = True
+        enable = bool(self._value_changed())
         enable_buttons(self.buttons, enable)
 
     def _save_config(self, *args) -> None:

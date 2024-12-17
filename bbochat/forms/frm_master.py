@@ -4,9 +4,9 @@ import tkinter as tk
 from tkinter import ttk
 
 from psiutils.constants import PAD, DIALOG_STATUS
-from psiutils.widgets import HAND, clickable_widget
+from psiutils.widgets import HAND
 from psiutils.treeview import sort_treeview
-from psiutils.buttons import ButtonFrame, Button, HORIZONTAL
+from psiutils.buttons import ButtonFrame, Button
 
 
 from constants import MODES, MODE_COLOURS
@@ -92,7 +92,7 @@ class MasterFrame():
 
         self.search_entry = ttk.Entry(frame, textvariable=self.search)
         self.search_entry.grid(row=1, column=0, sticky=tk.EW, padx=PAD)
-        self.search_entry.bind('<KeyRelease>', self._search)
+        self.search_entry.bind('<KeyRelease>', self.name_search)
         self.search_entry.focus_set()
 
         opponents_frame = self._opponents_frame(frame)
@@ -104,9 +104,6 @@ class MasterFrame():
         frame = ttk.Frame(master)
         frame.rowconfigure(1, weight=1)
         frame.columnconfigure(0, weight=1)
-
-        # label = ttk.Label(frame, text='Opponents')
-        # label.grid(row=0, column=0, padx=PAD, pady=PAD)
 
         self.pair_tree = self._get_pair_tree(frame)
         self.pair_tree.grid(row=1, column=0,
@@ -147,13 +144,22 @@ class MasterFrame():
         entry.configure(style='greeting.TEntry')
         entry.bind("<Key>", lambda e: 'break')
 
+        button_frame = ButtonFrame(frame, tk.HORIZONTAL)
         buttons = [
-            Button('Use', self._greeting, style='greeting.TButton'),
-            Button(text.EDIT, self._edit_greetings, underline=0),
+            Button(
+                button_frame,
+                text='Use',
+                command=self._greeting,
+                style='greeting.TButton'),
+            Button(
+                button_frame,
+                text=text.EDIT,
+                command=self._edit_greetings,
+                underline=0),
         ]
 
-        button_frame = ButtonFrame(frame, buttons, HORIZONTAL)
-        button_frame.grid(row=4, column=0, pady=PAD)
+        button_frame.buttons = buttons
+        button_frame.grid(row=99, column=0, pady=PAD)
 
         return frame
 
@@ -189,12 +195,21 @@ class MasterFrame():
         entry.configure(style='valediction.TEntry')
         entry.bind("<Key>", lambda e: 'break')
 
+        button_frame = ButtonFrame(frame, tk.HORIZONTAL)
         buttons = [
-            Button('Use', self._valediction, style='valediction.TButton'),
-            Button(text.EDIT, self._edit_valedictions, underline=0),
+            Button(
+                button_frame,
+                text='Use',
+                command=self._valediction,
+                style='valediction.TButton'),
+            Button(
+                button_frame,
+                text=text.EDIT,
+                command=self._edit_valedictions,
+                underline=0),
         ]
 
-        button_frame = ButtonFrame(frame, buttons, HORIZONTAL)
+        button_frame.buttons = buttons
         button_frame.grid(row=4, column=0, pady=PAD)
 
         return frame
@@ -231,12 +246,21 @@ class MasterFrame():
         entry.configure(style='chat.TEntry')
         entry.bind("<Key>", lambda e: 'break')
 
+        button_frame = ButtonFrame(frame, tk.HORIZONTAL)
         buttons = [
-            Button('Use', self._chat, style='chat.TButton'),
-            Button(text.EDIT, self._edit_chat, underline=0),
+            Button(
+                button_frame,
+                text='Use',
+                command=self._chat,
+                style='chat.TButton'),
+            Button(
+                button_frame,
+                text=text.EDIT,
+                command=self._edit_chat,
+                underline=0),
         ]
 
-        button_frame = ButtonFrame(frame, buttons, HORIZONTAL)
+        button_frame.buttons = buttons
         button_frame.grid(row=4, column=0, pady=PAD)
 
         return frame
@@ -248,7 +272,7 @@ class MasterFrame():
             if '---' in chat_text:
                 self.chat_listbox.itemconfig(tk.END, fg=CHAT_HEADINGS_COLOUR)
 
-    def _search(self, *args) -> None:
+    def name_search(self, *args) -> None:
         pairs = []
         text = self.search.get()
         for pair in self.pairs:
