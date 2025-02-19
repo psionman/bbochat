@@ -2,14 +2,16 @@
 """EditFrame for BBO Chat."""
 import tkinter as tk
 from tkinter import ttk
+from pathlib import Path
 
 from psiutils.constants import PAD, DIALOG_STATUS
 from psiutils.buttons import ButtonFrame, Button
 
 from constants import ICON_FILE, MODES
+from utilities import window_resize
+from config import get_config
 import text
 
-GEOMETRY = '500x600'
 FRAME_TITLE = 'Edit'
 
 
@@ -17,6 +19,7 @@ class EditFrame():
     def __init__(self, parent, mode, data):
         self.root = tk.Toplevel(parent.root)
         self.parent = parent
+        self.config = get_config()
         self.mode = mode
 
         # tk variables
@@ -28,7 +31,7 @@ class EditFrame():
 
     def show(self) -> None:
         root = self.root
-        root.geometry(GEOMETRY)
+        root.geometry(self.config.geometry[Path(__file__).stem])
         root.title(f'{FRAME_TITLE} - {MODES[self.mode]}')
         root.iconphoto(False, tk.PhotoImage(file=ICON_FILE))
         root.wait_visibility()
@@ -36,7 +39,8 @@ class EditFrame():
         root.transient(self.parent.root)
         root.bind('<Control-x>', self.dismiss)
         root.bind('<Control-s>', self._save)
-
+        root.bind('<Configure>',
+                  lambda event, arg=None: window_resize(self, __file__))
         root.rowconfigure(0, weight=1)
         root.columnconfigure(0, weight=1)
 

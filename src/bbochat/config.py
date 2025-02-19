@@ -13,6 +13,7 @@ DEFAULT_CONFIG = {
     'notes_path': '',
     'geometry': {
         'frm_main': '1350x800',
+        'frm_edit': '500x600',
     },
 }
 

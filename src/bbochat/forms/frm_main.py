@@ -8,14 +8,13 @@ import clipboard
 
 from psiutils.constants import PAD
 from psiutils.buttons import ButtonFrame, Button
-# from psiutils.utilities import geometry
 
-# from constants import GEOMETRY
 import text
 
 from data import DataStore, Pair, Player
 from config import get_config
 from constants import MODES, MODE_COLOURS
+from utilities import window_resize
 
 from main_menu import MainMenu
 from forms.frm_master import MasterFrame
@@ -95,7 +94,8 @@ class MainFrame():
         root.bind('<Control-v>', self._valediction)
         root.bind('<Control-c>', self._chat)
         root.bind('<Control-s>', self.save)
-        root.bind("<Configure>", self._window_resize)
+        root.bind('<Configure>',
+                  lambda event, arg=None: window_resize(self, __file__))
 
         main_menu = MainMenu(self)
         main_menu.create()
@@ -207,15 +207,6 @@ class MainFrame():
         frame.buttons = buttons
         frame.enable(False)
         return frame
-
-    def _window_resize(self, *args) -> None:
-        window_geometry = (
-            f'{self.root.winfo_width()}x{self.root.winfo_height()}+'
-            f'{self.root.winfo_rootx()}+{self.root.winfo_rooty()}')
-        geometry = self.config.geometry
-        geometry[Path(__file__).stem] = window_geometry
-        self.config.update('geometry', geometry)
-        self.config.save()
 
     def _greeting(self, *args) -> None:
         self.mode = MODES['greeting']
