@@ -11,6 +11,9 @@ DEFAULT_CONFIG = {
     'last_valediction': '',
     'randomize_name_order': True,
     'notes_path': '',
+    'geometry': {
+        'frm_main': '1350x800',
+    },
 }
 
 

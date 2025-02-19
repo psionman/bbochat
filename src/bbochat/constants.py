@@ -44,3 +44,14 @@ MODE_COLOURS = {
     'valediction': 'salmon',
     'chat': 'aqua',
 }
+
+GEOMETRY = {
+    'frm_main': {
+        'Linux': '1350x800',
+        'Windows': '1350x800',
+    },
+    'frm_config': {
+        'Linux': '700x300',
+        'Windows': '700x300',
+    },
+}

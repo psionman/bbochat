@@ -25,7 +25,7 @@ class Partner():
 
     def deserialize(self, username: str, item: list[str]) -> None:
         self.username = username
-        if len(item) < 1:
+        if not item:
             return
 
         self.name = item[0]
@@ -70,10 +70,10 @@ class Pair():
         return f'Pair: {self.username_1} {self.username_2}'
 
     def __eq__(self, other) -> bool:
-        if (self.username_1 == other.username_1
-                and self.username_2 == other.username_2):
-            return True
-        return False
+        return (
+            self.username_1 == other.username_1
+            and self.username_2 == other.username_2
+        )
 
     def serialize(self) -> dict:
         if self.username_1 > self.username_2:
@@ -100,30 +100,30 @@ class DataStore():
         if raw_data == FILE_NOT_FOUND:
             return FILE_NOT_FOUND
 
-        input = self._get_json(raw_data)
-        if input == INVALID_JSON:
+        data = self._get_json(raw_data)
+        if self._get_json(raw_data) == INVALID_JSON:
             return INVALID_JSON
 
-        if 'partners' in input:
-            self.partners = self._get_partners(input['partners'])
+        if 'partners' in data:
+            self.partners = self._get_partners(data['partners'])
 
-        if 'players' in input:
-            self.players = self._get_players(input['players'])
+        if 'players' in data:
+            self.players = self._get_players(data['players'])
 
-        if 'pairs' in input:
-            self.pairs = self._get_pairs(input['pairs'])
+        if 'pairs' in data:
+            self.pairs = self._get_pairs(data['pairs'])
 
-        if 'greetings' in input:
-            self.greetings = input['greetings']
+        if 'greetings' in data:
+            self.greetings = data['greetings']
 
-        if 'valedictions' in input:
-            self.valedictions = input['valedictions']
+        if 'valedictions' in data:
+            self.valedictions = data['valedictions']
 
-        if 'chat' in input:
-            self.chat = input['chat']
+        if 'chat' in data:
+            self.chat = data['chat']
 
-        if 'my_name' in input:
-            self.my_name = input['my_name']
+        if 'my_name' in data:
+            self.my_name = data['my_name']
 
     def _read_data_file(self) -> str | int | None:
         try:

@@ -2,18 +2,19 @@
 """MainFrame for BBO Chat."""
 import tkinter as tk
 from tkinter import ttk, messagebox
+from pathlib import Path
 import random
 import clipboard
 
 from psiutils.constants import PAD
 from psiutils.buttons import ButtonFrame, Button
-from psiutils.utilities import display_icon
+# from psiutils.utilities import geometry
 
-from constants import ICON_FILE
+# from constants import GEOMETRY
 import text
 
 from data import DataStore, Pair, Player
-from config import config
+from config import get_config
 from constants import MODES, MODE_COLOURS
 
 from main_menu import MainMenu
@@ -21,7 +22,6 @@ from forms.frm_master import MasterFrame
 from forms.frm_partners import PartnerFrame
 from forms.frm_notes import NotesFrame
 
-GEOMETRY = '1350x800'
 FRAME_TITLE = 'BBO Chat'
 
 
@@ -29,6 +29,7 @@ class MainFrame():
     def __init__(self, parent):
         self.root = parent.root
         self.parent = parent
+        self.config = get_config()
         self.mode = MODES['greeting']
 
         self.data_store = DataStore()
@@ -45,36 +46,12 @@ class MainFrame():
         self.partners_names = sorted(list(self.partners.keys()))
         self.search_pairs = []
         self.pair = []
-        self.partner = self.partners[config.last_partner]
+        self.partner = self.partners[self.config.last_partner]
 
         # tk variables
-        self.clipboard = tk.StringVar()
-
-        # Main
-        self.pairs_list = tk.StringVar()
-        self.search = tk.StringVar()
-        self.username_1 = tk.StringVar()
-        self.username_2 = tk.StringVar()
-        self.name_1 = tk.StringVar()
-        self.name_2 = tk.StringVar()
-        self.randomize = tk.BooleanVar(value=config.randomize_name_order)
-
+        self._create_tk_variables()
         self.username_1.trace_add('write', self._pair_username_change)
         self.username_2.trace_add('write', self._pair_username_change)
-
-        self.greetings_list = tk.StringVar(value=self.greetings)
-        self.greeting = tk.StringVar(value=self.partner.greeting)
-        # self.valedictions_list = tk.StringVar(value=self.valedictions)
-        self.valediction = tk.StringVar(value=config.last_valediction)
-        self.chat_list = tk.StringVar(value=self.chat)
-        self.system = tk.StringVar()
-        self.chat_line = tk.StringVar()
-
-        # Partners
-        self.partners_list = tk.StringVar(value=self.partners_names)
-        self.selected_partner = tk.StringVar(value=config.last_partner)
-        self.partners_name = tk.StringVar(value='')
-        self.partners_username = tk.StringVar()
 
         self.button_frame = None
         self.show()
@@ -84,16 +61,41 @@ class MainFrame():
         self._update_mode_colour()
         self._pair_username_change()
 
+    def _create_tk_variables(self) -> None:
+        self.clipboard = tk.StringVar()
+
+        # Main
+        self.pairs_list = tk.StringVar()
+        self.search = tk.StringVar()
+        self.username_1 = tk.StringVar()
+        self.username_2 = tk.StringVar()
+        self.name_1 = tk.StringVar()
+        self.name_2 = tk.StringVar()
+        self.randomize = tk.BooleanVar(value=self.config.randomize_name_order)
+
+        self.greetings_list = tk.StringVar(value=self.greetings)
+        self.greeting = tk.StringVar(value=self.partner.greeting)
+        self.valediction = tk.StringVar(value=self.config.last_valediction)
+        self.chat_list = tk.StringVar(value=self.chat)
+        self.system = tk.StringVar()
+        self.chat_line = tk.StringVar()
+
+        # Partners
+        self.partners_list = tk.StringVar(value=self.partners_names)
+        self.selected_partner = tk.StringVar(value=self.config.last_partner)
+        self.partners_name = tk.StringVar(value='')
+        self.partners_username = tk.StringVar()
+
     def show(self):
         root = self.root
-        root.geometry(GEOMETRY)
+        root.geometry(self.config.geometry[Path(__file__).stem])
         root.title(FRAME_TITLE)
-        display_icon(root, ICON_FILE)
         root.bind('<Control-x>', self.dismiss)
         root.bind('<Control-g>', self._greeting)
         root.bind('<Control-v>', self._valediction)
         root.bind('<Control-c>', self._chat)
         root.bind('<Control-s>', self.save)
+        root.bind("<Configure>", self._window_resize)
 
         main_menu = MainMenu(self)
         main_menu.create()
@@ -135,10 +137,6 @@ class MainFrame():
                           state='readonly')
         entry.grid(row=1, column=1, sticky=tk.W, padx=PAD)
 
-        check_button = tk.Checkbutton(frame, text='Randomize opp\'s names',
-                                      variable=self.randomize)
-        check_button.grid(row=3, column=3, sticky=tk.W)
-
         label = ttk.Label(frame, text='Opponents')
         label.grid(row=1, column=2)
 
@@ -163,6 +161,12 @@ class MainFrame():
         self.delete_button = ttk.Button(frame, text=text.DELETE,
                                         command=self._delete_pair)
         self.delete_button.grid(row=2, column=5, padx=PAD)
+
+        check_button = tk.Checkbutton(
+            frame,
+            text='Randomize opp\'s names order',
+            variable=self.randomize)
+        check_button.grid(row=1, column=6, rowspan=2, sticky=tk.W)
 
         notebook = self._get_notebook(frame)
         notebook.grid(row=4, column=0, columnspan=9,
@@ -203,6 +207,15 @@ class MainFrame():
         frame.buttons = buttons
         frame.enable(False)
         return frame
+
+    def _window_resize(self, *args) -> None:
+        window_geometry = (
+            f'{self.root.winfo_width()}x{self.root.winfo_height()}+'
+            f'{self.root.winfo_rootx()}+{self.root.winfo_rooty()}')
+        geometry = self.config.geometry
+        geometry[Path(__file__).stem] = window_geometry
+        self.config.update('geometry', geometry)
+        self.config.save()
 
     def _greeting(self, *args) -> None:
         self.mode = MODES['greeting']

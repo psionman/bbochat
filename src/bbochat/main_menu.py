@@ -5,7 +5,7 @@ import webbrowser
 from psiutils.menus import Menu, MenuItem
 
 from constants import AUTHOR, APP_TITLE, HELP_URI
-from version import __version__
+from _version import __version__
 import text
 from config import config
 
