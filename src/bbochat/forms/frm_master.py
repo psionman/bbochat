@@ -48,7 +48,12 @@ class MasterFrame():
 
         self.valediction = parent.valediction
         self.valedictions = parent.valedictions
-        self.valedictions_list = parent.valedictions_list
+        # self.valedictions_list = parent.valedictions_list
+        self.valedictions_list = tk.StringVar(
+            value=[u'{unicodes_value}'.format(unicodes_value=item)
+                   for item in parent.valedictions
+                   if item and item[0] != '#'])
+        # ic(parent.valedictions_list.get())
 
         self.chat = parent.chat
         self.chat_list = parent.chat_list

@@ -64,7 +64,7 @@ class MainFrame():
 
         self.greetings_list = tk.StringVar(value=self.greetings)
         self.greeting = tk.StringVar(value=self.partner.greeting)
-        self.valedictions_list = tk.StringVar(value=self.valedictions)
+        # self.valedictions_list = tk.StringVar(value=self.valedictions)
         self.valediction = tk.StringVar(value=config.last_valediction)
         self.chat_list = tk.StringVar(value=self.chat)
         self.system = tk.StringVar()

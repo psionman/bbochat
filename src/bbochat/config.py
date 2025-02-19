@@ -22,10 +22,7 @@ def get_config() -> TomlConfig:
 def save_config(config: TomlConfig) -> TomlConfig | None:
     # NB new attributes need to be updated in gui.write_config
     result = config.save()
-    if result != config.STATUS_OK:
-        return None
-    config = TomlConfig(CONFIG_PATH)
-    return config
+    return None if result != config.STATUS_OK else config
 
 
 config = get_config()
