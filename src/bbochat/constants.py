@@ -36,15 +36,6 @@ MODES = {
     2: 'chat',
 }
 
-MODE_COLOURS = {
-    0: 'limegreen',
-    1: 'salmon',
-    2: 'aqua',
-    'greeting': 'limegreen',
-    'valediction': 'salmon',
-    'chat': 'aqua',
-}
-
 GEOMETRY = {
     'frm_main': {
         'Linux': '1350x800',

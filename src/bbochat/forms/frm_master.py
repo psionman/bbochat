@@ -8,8 +8,8 @@ from psiutils.widgets import HAND
 from psiutils.treeview import sort_treeview
 from psiutils.buttons import ButtonFrame, Button
 
-
-from constants import MODES, MODE_COLOURS
+from constants import MODES
+from config import get_config
 
 import text
 
@@ -29,6 +29,7 @@ class MasterFrame():
     def __init__(self, parent, master):
         self.parent = parent
         self.root = parent.root
+        self.config = get_config()
 
         # tk variables
         self.search = parent.search
@@ -140,7 +141,7 @@ class MasterFrame():
 
         entry = ttk.Entry(frame, textvariable=self.greeting)
         entry.grid(row=3, column=0, sticky=tk.EW, padx=PAD)
-        colour = MODE_COLOURS[MODES['greeting']]
+        colour = self.config.colours['greeting']
         entry_style = ttk.Style()
         entry_style.configure(
             'greeting.TEntry',
@@ -191,7 +192,7 @@ class MasterFrame():
 
         entry = ttk.Entry(frame, textvariable=self.valediction)
         entry.grid(row=3, column=0, sticky=tk.EW, padx=PAD)
-        colour = MODE_COLOURS[MODES['valediction']]
+        colour = self.config.colours['valediction']
         entry_style = ttk.Style()
         entry_style.configure(
             'valediction.TEntry',
@@ -242,7 +243,7 @@ class MasterFrame():
 
         entry = ttk.Entry(frame, textvariable=self.chat_line)
         entry.grid(row=3, column=0, sticky=tk.EW, padx=PAD)
-        colour = MODE_COLOURS[MODES['chat']]
+        colour = self.config.colours['chat']
         entry_style = ttk.Style()
         entry_style.configure(
             'chat.TEntry',

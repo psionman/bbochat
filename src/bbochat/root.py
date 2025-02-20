@@ -2,13 +2,15 @@
 """
 Tkinter root for BBO Chat.
 """
-
+import sys
 import tkinter as tk
 
 from psiutils.widgets import get_styles
 from psiutils.utilities import display_icon
 
 from constants import ICON_FILE
+from module_caller import ModuleCaller
+
 from forms.frm_main import MainFrame
 
 
@@ -23,5 +25,11 @@ class Root():
 
         get_styles()
 
-        MainFrame(self)
+        dlg = None
+        if len(sys.argv) > 1:
+            module = sys.argv[1]
+            dlg = ModuleCaller(root, module)
+        if not dlg or dlg.invalid:
+            MainFrame(root)
+
         root.mainloop()

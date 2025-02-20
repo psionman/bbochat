@@ -14,6 +14,12 @@ DEFAULT_CONFIG = {
     'geometry': {
         'frm_main': '1350x800',
         'frm_edit': '500x600',
+        'frm_config': '700x300',
+    },
+    'colours': {
+        'greeting': 'limegreen',
+        'valediction': 'salmon',
+        'chat': 'aqua',
     },
 }
 

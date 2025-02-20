@@ -13,7 +13,7 @@ import text
 
 from data import DataStore, Pair, Player
 from config import get_config
-from constants import MODES, MODE_COLOURS
+from constants import MODES
 from utilities import window_resize
 
 from main_menu import MainMenu
@@ -25,9 +25,8 @@ FRAME_TITLE = 'BBO Chat'
 
 
 class MainFrame():
-    def __init__(self, parent):
-        self.root = parent.root
-        self.parent = parent
+    def __init__(self, root: tk.Tk) -> None:
+        self.root = root
         self.config = get_config()
         self.mode = MODES['greeting']
 
@@ -190,10 +189,10 @@ class MainFrame():
     def _button_frame(self, master: tk.Frame) -> tk.Frame:
         style = ttk.Style()
         style.configure('greeting.TButton',
-                        background=MODE_COLOURS['greeting'])
+                        background=self.config.colours['greeting'])
         style.configure('valediction.TButton',
-                        background=MODE_COLOURS['valediction'])
-        style.configure('chat.TButton', background=MODE_COLOURS['chat'])
+                        background=self.config.colours['valediction'])
+        style.configure('chat.TButton', background=self.config.colours['chat'])
 
         frame = ButtonFrame(master, tk.HORIZONTAL)
         buttons = [
@@ -232,7 +231,7 @@ class MainFrame():
         self.enable_buttons(False)
 
     def _update_mode_colour(self) -> None:
-        colour = MODE_COLOURS[self.mode]
+        colour = self.config.colours[MODES[self.mode]]
         entry_style = ttk.Style()
         entry_style.configure(
             'style.TEntry',

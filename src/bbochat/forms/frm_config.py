@@ -1,15 +1,17 @@
 
 import tkinter as tk
 from tkinter import ttk, filedialog
+from tkinter.colorchooser import askcolor
+from pathlib import Path
 
 from psiutils.buttons import ButtonFrame, Button, enable_buttons
-from psiutils.constants import PAD, PADT
+from psiutils.widgets import separator_frame
+from psiutils.constants import PAD, PADT, Pad
 
-from constants import ICON_FILE
+from constants import ICON_FILE, MODES
 from config import get_config, save_config
+from utilities import window_resize
 import text
-
-GEOMETRY = '700x300'
 
 # DEFAULT_CONFIG = {
 #     'data_directory': USER_DATA_DIR,
@@ -26,6 +28,7 @@ class ConfigFrame():
         self.root = tk.Toplevel(parent.root)
         self.parent = parent
         self.config = get_config()
+        self.colours = dict(self.config.colours)
 
         # tk variables
         self.data_directory = tk.StringVar(value=self.config.data_directory)
@@ -39,14 +42,25 @@ class ConfigFrame():
 
         self.show()
 
+        self.modes = {
+            'greeting': self.greeting_entry,
+            'valediction': self.valediction_entry,
+            'chat': self.chat_entry,
+        }
+        self._update_mode_colours()
+
     def show(self) -> None:
         root = self.root
-        root.geometry(GEOMETRY)
+        root.geometry(self.config.geometry[Path(__file__).stem])
         root.title(text.CONFIG)
         root.iconphoto(False, tk.PhotoImage(file=ICON_FILE))
         root.wait_visibility()
         root.grab_set()
         root.transient(self.parent.root)
+        root.bind('<Control-x>', self.dismiss)
+        root.bind('<Control-s>', self._save_config)
+        root.bind('<Configure>',
+                  lambda event, arg=None: window_resize(self, __file__))
 
         root.rowconfigure(1, weight=1)
         root.columnconfigure(0, weight=1)
@@ -63,32 +77,80 @@ class ConfigFrame():
     def _main_frame(self, master: tk.Frame) -> ttk.Frame:
         frame = ttk.Frame(master)
         frame.rowconfigure(0, weight=1)
-        frame.columnconfigure(1, weight=1)
+        frame.columnconfigure(3, weight=1)
 
+        row = 0
         label = ttk.Label(frame, text='Data directory')
-        label.grid(row=0, column=0, sticky=tk.E, pady=PADT)
+        label.grid(row=row, column=0, sticky=tk.E, pady=PADT)
 
         entry = ttk.Entry(frame, textvariable=self.data_directory)
-        entry.grid(row=0, column=1, columnspan=2, sticky=tk.EW, padx=PADT)
+        entry.grid(row=row, column=1, columnspan=3, sticky=tk.EW, padx=PADT)
         self.root.after(1, lambda: entry.focus_force())
 
         button = ttk.Button(frame, text='...',
                             command=self._get_data_directory)
-        button.grid(row=0, column=3, padx=PAD, pady=PADT)
+        button.grid(row=row, column=4, padx=PAD, pady=PADT)
 
+        row += 1
         label = ttk.Label(frame, text='Notes directory')
-        label.grid(row=1, column=0, sticky=tk.E, pady=PADT)
+        label.grid(row=row, column=0, sticky=tk.E, pady=PADT)
 
         entry = ttk.Entry(frame, textvariable=self.notes_path)
-        entry.grid(row=1, column=1, columnspan=2, sticky=tk.EW, padx=PADT)
+        entry.grid(row=row, column=1, columnspan=3, sticky=tk.EW, padx=PADT)
 
         button = ttk.Button(frame, text='...',
                             command=self._get_notes_directory)
-        button.grid(row=1, column=3, padx=PAD, pady=PADT)
+        button.grid(row=row, column=4, padx=PAD, pady=PADT)
 
-        check_button = tk.Checkbutton(frame, text='Randomize opp\'s names',
-                                      variable=self.randomize_name_order)
-        check_button.grid(row=2, column=1, sticky=tk.W)
+        row += 1
+        check_button = tk.Checkbutton(
+            frame, text='Randomize opp\'s name order',
+            variable=self.randomize_name_order)
+        check_button.grid(row=row, column=1, sticky=tk.W)
+
+        row += 1
+        separator = separator_frame(frame, 'Colours')
+        separator.grid(row=row, column=0, columnspan=5, sticky=tk.EW, padx=PAD)
+
+        row += 1
+        label = ttk.Label(frame, text='Greeting')
+        label.grid(row=row, column=0, sticky=tk.E, padx=PAD, pady=PAD)
+        self.greeting_entry = ttk.Entry(frame)
+        self.greeting_entry.grid(row=row, column=1,
+                                 sticky=tk.EW, padx=PAD, pady=PAD)
+
+        button = ttk.Button(frame, text=text.ELLIPSIS)
+        button.grid(row=row, column=2, padx=Pad.W)
+        button.bind('<Button-1>',
+                    lambda event, arg=None: self._ask_colour('greeting'))
+
+        row += 1
+        label = ttk.Label(frame, text='Valediction')
+        label.grid(row=row, column=0, sticky=tk.E, padx=PAD, pady=PAD)
+        self.valediction_entry = ttk.Entry(frame)
+        self.valediction_entry.grid(row=row, column=1,
+                                    sticky=tk.EW, padx=PAD, pady=PAD)
+        button = ttk.Button(frame, text=text.ELLIPSIS)
+        button.grid(row=row, column=2, padx=Pad.W)
+
+        button = ttk.Button(frame, text=text.ELLIPSIS)
+        button.grid(row=row, column=2, padx=Pad.W)
+        button.bind('<Button-1>',
+                    lambda event, arg=None: self._ask_colour('valediction'))
+
+        row += 1
+        label = ttk.Label(frame, text='Chat')
+        label.grid(row=row, column=0, sticky=tk.E, padx=PAD, pady=PAD)
+        self.chat_entry = ttk.Entry(frame)
+        self.chat_entry.grid(row=row, column=1,
+                             sticky=tk.EW, padx=PAD, pady=PAD)
+        button = ttk.Button(frame, text=text.ELLIPSIS)
+        button.grid(row=row, column=2, padx=Pad.W)
+
+        button = ttk.Button(frame, text=text.ELLIPSIS)
+        button.grid(row=row, column=2, padx=Pad.W)
+        button.bind('<Button-1>',
+                    lambda event, arg=None: self._ask_colour('chat'))
 
         return frame
 
@@ -138,7 +200,30 @@ class ConfigFrame():
             self.data_directory.get() != self.config.data_directory
             or self.notes_path.get() != self.config.notes_path
             or self.randomize_name_order.get() != name_order
+            or self.colours != self.config.colours
         )
+
+    def _ask_colour(self, mode: str) -> None:
+        colour = askcolor(
+            initialcolor=self.colours[mode],
+            title=f'{mode.capitalize()} colour',)
+        if colour[1]:
+            self.colours[mode] = colour[1]
+            self._update_mode_colours()
+            self._check_value_changed()
+
+    def _update_mode_colours(self) -> None:
+        for mode, entry in self.modes.items():
+            self._update_mode_colour(mode, entry)
+
+    def _update_mode_colour(self, mode: str, entry: ttk.Entry) -> None:
+        colour = self.colours[mode]
+        entry_style = ttk.Style()
+        entry_style.configure(
+            f'style_{mode}.TEntry',
+            fieldbackground=colour,
+            )
+        entry.configure(style=f'style_{mode}.TEntry')
 
     def _check_value_changed(self, *args) -> None:
         enable = bool(self._value_changed())
@@ -146,9 +231,10 @@ class ConfigFrame():
 
     def _save_config(self, *args) -> None:
         name_order = self.randomize_name_order.get()
-        self.config.config['data_directory'] = self.data_directory.get()
-        self.config.config['notes_path'] = self.notes_path.get()
-        self.config.config['randomize_name_order'] = name_order
+        self.config.update('data_directory', self.data_directory.get())
+        self.config.update('notes_path', self.notes_path.get())
+        self.config.update('randomize_name_order', name_order)
+        self.config.update('colours', dict(self.colours))
         save_config(self.config)
         self.dismiss()
 
