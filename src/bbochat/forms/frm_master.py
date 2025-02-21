@@ -13,8 +13,7 @@ from config import get_config
 
 import text
 
-from forms.frm_edit_0ld import EditFrame
-from forms.frm_edit import EditFrameTree
+from forms.frm_edit import EditFrame
 
 PAIR_TREE_COLUMNS = (
     ('username1', 'Opp 1', 100),
@@ -362,7 +361,7 @@ class MasterFrame():
         self.parent.update_clipboard()
 
     def _edit_greetings(self, *args) -> None:
-        dlg = EditFrameTree(self, MODES['greeting'], self.greetings)
+        dlg = EditFrame(self, MODES['greeting'])
         self.root.wait_window(dlg.root)
         if dlg.status == DIALOG_STATUS['updated']:
             self.greetings = dlg.data
@@ -371,7 +370,7 @@ class MasterFrame():
             self.greetings_list.set(dlg.data)
 
     def _edit_valedictions(self, *args) -> None:
-        dlg = EditFrame(self, MODES['valediction'], self.valedictions)
+        dlg = EditFrame(self, MODES['valediction'])
         self.root.wait_window(dlg.root)
         if dlg.status == DIALOG_STATUS['updated']:
             self.valedictions = dlg.data
@@ -380,7 +379,7 @@ class MasterFrame():
             self.valedictions_list.set(dlg.data)
 
     def _edit_chat(self, *args) -> None:
-        dlg = EditFrame(self, MODES['chat'], self.chat)
+        dlg = EditFrame(self, MODES['chat'])
         self.root.wait_window(dlg.root)
         if dlg.status == DIALOG_STATUS['updated']:
             self.chat = dlg.data

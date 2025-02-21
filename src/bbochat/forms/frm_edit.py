@@ -11,6 +11,8 @@ from psiutils.menus import Menu, MenuItem
 from psiutils.utilities import window_resize
 
 from config import get_config
+from constants import MODES
+from data import DataStore
 import text
 
 from forms.frm_text_dialog import TextDialogFrame
@@ -18,14 +20,17 @@ from forms.frm_text_dialog import TextDialogFrame
 FRAME_TITLE = 'Edit'
 
 
-class EditFrameTree():
-    def __init__(self, parent, data):
+class EditFrame():
+    def __init__(self, parent, mode: int) -> None:
         self.root = tk.Toplevel(parent.root)
         self.parent = parent
         self.config = get_config()
         self.status = DIALOG_STATUS['null']
+        self.data_store = DataStore()
+        self.data_store.read()
+        ds = self.data_store
+        data = ds.data_sets[MODES[mode]]
 
-        # self.data_text = '\n'.join(data)
         self.data = [item for item in data if item]
         self.text = [item for item in data if item]
         self.selected_item = None
@@ -34,7 +39,6 @@ class EditFrameTree():
         # tk variables
 
         self.show()
-
         self.context_menu = self._context_menu()
         self._populate_text_items()
         self.button_frame.disable()

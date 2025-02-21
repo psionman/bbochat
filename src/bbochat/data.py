@@ -101,29 +101,38 @@ class DataStore():
             return FILE_NOT_FOUND
 
         data = self._get_json(raw_data)
-        if self._get_json(raw_data) == INVALID_JSON:
+        if data == INVALID_JSON:
             return INVALID_JSON
 
+        self.data_sets = {}
         if 'partners' in data:
             self.partners = self._get_partners(data['partners'])
+            self.data_sets['partners'] = self.partners
 
         if 'players' in data:
             self.players = self._get_players(data['players'])
+            self.data_sets['players'] = self.players
 
         if 'pairs' in data:
             self.pairs = self._get_pairs(data['pairs'])
+            self.data_sets['pairs'] = self.pairs
 
         if 'greetings' in data:
             self.greetings = data['greetings']
+            self.data_sets['greeting'] = self.greetings
 
         if 'valedictions' in data:
             self.valedictions = data['valedictions']
+            self.data_sets['valediction'] = self.valedictions
 
         if 'chat' in data:
             self.chat = data['chat']
+            self.data_sets['chat'] = self.chat
 
         if 'my_name' in data:
             self.my_name = data['my_name']
+            self.data_sets['my_name'] = self.my_name
+
 
     def _read_data_file(self) -> str | int | None:
         try:

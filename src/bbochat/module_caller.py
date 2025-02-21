@@ -1,5 +1,5 @@
 from forms.frm_config import ConfigFrame
-from forms.frm_edit import EditFrameTree
+from forms.frm_edit import EditFrame
 from data import DataStore
 
 
@@ -36,9 +36,5 @@ class ModuleCaller():
         self.data_store = DataStore()
         ds = self.data_store
         ds.read()
-        # self.partners = ds.partners
-        # self.players = ds.players
-        # self.pairs = ds.pairs
-        # self.greetings = ds.greetings
-        dlg = EditFrameTree(self, ds.greetings)
+        dlg = EditFrame(self, 'greetings')
         self.root.wait_window(dlg.root)
