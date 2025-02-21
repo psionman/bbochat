@@ -9,8 +9,17 @@ NEW = 'New'
 EDIT = 'Edit'
 DELETE = 'Delete'
 ACCEPT = 'Accept'
-DELETE_PROMPT = 'Are you sure you wish to delete this record?'
+DELETE_RECORD = 'Are you sure you wish to delete this record?'
+DELETE_ITEM = 'Are you sure you wish to delete this item?'
+DELETE_THESE_ITEMS = 'Are you sure you want to delete these item(s)?'
+
 SELECT = 'Select'
 CONFIG = 'Settings'
 ELLIPSIS = ' ...'
 NO_SUCH_FILE = 'no such file or directory'
+
+MOVE_UP = 'Move up'
+MOVE_DOWN = 'Move down'
+
+CHEVRON_UP = '\u25B4'
+CHEVRON_DOWN = '\u25BE'

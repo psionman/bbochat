@@ -13,7 +13,8 @@ from config import get_config
 
 import text
 
-from forms.frm_edit import EditFrame
+from forms.frm_edit_0ld import EditFrame
+from forms.frm_edit import EditFrameTree
 
 PAIR_TREE_COLUMNS = (
     ('username1', 'Opp 1', 100),
@@ -361,7 +362,7 @@ class MasterFrame():
         self.parent.update_clipboard()
 
     def _edit_greetings(self, *args) -> None:
-        dlg = EditFrame(self, MODES['greeting'], self.greetings)
+        dlg = EditFrameTree(self, MODES['greeting'], self.greetings)
         self.root.wait_window(dlg.root)
         if dlg.status == DIALOG_STATUS['updated']:
             self.greetings = dlg.data

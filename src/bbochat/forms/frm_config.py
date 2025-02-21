@@ -7,19 +7,10 @@ from pathlib import Path
 from psiutils.buttons import ButtonFrame, Button, enable_buttons
 from psiutils.widgets import separator_frame
 from psiutils.constants import PAD, PADT, Pad
+from psiutils.utilities import window_resize
 
-from constants import ICON_FILE, MODES
 from config import get_config, save_config
-from utilities import window_resize
 import text
-
-# DEFAULT_CONFIG = {
-#     'data_directory': USER_DATA_DIR,
-#     'last_partner': 'eirikr',
-#     'last_greeting': 'Hi <opps>: <names>: <system>',
-#     'last_valediction': 'Thanks both',
-#     'randomize_name_order': True,
-# }
 
 
 class ConfigFrame():
@@ -53,10 +44,8 @@ class ConfigFrame():
         root = self.root
         root.geometry(self.config.geometry[Path(__file__).stem])
         root.title(text.CONFIG)
-        root.iconphoto(False, tk.PhotoImage(file=ICON_FILE))
-        root.wait_visibility()
-        root.grab_set()
         root.transient(self.parent.root)
+
         root.bind('<Control-x>', self.dismiss)
         root.bind('<Control-s>', self._save_config)
         root.bind('<Configure>',

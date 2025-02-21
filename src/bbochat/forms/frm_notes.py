@@ -66,17 +66,19 @@ class NotesFrame():
 
     def _get_path(self, *args) -> None:
         file_path = Path(self.path.get())
-        path = filedialog.askopenfilename(
+        if path := filedialog.askopenfilename(
             initialdir=file_path.parent,
             initialfile=file_path,
             parent=self.root,
             filetypes=TXT_FILE_TYPES,
-        )
-        if path:
+        ):
             self.path.set(path)
             self._notes_contents()
 
     def _get_partners_notes(self, *args) -> None:
+        if not config.notes_path:
+            return
+
         date = datetime.now().strftime('%Y%m%d')
         file_name = f'{self.partner.username}_{date}.txt'
         path = str(Path(config.notes_path, file_name))

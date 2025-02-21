@@ -57,8 +57,9 @@ class PartnerFrame():
         )
         self.listbox.grid(row=1, column=0, rowspan=3,
                           sticky=tk.N, padx=PAD, pady=PAD)
-        index = self.partners_names.index(config.last_partner)
-        self.listbox.select_set(index)
+        if config.last_partner:
+            index = self.partners_names.index(config.last_partner)
+            self.listbox.select_set(index)
         self.listbox.bind('<<ListboxSelect>>', self._partner_selected)
 
         label = ttk.Label(frame, text='Name')
@@ -130,6 +131,9 @@ class PartnerFrame():
         save_config(config)
 
     def _update_partner_values(self) -> None:
+        if not self.partner:
+            return
+
         self.partners_username.set(
                 f'{self.partner.username}, {self.partner.name}'
             )

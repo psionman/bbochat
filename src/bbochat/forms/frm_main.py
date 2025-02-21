@@ -8,13 +8,13 @@ import clipboard
 
 from psiutils.constants import PAD
 from psiutils.buttons import ButtonFrame, Button
+from psiutils.utilities import window_resize
 
 import text
 
 from data import DataStore, Pair, Player
 from config import get_config
 from constants import MODES
-from utilities import window_resize
 
 from main_menu import MainMenu
 from forms.frm_master import MasterFrame
@@ -44,7 +44,9 @@ class MainFrame():
         self.partners_names = sorted(list(self.partners.keys()))
         self.search_pairs = []
         self.pair = []
-        self.partner = self.partners[self.config.last_partner]
+        self.partner = ''
+        if self.config.last_partner:
+            self.partner = self.partners[self.config.last_partner]
 
         # tk variables
         self._create_tk_variables()
@@ -71,8 +73,9 @@ class MainFrame():
         self.name_2 = tk.StringVar()
         self.randomize = tk.BooleanVar(value=self.config.randomize_name_order)
 
+        greeting = self.partner.greeting if self.config.last_partner else ''
         self.greetings_list = tk.StringVar(value=self.greetings)
-        self.greeting = tk.StringVar(value=self.partner.greeting)
+        self.greeting = tk.StringVar(value=greeting)
         self.valediction = tk.StringVar(value=self.config.last_valediction)
         self.chat_list = tk.StringVar(value=self.chat)
         self.system = tk.StringVar()
@@ -240,6 +243,9 @@ class MainFrame():
         self.clipboard_entry.configure(style='style.TEntry')
 
     def update_clipboard(self, *args) -> None:
+        if not self.partner:
+            return
+
         self._update_mode_colour()
         opps = self._get_opps()
         names = f'{self.partner.name} and {self.my_name}'
