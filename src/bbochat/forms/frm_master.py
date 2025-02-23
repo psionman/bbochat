@@ -59,9 +59,13 @@ class MasterFrame():
         self.chat = parent.chat
         self.chat_list = parent.chat_list
         self.chat_line = parent.chat_line
+        self.chat_topics = list(self.chat.keys())
+        self.chat_topic = ''
 
         self.master_frame = self._get_master_frame(master)
         self.master_frame.grid(row=0, column=0, sticky=tk.EW)
+
+        self._populate_chat()
 
     def _get_master_frame(self, master) -> ttk.Frame:
         frame = ttk.PanedWindow(master, orient=tk.HORIZONTAL)
@@ -228,6 +232,20 @@ class MasterFrame():
         chat_panel = self._chat_panel(frame)
         chat_panel.grid(row=1, column=0, sticky=tk.NSEW)
 
+        label = ttk.Label(frame, text='Selected chat')
+        label.grid(row=2, column=0, pady=PAD)
+
+        entry = ttk.Entry(frame, textvariable=self.chat_line)
+        entry.grid(row=3, column=0, sticky=tk.EW, padx=(0, PAD))
+        colour = self.config.colours['chat']
+        entry_style = ttk.Style()
+        entry_style.configure(
+            'chat.TEntry',
+            fieldbackground=colour,
+            )
+        entry.configure(style='chat.TEntry')
+        entry.bind("<Key>", lambda e: 'break')
+
         button_frame = ButtonFrame(frame, tk.HORIZONTAL)
         buttons = [
             Button(
@@ -249,22 +267,6 @@ class MasterFrame():
 
     def _chat_panel(self, master: ttk.Frame) -> ttk.Frame:
         frame = ttk.PanedWindow(master, orient=tk.VERTICAL)
-        frame.rowconfigure(1, weight=1)
-        frame.rowconfigure(2, weight=1)
-        frame.columnconfigure(0, weight=1)
-
-        chat_master = self._chat_master_frame(frame)
-        chat_master.grid(row=1, column=0, sticky=tk.NSEW, pady=(0, PAD))
-        frame.add(chat_master)
-
-        chat_detail = self._chat_detail_frame(frame)
-        chat_detail.grid(row=2, column=0, sticky=tk.NSEW)
-        frame.add(chat_detail)
-
-        return frame
-
-    def _chat_master_frame(self, master: ttk.Frame) -> ttk.Frame:
-        frame = ttk.Frame(master)
         frame.rowconfigure(0, weight=1)
         frame.columnconfigure(0, weight=1)
 
@@ -275,15 +277,8 @@ class MasterFrame():
             cursor=HAND,
         )
         self.chat_selector.grid(row=0, column=0, sticky=tk.NSEW)
-        # self.chat_selector.bind('<<ListboxSelect>>', self._chat_selected)
-        # self._populate_chat()
-
-        return frame
-
-    def _chat_detail_frame(self, master: ttk.Frame) -> ttk.Frame:
-        frame = ttk.Frame(master)
-        frame.rowconfigure(0, weight=1)
-        frame.columnconfigure(0, weight=1)
+        self.chat_selector.bind('<<ListboxSelect>>', self._chat_topic_selected)
+        frame.add(self.chat_selector)
 
         self.chat_listbox = tk.Listbox(
             frame,
@@ -292,31 +287,24 @@ class MasterFrame():
             cursor=HAND,
         )
         self.chat_listbox.grid(row=0, column=0, sticky=tk.NSEW)
+        frame.add(self.chat_listbox)
         self.chat_listbox.bind('<<ListboxSelect>>', self._chat_selected)
-        self._populate_chat()
-
-        label = ttk.Label(frame, text='Selected chat')
-        label.grid(row=2, column=0, pady=PAD)
-
-        entry = ttk.Entry(frame, textvariable=self.chat_line)
-        entry.grid(row=3, column=0, sticky=tk.EW, padx=(0, PAD))
-        colour = self.config.colours['chat']
-        entry_style = ttk.Style()
-        entry_style.configure(
-            'chat.TEntry',
-            fieldbackground=colour,
-            )
-        entry.configure(style='chat.TEntry')
-        entry.bind("<Key>", lambda e: 'break')
 
         return frame
 
     def _populate_chat(self) -> None:
+        self.chat_selector.delete('0', tk.END)
+        for chat_text in self.chat_topics:
+            self.chat_selector.insert(tk.END, chat_text)
+
+    def _chat_topic_selected(self, event: tk.Event) -> None:
+        selection = event.widget.curselection()
+        if not selection:
+            return
+        self.chat_topic = self.chat_topics[selection[0]]
         self.chat_listbox.delete('0', tk.END)
-        for chat_text in self.chat:
+        for chat_text in self.chat[self.chat_topic]:
             self.chat_listbox.insert(tk.END, chat_text)
-            if '---' in chat_text:
-                self.chat_listbox.itemconfig(tk.END, fg=CHAT_HEADINGS_COLOUR)
 
     def name_search(self, *args) -> None:
         pairs = []
@@ -350,7 +338,7 @@ class MasterFrame():
             )
         tree.bind('<<TreeviewSelect>>', self._pair_tree_clicked)
 
-        col_list = tuple([col[0] for col in PAIR_TREE_COLUMNS])
+        col_list = tuple(col[0] for col in PAIR_TREE_COLUMNS)
         tree['columns'] = col_list
         for col in PAIR_TREE_COLUMNS:
             (col_key, col_text, col_width) = (col[0], col[1], col[2])
@@ -373,7 +361,7 @@ class MasterFrame():
         self.parent.mode = MODES['greeting']
         self.parent.update_clipboard()
 
-    def _greeting_selected(self, event: object = None) -> None:
+    def _greeting_selected(self, event: tk.Event) -> None:
         selection = event.widget.curselection()
         if not selection:
             return
@@ -381,7 +369,7 @@ class MasterFrame():
         self.parent.mode = MODES['greeting']
         self.parent.update_clipboard()
 
-    def _valediction_selected(self, event: object = None) -> None:
+    def _valediction_selected(self, event: tk.Event) -> None:
         selection = event.widget.curselection()
         if not selection:
             return
@@ -389,13 +377,11 @@ class MasterFrame():
         self.parent.mode = MODES['valediction']
         self.parent.update_clipboard()
 
-    def _chat_selected(self, event: object = None) -> None:
+    def _chat_selected(self, event: tk.Event) -> None:
         selection = event.widget.curselection()
         if not selection:
             return
-        selected_chat = self.chat[selection[0]]
-        if '---' in selected_chat:
-            return
+        selected_chat = self.chat[self.chat_topic][selection[0]]
         self.chat_line.set(selected_chat)
         self.parent.mode = MODES['chat']
         self.parent.update_clipboard()

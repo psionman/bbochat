@@ -133,7 +133,6 @@ class DataStore():
             self.my_name = data['my_name']
             self.data_sets['my_name'] = self.my_name
 
-
     def _read_data_file(self) -> str | int | None:
         try:
             with open(DATA_FILE, 'r') as f_data:
@@ -148,7 +147,6 @@ class DataStore():
             return json.loads(data)
         except json.decoder.JSONDecodeError:
             return INVALID_JSON
-        return None
 
     @staticmethod
     def _get_partners(data: dict) -> dict[str, Partner]:
