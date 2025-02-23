@@ -64,27 +64,24 @@ class MasterFrame():
         self.master_frame.grid(row=0, column=0, sticky=tk.EW)
 
     def _get_master_frame(self, master) -> ttk.Frame:
-        frame = ttk.Frame(master)
+        frame = ttk.PanedWindow(master, orient=tk.HORIZONTAL)
         frame.rowconfigure(0, weight=1)
-        frame.columnconfigure(0, weight=1)
-        frame.columnconfigure(1, weight=1)
-        frame.columnconfigure(2, weight=1)
-        frame.columnconfigure(3, weight=1)
 
         search_frame = self._search_frame(frame)
-        search_frame.grid(row=0, column=0, sticky=tk.NSEW, pady=PAD)
-
-        # opponents_frame = self._opponents_frame(frame)
-        # opponents_frame.grid(row=0, column=1, sticky=tk.NSEW, pady=PAD)
+        search_frame.pack()
+        frame.add(search_frame)
 
         greetings_frame = self._greetings_frame(frame)
-        greetings_frame.grid(row=0, column=1, sticky=tk.NSEW, pady=PAD)
+        greetings_frame.pack()
+        frame.add(greetings_frame)
 
         valediction_frame = self._valediction_frame(frame)
-        valediction_frame.grid(row=0, column=2, sticky=tk.NSEW, pady=PAD)
+        valediction_frame.pack()
+        frame.add(valediction_frame)
 
         chat_frame = self._chat_frame(frame)
-        chat_frame.grid(row=0, column=3, sticky=tk.NSEW, pady=PAD)
+        chat_frame.pack()
+        frame.add(chat_frame)
 
         return frame
 
@@ -97,7 +94,7 @@ class MasterFrame():
         label.grid(row=0, column=0, padx=PAD, pady=PAD)
 
         self.search_entry = ttk.Entry(frame, textvariable=self.search)
-        self.search_entry.grid(row=1, column=0, sticky=tk.EW, padx=PAD)
+        self.search_entry.grid(row=1, column=0, sticky=tk.EW)
         self.search_entry.bind('<KeyRelease>', self.name_search)
         self.search_entry.focus_set()
 
@@ -113,7 +110,7 @@ class MasterFrame():
 
         self.pair_tree = self._get_pair_tree(frame)
         self.pair_tree.grid(row=1, column=0,
-                            sticky=tk.NSEW, padx=PAD)
+                            sticky=tk.NSEW)
 
         return frame
 
@@ -132,7 +129,7 @@ class MasterFrame():
             selectmode=tk.BROWSE,
             cursor=HAND,
         )
-        self.greetings_listbox.grid(row=1, column=0, sticky=tk.NSEW, padx=PAD)
+        self.greetings_listbox.grid(row=1, column=0, sticky=tk.NSEW)
         self.greetings_listbox.bind('<<ListboxSelect>>',
                                     self._greeting_selected)
 
@@ -140,7 +137,7 @@ class MasterFrame():
         label.grid(row=2, column=0, pady=PAD)
 
         entry = ttk.Entry(frame, textvariable=self.greeting)
-        entry.grid(row=3, column=0, sticky=tk.EW, padx=PAD)
+        entry.grid(row=3, column=0, sticky=tk.EW)
         colour = self.config.colours['greeting']
         entry_style = ttk.Style()
         entry_style.configure(
@@ -175,7 +172,7 @@ class MasterFrame():
         frame.columnconfigure(0, weight=1)
 
         label = ttk.Label(frame, text='Valedictions')
-        label.grid(row=0, column=0, padx=PAD, pady=PAD)
+        label.grid(row=0, column=0, pady=PAD)
 
         listbox = tk.Listbox(
             frame,
@@ -184,14 +181,14 @@ class MasterFrame():
             selectmode=tk.BROWSE,
             cursor=HAND,
         )
-        listbox.grid(row=1, column=0, sticky=tk.NSEW, padx=PAD)
+        listbox.grid(row=1, column=0, sticky=tk.NSEW)
         listbox.bind('<<ListboxSelect>>', self._valediction_selected)
 
         label = ttk.Label(frame, text='Selected valediction')
         label.grid(row=2, column=0, pady=PAD)
 
         entry = ttk.Entry(frame, textvariable=self.valediction)
-        entry.grid(row=3, column=0, sticky=tk.EW, padx=PAD)
+        entry.grid(row=3, column=0, sticky=tk.EW)
         colour = self.config.colours['valediction']
         entry_style = ttk.Style()
         entry_style.configure(
@@ -226,31 +223,10 @@ class MasterFrame():
         frame.columnconfigure(0, weight=1)
 
         label = ttk.Label(frame, text='Chat')
-        label.grid(row=0, column=0, padx=PAD, pady=PAD)
+        label.grid(row=0, column=0, pady=PAD)
 
-        self.chat_listbox = tk.Listbox(
-            frame,
-            width=TEXT_WIDTH,
-            selectmode=tk.BROWSE,
-            cursor=HAND,
-        )
-        self.chat_listbox.grid(row=1, column=0, sticky=tk.NSEW, padx=PAD)
-        self.chat_listbox.bind('<<ListboxSelect>>', self._chat_selected)
-        self._populate_chat()
-
-        label = ttk.Label(frame, text='Selected chat')
-        label.grid(row=2, column=0, pady=PAD)
-
-        entry = ttk.Entry(frame, textvariable=self.chat_line)
-        entry.grid(row=3, column=0, sticky=tk.EW, padx=PAD)
-        colour = self.config.colours['chat']
-        entry_style = ttk.Style()
-        entry_style.configure(
-            'chat.TEntry',
-            fieldbackground=colour,
-            )
-        entry.configure(style='chat.TEntry')
-        entry.bind("<Key>", lambda e: 'break')
+        chat_panel = self._chat_panel(frame)
+        chat_panel.grid(row=1, column=0, sticky=tk.NSEW)
 
         button_frame = ButtonFrame(frame, tk.HORIZONTAL)
         buttons = [
@@ -268,6 +244,70 @@ class MasterFrame():
 
         button_frame.buttons = buttons
         button_frame.grid(row=4, column=0, pady=PAD)
+
+        return frame
+
+    def _chat_panel(self, master: ttk.Frame) -> ttk.Frame:
+        frame = ttk.PanedWindow(master, orient=tk.VERTICAL)
+        frame.rowconfigure(1, weight=1)
+        frame.rowconfigure(2, weight=1)
+        frame.columnconfigure(0, weight=1)
+
+        chat_master = self._chat_master_frame(frame)
+        chat_master.grid(row=1, column=0, sticky=tk.NSEW, pady=(0, PAD))
+        frame.add(chat_master)
+
+        chat_detail = self._chat_detail_frame(frame)
+        chat_detail.grid(row=2, column=0, sticky=tk.NSEW)
+        frame.add(chat_detail)
+
+        return frame
+
+    def _chat_master_frame(self, master: ttk.Frame) -> ttk.Frame:
+        frame = ttk.Frame(master)
+        frame.rowconfigure(0, weight=1)
+        frame.columnconfigure(0, weight=1)
+
+        self.chat_selector = tk.Listbox(
+            frame,
+            width=TEXT_WIDTH,
+            selectmode=tk.BROWSE,
+            cursor=HAND,
+        )
+        self.chat_selector.grid(row=0, column=0, sticky=tk.NSEW)
+        # self.chat_selector.bind('<<ListboxSelect>>', self._chat_selected)
+        # self._populate_chat()
+
+        return frame
+
+    def _chat_detail_frame(self, master: ttk.Frame) -> ttk.Frame:
+        frame = ttk.Frame(master)
+        frame.rowconfigure(0, weight=1)
+        frame.columnconfigure(0, weight=1)
+
+        self.chat_listbox = tk.Listbox(
+            frame,
+            width=TEXT_WIDTH,
+            selectmode=tk.BROWSE,
+            cursor=HAND,
+        )
+        self.chat_listbox.grid(row=0, column=0, sticky=tk.NSEW)
+        self.chat_listbox.bind('<<ListboxSelect>>', self._chat_selected)
+        self._populate_chat()
+
+        label = ttk.Label(frame, text='Selected chat')
+        label.grid(row=2, column=0, pady=PAD)
+
+        entry = ttk.Entry(frame, textvariable=self.chat_line)
+        entry.grid(row=3, column=0, sticky=tk.EW, padx=(0, PAD))
+        colour = self.config.colours['chat']
+        entry_style = ttk.Style()
+        entry_style.configure(
+            'chat.TEntry',
+            fieldbackground=colour,
+            )
+        entry.configure(style='chat.TEntry')
+        entry.bind("<Key>", lambda e: 'break')
 
         return frame
 
