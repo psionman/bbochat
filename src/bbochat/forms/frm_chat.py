@@ -38,8 +38,8 @@ class ChatFrame():
         label = ttk.Label(frame, text='Chat')
         label.grid(row=0, column=0, pady=PAD)
 
-        chat_panel = self._chat_panel(frame)
-        chat_panel.grid(row=1, column=0, sticky=tk.NSEW)
+        self.chat_panel = self._chat_panel(frame)
+        self.chat_panel.grid(row=1, column=0, sticky=tk.NSEW)
 
         label = ttk.Label(frame, text='Selected chat')
         label.grid(row=2, column=0, pady=PAD)
@@ -74,8 +74,8 @@ class ChatFrame():
 
         return frame
 
-    def _chat_panel(self, master: ttk.Frame) -> ttk.Frame:
-        frame = ttk.PanedWindow(master, orient=tk.VERTICAL)
+    def _chat_panel(self, master: ttk.Frame) -> ttk.PanedWindow:
+        frame = tk.PanedWindow(master, orient=tk.VERTICAL)
         frame.rowconfigure(0, weight=1)
         frame.columnconfigure(0, weight=1)
 

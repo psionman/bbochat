@@ -47,6 +47,10 @@ class MasterFrame():
             for index, sash in enumerate(self.config.vertical_sashes):
                 self.master_frame.sash_place(index, sash[0], 0)
 
+        if self.config.horizontal_sashes:
+            for index, sash in enumerate(self.config.horizontal_sashes):
+                self.chat_panel.sash_place(index, 0, sash[1])
+
     def _master_frame(self, master) -> ttk.PanedWindow:
         frame = tk.PanedWindow(master, orient=tk.HORIZONTAL)
 
@@ -62,7 +66,9 @@ class MasterFrame():
         valediction_frame = ValedictionFrame(self, frame).valediction_frame
         frame.add(valediction_frame)
 
-        self.chat_frame = ChatFrame(self, frame).chat_frame
+        chat_frame = ChatFrame(self, frame)
+        self.chat_frame = chat_frame.chat_frame
+        self.chat_panel = chat_frame.chat_panel
         frame.add(self.chat_frame)
 
         return frame

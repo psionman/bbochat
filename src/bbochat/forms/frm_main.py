@@ -351,10 +351,17 @@ class MainFrame():
             return
         self.button_frame.enable(True)
 
-    def dismiss(self, *args) -> None:
+    def _save_sashes(self) -> None:
         vertical_sashes = [self.master_tab.master_frame.sash_coord(index)
                            for index in range(3)]
+        horizontal_sashes = [
+            self.master_tab.chat_panel.sash_coord(index)
+            for index in range(1)]
+
         self.config.update('vertical_sashes', vertical_sashes)
-        ic(self.config.vertical_sashes)
+        self.config.update('horizontal_sashes', horizontal_sashes)
         self.config.save()
+
+    def dismiss(self, *args) -> None:
+        self._save_sashes()
         self.root.destroy()
