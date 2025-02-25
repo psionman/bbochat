@@ -22,6 +22,8 @@ DEFAULT_CONFIG = {
         'valediction': 'salmon',
         'chat': 'aqua',
     },
+    'vertical_sashes': [],
+    'horizontal_sashes': [],
 }
 
 

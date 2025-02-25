@@ -55,6 +55,7 @@ class MainFrame():
 
         self.button_frame = None
         self.show()
+
         self.pair_tree = self.master_tab.pair_tree
         self.search_entry = self.master_tab.search_entry
 
@@ -89,6 +90,7 @@ class MainFrame():
 
     def show(self):
         root = self.root
+        root.protocol("WM_DELETE_WINDOW", self.dismiss)
         root.geometry(self.config.geometry[Path(__file__).stem])
         root.title(FRAME_TITLE)
         root.bind('<Control-x>', self.dismiss)
@@ -97,7 +99,7 @@ class MainFrame():
         root.bind('<Control-c>', self._chat)
         root.bind('<Control-s>', self.save)
         root.bind('<Configure>',
-                  lambda event, arg=None: window_resize(self, __file__))
+                  lambda e=None: window_resize(self, __file__))
 
         main_menu = MainMenu(self)
         main_menu.create()
@@ -350,4 +352,9 @@ class MainFrame():
         self.button_frame.enable(True)
 
     def dismiss(self, *args) -> None:
+        vertical_sashes = [self.master_tab.master_frame.sash_coord(index)
+                           for index in range(3)]
+        self.config.update('vertical_sashes', vertical_sashes)
+        ic(self.config.vertical_sashes)
+        self.config.save()
         self.root.destroy()
