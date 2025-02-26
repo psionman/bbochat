@@ -33,7 +33,6 @@ def get_config() -> TomlConfig:
 
 
 def save_config(config: TomlConfig) -> TomlConfig | None:
-    # NB new attributes need to be updated in gui.write_config
     result = config.save()
     return None if result != config.STATUS_OK else config
 

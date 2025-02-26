@@ -6,6 +6,7 @@ from tkinter import ttk
 from psiutils.constants import PAD, DIALOG_STATUS
 from psiutils.widgets import HAND
 from psiutils.buttons import ButtonFrame, Button
+from psiutils.menus import Menu, MenuItem
 
 from constants import MODES
 from config import get_config
@@ -25,6 +26,7 @@ class GreetingFrame():
         self.greetings_list = parent.greetings_list
 
         self.greeting_frame = self._greeting_frame(master)
+        self.context_menu = self._context_menu()
 
     def _greeting_frame(self, master: ttk.Frame) -> ttk.Frame:
         frame = ttk.Frame(master)
@@ -37,13 +39,13 @@ class GreetingFrame():
         self.greetings_listbox = tk.Listbox(
             frame,
             listvariable=self.greetings_list,
-            # width=TEXT_WIDTH,
             selectmode=tk.BROWSE,
             cursor=HAND,
         )
         self.greetings_listbox.grid(row=1, column=0, sticky=tk.NSEW)
         self.greetings_listbox.bind('<<ListboxSelect>>',
                                     self._greeting_selected)
+        self.greetings_listbox.bind('<Button-3>', self._show_context_menu)
 
         label = ttk.Label(frame, text='Selected greeting')
         label.grid(row=2, column=0, pady=PAD)
@@ -98,3 +100,14 @@ class GreetingFrame():
     def _greeting(self, *args) -> None:
         self.parent.parent.mode = MODES['greeting']
         self.parent.parent.update_clipboard()
+
+    def _context_menu(self) -> tk.Menu:
+        menu_items = [
+            MenuItem(text.EDIT, self._edit_greetings),
+        ]
+        context_menu = Menu(self.root, menu_items)
+        context_menu.enable(False)
+        return context_menu
+
+    def _show_context_menu(self, event: tk.Event) -> None:
+        self.context_menu.tk_popup(event.x_root, event.y_root)

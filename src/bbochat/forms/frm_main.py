@@ -99,7 +99,7 @@ class MainFrame():
         root.bind('<Control-c>', self._chat)
         root.bind('<Control-s>', self.save)
         root.bind('<Configure>',
-                  lambda e=None: window_resize(self, __file__))
+                  lambda e: window_resize(self, __file__))
 
         main_menu = MainMenu(self)
         main_menu.create()

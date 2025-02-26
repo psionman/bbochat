@@ -6,6 +6,7 @@ from tkinter import ttk
 from psiutils.constants import PAD, DIALOG_STATUS
 from psiutils.widgets import HAND
 from psiutils.buttons import ButtonFrame, Button
+from psiutils.menus import Menu, MenuItem
 
 from constants import MODES
 from config import get_config
@@ -27,6 +28,7 @@ class ChatFrame():
         self.chat_topic = ''
 
         self.chat_frame = self._chat_frame(master)
+        self.context_menu = self._context_menu()
 
         self._populate_chat()
 
@@ -81,17 +83,16 @@ class ChatFrame():
 
         self.chat_selector = tk.Listbox(
             frame,
-            # width=TEXT_WIDTH,
             selectmode=tk.BROWSE,
             cursor=HAND,
         )
         self.chat_selector.grid(row=0, column=0, sticky=tk.NSEW)
         self.chat_selector.bind('<<ListboxSelect>>', self._chat_topic_selected)
+        self.chat_selector.bind('<Button-3>', self._show_context_menu)
         frame.add(self.chat_selector)
 
         self.chat_listbox = tk.Listbox(
             frame,
-            # width=TEXT_WIDTH,
             selectmode=tk.BROWSE,
             cursor=HAND,
         )
@@ -137,3 +138,14 @@ class ChatFrame():
             self.parent.save()
             self.chat_list.set(dlg.data)
             self._populate_chat()
+
+    def _context_menu(self) -> tk.Menu:
+        menu_items = [
+            MenuItem(text.EDIT, self._edit_chat),
+        ]
+        context_menu = Menu(self.root, menu_items)
+        context_menu.enable(False)
+        return context_menu
+
+    def _show_context_menu(self, event: tk.Event) -> None:
+        self.context_menu.tk_popup(event.x_root, event.y_root)

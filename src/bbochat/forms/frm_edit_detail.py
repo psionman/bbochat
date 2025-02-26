@@ -16,13 +16,12 @@ from data import DataStore
 import text
 
 from forms.frm_text_dialog import TextDialogFrame
-from forms.frm_edit_detail import EditDetailFrame
 
-FRAME_TITLE = 'Edit'
+FRAME_TITLE = 'Edit detail'
 
 
-class EditFrame():
-    def __init__(self, parent, mode: int) -> None:
+class EditDetailFrame():
+    def __init__(self, parent, mode: int, detail: str) -> None:
         self.root = tk.Toplevel(parent.root)
         self.parent = parent
         self.mode = mode
@@ -32,7 +31,7 @@ class EditFrame():
         self.data_store = DataStore()
         self.data_store.read()
         ds = self.data_store
-        data = ds.data_sets[MODES[mode]]
+        data = ds.data_sets[MODES[mode]][detail]
 
         self.data = [item for item in data if item]
         self.text = [item for item in data if item]
@@ -181,20 +180,13 @@ class EditFrame():
             self._populate_text_items()
 
     def _edit_item(self, *args) -> None:
-        if self.mode == MODES['chat']:
-            dlg = EditDetailFrame(self, MODES['chat'], self.selected_text)
-            self.root.wait_window(dlg.root)
-            if dlg.status == DIALOG_STATUS['updated']:
-                self.chat[self.selected_text] = dlg.data
-                self.parent.save()
-        else:
-            dlg = TextDialogFrame(self, 'Edit', self.selected_text)
-            self.root.wait_window(dlg.root)
-            if dlg.text != self.selected_text:
-                index = self.text.index(self.selected_text)
-                self.text.remove(self.selected_text)
-                self.text.insert(index, dlg.text)
-                self._populate_text_items()
+        dlg = TextDialogFrame(self, 'Edit', self.selected_text)
+        self.root.wait_window(dlg.root)
+        if dlg.text != self.selected_text:
+            index = self.text.index(self.selected_text)
+            self.text.remove(self.selected_text)
+            self.text.insert(index, dlg.text)
+            self._populate_text_items()
 
     def _delete_item(self, *args) -> None:
         if messagebox.askyesno('Delete item', text.DELETE_ITEM):
@@ -239,7 +231,8 @@ class EditFrame():
             self.save_button.enable()
 
     def _process(self, *args) -> None:
-        ...
+        self.data = list(self.text)
+        self.status = DIALOG_STATUS['updated']
 
     def dismiss(self, *args) -> None:
         self.root.destroy()

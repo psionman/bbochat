@@ -36,7 +36,7 @@ class TextDialogFrame():
         root.transient(self.parent.root)
         root.title(f'{APP_TITLE} - {self.title}')
         root.bind('<Configure>',
-                  lambda event, arg=None: window_resize(self, __file__))
+                  lambda e: window_resize(self, __file__))
 
         root.bind('<Control-x>', self.dismiss)
 

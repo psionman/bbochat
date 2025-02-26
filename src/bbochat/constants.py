@@ -16,7 +16,7 @@ CONFIG_PATH = Path(user_config_dir(APP_NAME, APP_AUTHOR), 'config.toml')
 USER_DATA_DIR = user_data_dir(APP_NAME, APP_AUTHOR)
 
 # GUI
-APP_TITLE = 'Application Title'
+APP_TITLE = 'BBO Chat'
 ICON_FILE = resolve_path('images/icon.png', __file__)
 
 # Data
@@ -31,9 +31,11 @@ MODES = {
     'greeting': 0,
     'valediction': 1,
     'chat': 2,
+    'chat-detail': 3,
     0: 'greeting',
     1: 'valediction',
     2: 'chat',
+    3: 'chat-detail',
 }
 
 GEOMETRY = {

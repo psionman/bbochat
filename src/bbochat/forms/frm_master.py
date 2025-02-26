@@ -10,6 +10,8 @@ from forms.frm_greeting import GreetingFrame
 from forms.frm_valediction import ValedictionFrame
 from forms.frm_chat import ChatFrame
 
+FRAME_WIDTH = 4000
+
 
 class MasterFrame():
     def __init__(self, parent, master):
@@ -58,17 +60,17 @@ class MasterFrame():
         self.players_frame = players.players_frame
         self.pair_tree = players.pair_tree
         self.search_entry = players.search_entry
-        frame.add(self.players_frame)
+        frame.add(self.players_frame, width=FRAME_WIDTH)
 
         self.greetings_frame = GreetingFrame(self, frame).greeting_frame
-        frame.add(self.greetings_frame)
+        frame.add(self.greetings_frame, width=FRAME_WIDTH)
 
         valediction_frame = ValedictionFrame(self, frame).valediction_frame
-        frame.add(valediction_frame)
+        frame.add(valediction_frame, width=FRAME_WIDTH)
 
         chat_frame = ChatFrame(self, frame)
         self.chat_frame = chat_frame.chat_frame
         self.chat_panel = chat_frame.chat_panel
-        frame.add(self.chat_frame)
+        frame.add(self.chat_frame, width=FRAME_WIDTH)
 
         return frame

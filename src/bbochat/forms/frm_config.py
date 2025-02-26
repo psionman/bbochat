@@ -49,7 +49,7 @@ class ConfigFrame():
         root.bind('<Control-x>', self.dismiss)
         root.bind('<Control-s>', self._save_config)
         root.bind('<Configure>',
-                  lambda event, arg=None: window_resize(self, __file__))
+                  lambda e: window_resize(self, __file__))
 
         root.rowconfigure(1, weight=1)
         root.columnconfigure(0, weight=1)
@@ -111,7 +111,7 @@ class ConfigFrame():
         button = ttk.Button(frame, text=text.ELLIPSIS)
         button.grid(row=row, column=2, padx=Pad.W)
         button.bind('<Button-1>',
-                    lambda event, arg=None: self._ask_colour('greeting'))
+                    lambda e: self._ask_colour('greeting'))
 
         row += 1
         label = ttk.Label(frame, text='Valediction')
@@ -125,7 +125,7 @@ class ConfigFrame():
         button = ttk.Button(frame, text=text.ELLIPSIS)
         button.grid(row=row, column=2, padx=Pad.W)
         button.bind('<Button-1>',
-                    lambda event, arg=None: self._ask_colour('valediction'))
+                    lambda e: self._ask_colour('valediction'))
 
         row += 1
         label = ttk.Label(frame, text='Chat')
@@ -139,7 +139,7 @@ class ConfigFrame():
         button = ttk.Button(frame, text=text.ELLIPSIS)
         button.grid(row=row, column=2, padx=Pad.W)
         button.bind('<Button-1>',
-                    lambda event, arg=None: self._ask_colour('chat'))
+                    lambda e: self._ask_colour('chat'))
 
         return frame
 
