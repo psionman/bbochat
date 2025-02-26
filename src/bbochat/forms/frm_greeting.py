@@ -87,6 +87,7 @@ class GreetingFrame():
         self.greeting.set(self.greetings[selection[0]])
         self.parent.mode = MODES['greeting']
         self.parent.parent.update_clipboard()
+        self._greeting()
 
     def _edit_greetings(self, *args) -> None:
         dlg = EditFrame(self, MODES['greeting'])

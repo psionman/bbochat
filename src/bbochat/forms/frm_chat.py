@@ -128,6 +128,7 @@ class ChatFrame():
         self.chat_line.set(selected_chat)
         self.parent.mode = MODES['chat']
         self.parent.parent.update_clipboard()
+        self._chat()
 
     def _edit_chat(self, *args) -> None:
         dlg = EditFrame(self, MODES['chat'])

@@ -89,6 +89,7 @@ class ValedictionFrame():
         self.valediction.set(self.valedictions[selection[0]])
         self.parent.mode = MODES['valediction']
         self.parent.parent.update_clipboard()
+        self._valediction()
 
     def _edit_valedictions(self, *args) -> None:
         dlg = EditFrame(self, MODES['valediction'])
