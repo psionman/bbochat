@@ -184,9 +184,9 @@ class DataStore():
                 player.username: player.name
                 for player in self.players.values()
             },
-            'greetings': self.greetings,
-            'valedictions': self.valedictions,
-            'chat': self.chat,
+            'greetings': self.data_sets['greeting'],
+            'valedictions': self.data_sets['valediction'],
+            'chat': self.data_sets['chat'],
             'my_name': self.my_name,
         }
         json_data = self._data_to_json(output)

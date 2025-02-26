@@ -12,7 +12,6 @@ from psiutils.utilities import window_resize
 
 from config import get_config
 from constants import MODES
-from data import DataStore
 import text
 
 from forms.frm_text_dialog import TextDialogFrame
@@ -22,20 +21,24 @@ FRAME_TITLE = 'Edit'
 
 
 class EditFrame():
-    def __init__(self, parent, mode: int) -> None:
+    def __init__(self, parent, mode: int, default_item: str = '') -> None:
         self.root = tk.Toplevel(parent.root)
         self.parent = parent
+        self.data_store = parent.data_store
         self.mode = mode
+        self.default_item = default_item
 
         self.config = get_config()
         self.status = DIALOG_STATUS['null']
-        self.data_store = DataStore()
-        self.data_store.read()
-        ds = self.data_store
-        data = ds.data_sets[MODES[mode]]
 
+        data = self.data_store.data_sets[MODES[mode]]
+
+        # Original text in data store - udsed to check change
         self.data = [item for item in data if item]
+
+        # Current text in frame
         self.text = [item for item in data if item]
+
         self.selected_item = None
         self.selected_text = ''
 
@@ -43,8 +46,8 @@ class EditFrame():
 
         self.show()
         self.context_menu = self._context_menu()
-        self._populate_text_items()
         self.button_frame.disable()
+        self._populate_text_items()
 
     def show(self) -> None:
         root = self.root
@@ -53,7 +56,7 @@ class EditFrame():
         root.title(FRAME_TITLE)
 
         root.bind('<Control-x>', self.dismiss)
-        root.bind('<Control-s>', self._process)
+        root.bind('<Control-s>', self._save)
         root.bind('<Configure>',
                   lambda e: window_resize(self, __file__))
 
@@ -73,13 +76,13 @@ class EditFrame():
 
         self.text_items = tk.Listbox(
             frame,
-            height=6,
-            selectmode=tk.BROWSE,
+            # height=6,
+            # selectmode=tk.BROWSE,
             cursor=HAND,
         )
         self.text_items.grid(row=0, column=0, rowspan=6,
                              sticky=tk.NSEW, padx=PAD)
-        self.text_items.bind('<<ListboxSelect>>', self._enable_menu)
+        self.text_items.bind('<<ListboxSelect>>', self._select_item)
         self.text_items.bind('<Button-3>', self._show_context_menu)
 
         scroll_buttons = self._scroll_buttons(frame)
@@ -110,7 +113,7 @@ class EditFrame():
         self.save_button = Button(
                 frame,
                 text=text.SAVE,
-                command=self._process,
+                command=self._save,
                 underline=0,
                 dimmable=True)
         frame.buttons = [
@@ -154,23 +157,34 @@ class EditFrame():
         context_menu.enable(False)
         return context_menu
 
-    def _enable_menu(self, event: tk.Event) -> None:
-        self.context_menu.enable()
-        self._show_context_menu(event)
-
-    def _show_context_menu(self, event: tk.Event) -> None:
+    def _select_item(self, event: tk.Event) -> None:
         self.selected_item = None
-        self.context_menu.tk_popup(event.x_root, event.y_root)
         if len(event.widget.curselection()) == 0:
             return
         self.selected_item = event.widget.curselection()[0]
         self.selected_text = self.text[self.selected_item]
-        self._enable_buttons()
+        self._enable_menu()
 
-    def _populate_text_items(self):
+    def _enable_menu(self, *args) -> None:
+        self.context_menu.enable()
+        self.button_frame.enable()
+
+    def _show_context_menu(self, event: tk.Event) -> None:
+        self.context_menu.tk_popup(event.x_root, event.y_root)
+
+    def _populate_text_items(self) -> None:
         self.text_items.delete(0, tk.END)
-        for item in self.text:
+        for index, item in enumerate(self.text):
             self.text_items.insert('end', item)
+            if self.default_item and item == self.default_item:
+                self.text_items.selection_set(index)
+                self.selected_text = self.default_item
+                self.selected_item = index
+
+        if self.default_item:
+            self.default_item = ''
+            self._enable_menu()
+
         self._enable_buttons()
 
     def _new_item(self, *args) -> None:
@@ -190,11 +204,14 @@ class EditFrame():
         else:
             dlg = TextDialogFrame(self, 'Edit', self.selected_text)
             self.root.wait_window(dlg.root)
+
             if dlg.text != self.selected_text:
                 index = self.text.index(self.selected_text)
                 self.text.remove(self.selected_text)
                 self.text.insert(index, dlg.text)
+                self.selected_text = dlg.text
                 self._populate_text_items()
+                self.text_items.select_set(index)
 
     def _delete_item(self, *args) -> None:
         if messagebox.askyesno('Delete item', text.DELETE_ITEM):
@@ -238,8 +255,11 @@ class EditFrame():
         if self.text != self.data:
             self.save_button.enable()
 
-    def _process(self, *args) -> None:
-        ...
+    def _save(self, *args) -> None:
+        self.data_store.data_sets[MODES[self.mode]] = self.text
+        self.data_store.save()
+        self.status = DIALOG_STATUS['updated']
+        self.dismiss()
 
     def dismiss(self, *args) -> None:
         self.root.destroy()

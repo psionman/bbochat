@@ -3,7 +3,7 @@ import tkinter as tk
 from tkinter import ttk
 from pathlib import Path
 
-from psiutils.constants import PAD
+from psiutils.constants import PAD, DIALOG_STATUS
 from psiutils.buttons import ButtonFrame, Button
 from psiutils.utilities import window_resize
 
@@ -18,11 +18,14 @@ class TextDialogFrame():
                  title: str = 'Text dialog',
                  default: str = '') -> None:
         self.root = tk.Toplevel(parent.root)
+
         self.parent = parent
         self.config = get_config()
         self.title = title
         self.default = default
         self._text = default
+
+        self.status = DIALOG_STATUS['null']
 
         # tk variables
         self.text_value = tk.StringVar(value=default)
@@ -61,9 +64,9 @@ class TextDialogFrame():
 
         entry = ttk.Entry(frame, textvariable=self.text_value)
         entry.grid(row=0, column=1, sticky=tk.EW)
-        entry.focus_set()
         entry.select_range(start=0, end='end')
         entry.icursor(len(self.default))
+        entry.focus_set()
 
         return frame
 
@@ -78,10 +81,9 @@ class TextDialogFrame():
                 dimmable=True),
             Button(
                 frame,
-                text=text.EXIT,
+                text=text.CANCEL,
                 command=self.dismiss,
-                sticky=tk.E,
-                underline=1),
+                sticky=tk.E,),
         ]
         frame.enable(False)
         return frame
@@ -93,6 +95,7 @@ class TextDialogFrame():
 
     def _process(self, *args) -> None:
         self._text = self.text_value.get()
+        self.status = DIALOG_STATUS['updated']
         self.dismiss()
 
     @property

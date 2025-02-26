@@ -18,6 +18,7 @@ class MasterFrame():
         self.parent = parent
         self.root = parent.root
         self.config = get_config()
+        self.data_store = parent.data_store
 
         # tk variables
         self.search = parent.search

@@ -1,6 +1,7 @@
 OK = 'OK'
 EXIT = 'Exit'
 QUIT = 'Quit'
+CANCEL = 'Cancel'
 CLOSE = 'Close'
 COPY = 'Copy'
 EVENT = 'Event'
