@@ -32,17 +32,13 @@ class MasterFrame():
         self.username_1 = parent.username_1
         self.username_2 = parent.username_2
 
-        self.greeting = parent.greeting
-        self.greetings = parent.greetings
-        self.greetings_list = parent.greetings_list
-
         self.chat = parent.chat
         self.chat_list = parent.chat_list
         self.chat_line = parent.chat_line
 
         self.master_frame = self._master_frame(master)
 
-        self.parent.root.update()
+        # self.parent.root.update()
         if self.config.vertical_sashes:
             for index, sash in enumerate(self.config.vertical_sashes):
                 self.master_frame.sash_place(index, sash[0], 0)

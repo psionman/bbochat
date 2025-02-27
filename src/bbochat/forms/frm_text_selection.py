@@ -30,10 +30,10 @@ class TextSelectionFrame():
         self.config = get_config()
         self.text_var = tk.StringVar(value=self.config.config[self.config_key])
 
-        self.parent_text_list = self.data_store.data_sets[MODES[self.mode]]
+        self.data_store_text_list = self.data_store.data_sets[MODES[self.mode]]
 
         # self.text_list is a cleaned version of the list in data store
-        self.text_list = build_text_list(self.parent_text_list)
+        self.text_list = build_text_list(self.data_store_text_list)
 
         # self.selected_text contains the text selected from the listbox
         self.selected_text = ''
@@ -110,7 +110,7 @@ class TextSelectionFrame():
             return
 
         self.text_list.append(dlg.text)
-        self.parent_text_list.append(dlg.text)
+        self.data_store_text_list.append(dlg.text)
         self.text_var.set(dlg.text)
         self._use_item()
         self._populate_text_items(dlg.text)
@@ -124,7 +124,7 @@ class TextSelectionFrame():
 
         index = self.text_list.index(self.selected_text)
         self._update_text_list(self.text_list, dlg.text, index)
-        self._update_text_list(self.parent_text_list, dlg.text, index)
+        self._update_text_list(self.data_store_text_list, dlg.text, index)
 
         self._populate_text_items(dlg.text)
 
@@ -138,24 +138,29 @@ class TextSelectionFrame():
             return
 
         self.text_list.remove(self.selected_text)
-        self.parent_text_list.remove(self.selected_text)
+        self.data_store_text_list.remove(self.selected_text)
         self.text_var.set('')
         self._use_item()
         self._populate_text_items()
         self._save()
 
     def _edit_all(self, *args) -> None:
-        dlg = EditFrame(self, self.mode, self.selected_text)
+        dlg = EditFrame(self)
         self.root.wait_window(dlg.root)
-        if dlg.status == DIALOG_STATUS['updated']:
-            index = self.text_list.index(self.selected_text)
-            self._update_text_list(self.text_list, dlg.text, index)
-            self._update_text_list(self.parent_text_list, dlg.text, index)
+        if dlg.status != DIALOG_STATUS['updated']:
+            return
 
-            self._populate_text_items(dlg.selected_text)
-            self.selected_text = dlg.selected_text
-            self.text_var.set(dlg.selected_text)
-            self._use_item()
+        self.text_list = build_text_list(dlg.text_list)
+        self.data_store_text_list = dlg.text_list
+
+        self._populate_text_items(dlg.selected_text)
+        if not dlg.selected_text or dlg.selected_text[0] == '#':
+            return
+
+        self.selected_text = dlg.selected_text
+        self.text_var.set(dlg.selected_text)
+        self._use_item()
+        self._save()
 
     def _update_text_list(
             self, text_list: list[str], text: str, index: int) -> None:
@@ -176,7 +181,7 @@ class TextSelectionFrame():
                 self.listbox.selection_set(index)
 
     def _save(self, *args) -> None:
-        self.data_store.data_sets[MODES[self.mode]] = self.text_list
+        self.data_store.data_sets[MODES[self.mode]] = self.data_store_text_list
         self.data_store.save()
 
     def _context_menu(self) -> tk.Menu:

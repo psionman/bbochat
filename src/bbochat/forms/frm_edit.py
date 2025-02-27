@@ -1,5 +1,5 @@
 
-"""EditFrame for BBO Chat."""
+"""Text Edit Frame for BBO Chat."""
 import tkinter as tk
 from tkinter import ttk, messagebox
 from pathlib import Path
@@ -21,34 +21,29 @@ FRAME_TITLE = 'Edit'
 
 
 class EditFrame():
-    def __init__(self, parent, mode: int, default_text: str = '') -> None:
+    def __init__(self, parent) -> None:
         self.root = tk.Toplevel(parent.root)
         self.parent = parent
-        self.data_store = parent.data_store
-        self.mode = mode
+        self.mode = parent.mode
 
-        # self.default_text is the value of the text selected
+        # self.master_selected_text is the value of the text selected
         # in the calling function
-        self.default_text = default_text
+        self.master_selected_text = parent.selected_text
 
         self.config = get_config()
         self.status = DIALOG_STATUS['null']
 
-        data = self.data_store.data_sets[MODES[mode]]
-
         # Original text in data store - used to check change
-        self.data = [item for item in data if item]
+        self.original_data = parent.data_store_text_list
 
         # Current text in frame
-        self.text_list = [item for item in data if item]
+        self.text_list = [item for item in self.original_data if item]
 
         # self.selected_item is the index of the item selected in the listbox
         self.selected_item = None
 
         # self.selected_text contains the text selected from the listbox
         self.selected_text = ''
-
-        # tk variables
 
         self.show()
         self.context_menu = self._context_menu()
@@ -176,13 +171,13 @@ class EditFrame():
         self.listbox.delete(0, tk.END)
         for index, item in enumerate(self.text_list):
             self.listbox.insert('end', item)
-            if self.default_text and item == self.default_text:
+            if self.master_selected_text and item == self.master_selected_text:
                 self.listbox.selection_set(index)
-                self.selected_text = self.default_text
+                self.selected_text = self.master_selected_text
                 self.selected_item = index
 
-        if self.default_text:
-            self.default_text = ''
+        if self.master_selected_text:
+            self.master_selected_text = ''
             self._enable_menu()
 
         self._enable_buttons()
@@ -196,22 +191,31 @@ class EditFrame():
 
     def _edit_item(self, *args) -> None:
         if self.mode == MODES['chat']:
-            dlg = EditDetailFrame(self, MODES['chat'], self.selected_text)
-            self.root.wait_window(dlg.root)
-            if dlg.status == DIALOG_STATUS['updated']:
-                self.chat[self.selected_text] = dlg.data
-                self.parent.save()
+            self._edit_item_for_chat()
         else:
-            dlg = TextDialogFrame(self, 'Edit', self.selected_text)
-            self.root.wait_window(dlg.root)
+            self._edit_item_for_non_chat()
 
-            if dlg.text != self.selected_text:
-                index = self.text_list.index(self.selected_text)
-                self.text_list.remove(self.selected_text)
-                self.text_list.insert(index, dlg.text)
-                self.selected_text = dlg.text
-                self._populate_text_items()
-                self.listbox.select_set(index)
+    def _edit_item_for_non_chat(self) -> None:
+        dlg = TextDialogFrame(self, 'Edit', self.selected_text)
+        self.root.wait_window(dlg.root)
+        if dlg.text == self.selected_text:
+            return
+
+        index = self.text_list.index(self.selected_text)
+        self.text_list.remove(self.selected_text)
+        self.text_list.insert(index, dlg.text)
+        self.selected_text = dlg.text
+        self._populate_text_items()
+        self.listbox.select_set(index)
+
+    def _edit_item_for_chat(self) -> None:
+        dlg = EditDetailFrame(self, self.mode, self.selected_text)
+        self.root.wait_window(dlg.root)
+        if dlg.status != DIALOG_STATUS['updated']:
+            return
+
+        self.chat[self.selected_text] = dlg.data
+        self.parent.save()
 
     def _delete_item(self, *args) -> None:
         if messagebox.askyesno('Delete item', text.DELETE_ITEM):
@@ -252,12 +256,10 @@ class EditFrame():
             self.button_frame.enable()
 
         self.save_button.disable()
-        if self.text_list != self.data:
+        if self.text_list != self.original_data:
             self.save_button.enable()
 
     def _save(self, *args) -> None:
-        self.data_store.data_sets[MODES[self.mode]] = self.text_list
-        self.data_store.save()
         self.status = DIALOG_STATUS['updated']
         self.dismiss()
 
