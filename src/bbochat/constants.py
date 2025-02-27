@@ -38,6 +38,13 @@ MODES = {
     3: 'chat-detail',
 }
 
+MODE_TEXT = {
+    0: 'greeting',
+    1: 'valediction',
+    2: 'chat',
+    3: 'chat-detail',
+}
+
 GEOMETRY = {
     'frm_main': {
         'Linux': '1350x800',

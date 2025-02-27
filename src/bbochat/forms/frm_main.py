@@ -236,7 +236,13 @@ class MainFrame():
         self.enable_buttons(False)
 
     def _update_mode_colour(self) -> None:
-        colour = self.config.colours[MODES[self.mode]]
+        self._set_clipboard_colour(self.mode)
+
+    def _update_clipboard_colour(self, mode: int):
+        self._set_clipboard_colour(mode)
+
+    def _set_clipboard_colour(self, mode: int):
+        colour = self.config.colours[MODES[mode]]
         entry_style = ttk.Style()
         entry_style.configure(
             'style.TEntry',
@@ -244,20 +250,27 @@ class MainFrame():
             )
         self.clipboard_entry.configure(style='style.TEntry')
 
-    def update_clipboard(self, *args) -> None:
+    def update_clipboard(
+            self, message: str = '', mode: int = None, *args) -> None:
         if not self.partner:
             return
 
-        self._update_mode_colour()
+        if mode:
+            self._update_clipboard_colour(mode)
+        else:
+            self._update_mode_colour()
+
         opps = self._get_opps()
         names = f'{self.partner.name} and {self.my_name}'
 
-        if self.mode == MODES['greeting']:
-            message = self.greeting.get()
-        elif self.mode == MODES['valediction']:
-            message = self.valediction.get()
-        elif self.mode == MODES['chat']:
-            message = self.chat_line.get()
+        # TODO handle message when text is deleted in selection frame
+        if not message:
+            if self.mode == MODES['greeting']:
+                message = self.greeting.get()
+            # elif self.mode == MODES['valediction']:
+            #     message = self.valediction.get()
+            elif self.mode == MODES['chat']:
+                message = self.chat_line.get()
 
         message = message.replace('<opps>', opps)
         message = message.replace('<names>', names)
@@ -358,6 +371,7 @@ class MainFrame():
             self.master_tab.chat_panel.sash_coord(index)
             for index in range(1)]
 
+        self.config = get_config()
         self.config.update('vertical_sashes', vertical_sashes)
         self.config.update('horizontal_sashes', horizontal_sashes)
         self.config.save()
