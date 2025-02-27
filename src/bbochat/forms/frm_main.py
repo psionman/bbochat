@@ -42,7 +42,6 @@ class MainFrame():
         self.my_name = ds.my_name
 
         self.partners_names = sorted(list(self.partners.keys()))
-        self.search_pairs = []
         self.pair = []
         self.partner = ''
         if self.config.last_partner:
@@ -66,7 +65,6 @@ class MainFrame():
         self.clipboard = tk.StringVar()
 
         # Main
-        self.pairs_list = tk.StringVar()
         self.search = tk.StringVar()
         self.username_1 = tk.StringVar()
         self.username_2 = tk.StringVar()
@@ -263,14 +261,11 @@ class MainFrame():
         opps = self._get_opps()
         names = f'{self.partner.name} and {self.my_name}'
 
-        # TODO handle message when text is deleted in selection frame
         if not message:
-            if self.mode == MODES['greeting']:
-                message = self.greeting.get()
-            # elif self.mode == MODES['valediction']:
-            #     message = self.valediction.get()
-            elif self.mode == MODES['chat']:
+            if self.mode == MODES['chat']:
                 message = self.chat_line.get()
+            elif self.mode == MODES['greeting']:
+                message = self.config.last_greeting
 
         message = message.replace('<opps>', opps)
         message = message.replace('<names>', names)

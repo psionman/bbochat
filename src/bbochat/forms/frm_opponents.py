@@ -1,4 +1,4 @@
-"""Players frame for BBO Chat."""
+"""Opponents frame for BBO Chat."""
 
 import tkinter as tk
 from tkinter import ttk
@@ -6,7 +6,6 @@ from tkinter import ttk
 from psiutils.constants import PAD
 from psiutils.treeview import sort_treeview
 
-from constants import MODES
 from config import get_config
 
 
@@ -16,27 +15,29 @@ PAIR_TREE_COLUMNS = (
 )
 
 
-class PlayersFrame():
+class OpponentsFrame():
     def __init__(self, parent, master: ttk.Frame) -> None:
         self.parent = parent
         self.root = parent.root
         self.config = get_config()
 
         # tk variables
-        self.search = parent.search
-        self.pairs = parent.pairs
-        self.pairs_list = parent.pairs_list
-        self.search_pairs = parent.search_pairs
-        self.players = parent.players
+        self.search = parent.parent.search
+        self.pairs = parent.parent.pairs
+        self.players = parent.parent.players
 
-        self.name_1 = parent.name_1
-        self.name_2 = parent.name_2
-        self.username_1 = parent.username_1
-        self.username_2 = parent.username_2
+        self.name_1 = parent.parent.name_1
+        self.name_2 = parent.parent.name_2
+        self.username_1 = parent.parent.username_1
+        self.username_2 = parent.parent.username_2
 
-        self.players_frame = self._players_frame(master)
+        self.opponents_frame = self._opponents_frame(master)
 
-    def _players_frame(self, master: ttk.Frame) -> ttk.Frame:
+        self.search_pairs = []
+        self.name_search()
+        self._populate_pair_tree()
+
+    def _opponents_frame(self, master: ttk.Frame) -> ttk.Frame:
         frame = ttk.Frame(master)
         frame.columnconfigure(0, weight=1)
         frame.rowconfigure(2, weight=1)
@@ -49,25 +50,11 @@ class PlayersFrame():
         self.search_entry.bind('<KeyRelease>', self.name_search)
         self.search_entry.focus_set()
 
-        # players_frame = self._players_frame(frame)
-        # players_frame.grid(row=2, column=0, sticky=tk.NSEW, pady=PAD)
-
         self.pair_tree = self._pair_tree(frame)
         self.pair_tree.grid(row=2, column=0,
                             sticky=tk.NSEW)
 
         return frame
-
-    # def _players_frame(self, master: ttk.Frame) -> ttk.Frame:
-    #     frame = ttk.Frame(master)
-    #     frame.rowconfigure(1, weight=1)
-    #     frame.columnconfigure(0, weight=1)
-
-    #     self.pair_tree = self._pair_tree(frame)
-    #     self.pair_tree.grid(row=1, column=0,
-    #                         sticky=tk.NSEW)
-
-    #     return frame
 
     def _populate_pair_tree(self) -> None:
         self.pair_tree.delete(*self.pair_tree.get_children())
@@ -95,19 +82,6 @@ class PlayersFrame():
             tree.column(col_key, width=col_width, anchor=tk.W)
         return tree
 
-    def _pair_tree_clicked(self, *args) -> None:
-        self.selected_item = self.pair_tree.selection()
-        values = self.pair_tree.item(self.selected_item)['values']
-        if not values:
-            return
-        self.pair = [self.players[values[0]], self.players[values[1]]]
-        self.username_1.set(self.pair[0].username)
-        self.name_1.set(self.pair[0].name)
-        self.username_2.set(self.pair[1].username)
-        self.name_2.set(self.pair[1].name)
-        self.parent.parent.mode = MODES['greeting']
-        self.parent.parent.update_clipboard()
-
     def name_search(self, *args) -> None:
         pairs = []
         input_text = self.search.get()
@@ -120,6 +94,18 @@ class PlayersFrame():
                     [pair.username_2, pair.username_1])
         pairs.sort(key=lambda item: item[1])
         pairs.sort(key=lambda item: item[0])
-        self.pairs_list.set(pairs)
         self.search_pairs = pairs
         self._populate_pair_tree()
+
+    def _pair_tree_clicked(self, *args) -> None:
+        self.selected_item = self.pair_tree.selection()
+        values = self.pair_tree.item(self.selected_item)['values']
+        if not values:
+            return
+        self.pair = [self.players[values[0]], self.players[values[1]]]
+        self.username_1.set(self.pair[0].username)
+        self.name_1.set(self.pair[0].name)
+        self.username_2.set(self.pair[1].username)
+        self.name_2.set(self.pair[1].name)
+
+        self.parent.parent.update_clipboard()
