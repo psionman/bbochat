@@ -1,7 +1,8 @@
-"""Valediction frame for BBO Chat."""
+"""Text Selection frame for BBO Chat."""
 
 import tkinter as tk
 from tkinter import ttk, messagebox
+from typing import NamedTuple
 
 from psiutils.constants import PAD, DIALOG_STATUS
 from psiutils.widgets import HAND
@@ -17,37 +18,44 @@ from forms.frm_edit import EditFrame
 from forms.frm_text_dialog import TextDialogFrame
 
 
-class ValedictionFrame():
-    def __init__(self, parent, master: ttk.Frame) -> None:
-        self.parent = parent
-        self.root = parent.root
-        self.config = get_config()
-        self.data_store = parent.data_store
-        self.mode = MODES['valediction']
+class TextFrameData(NamedTuple):
+    parent: ttk.Frame
+    master: ttk.Frame
+    mode: int
+    parent_var: tk.StringVar
+    text_list: list[str]
+    description: str
 
-        self.valediction = parent.valediction
-        self.valedictions = build_text_list(parent.valedictions)
-        self.valedictions_list = tk.StringVar(
-            value=build_text_list(parent.valedictions))
+
+class TextSelectionFrame():
+    def __init__(self, context) -> None:
+        self.parent = context.parent
+        self.root = context.parent.root
+        self.config = get_config()
+        self.data_store = context.parent.data_store
+        self.mode = context.mode
+        self.description = context.description
+
+        self.parent_var = context.parent_var
+        self.text_list = build_text_list(context.text_list)
 
         self.selected_item = ''
 
-        self.valediction_frame = self._valediction_frame(master)
+        self.main_frame = self._main_frame(context.master)
         self.context_menu = self._context_menu()
 
         self._populate_text_items()
 
-    def _valediction_frame(self, master: ttk.Frame) -> ttk.Frame:
+    def _main_frame(self, master: ttk.Frame) -> ttk.Frame:
         frame = ttk.Frame(master)
         frame.rowconfigure(1, weight=1)
         frame.columnconfigure(0, weight=1)
 
-        label = ttk.Label(frame, text='Valedictions')
+        label = ttk.Label(frame, text=f'{self.description.capitalize()}s')
         label.grid(row=0, column=0, pady=PAD)
 
         self.listbox = tk.Listbox(
             frame,
-            # listvariable=self.valedictions_list,
             selectmode=tk.BROWSE,
             cursor=HAND,
         )
@@ -55,18 +63,18 @@ class ValedictionFrame():
         self.listbox .bind('<<ListboxSelect>>', self._item_selected)
         self.listbox .bind('<Button-3>', self._show_context_menu)
 
-        label = ttk.Label(frame, text='Selected valediction')
+        label = ttk.Label(frame, text=f'Selected {self.description}')
         label.grid(row=2, column=0, pady=PAD)
 
-        entry = ttk.Entry(frame, textvariable=self.valediction)
+        entry = ttk.Entry(frame, textvariable=self.parent_var)
         entry.grid(row=3, column=0, sticky=tk.EW)
-        colour = self.config.colours['valediction']
+        colour = self.config.colours[self.description]
         entry_style = ttk.Style()
         entry_style.configure(
-            'valediction.TEntry',
+            f'{self.description}.TEntry',
             fieldbackground=colour,
             )
-        entry.configure(style='valediction.TEntry')
+        entry.configure(style=f'{self.description}.TEntry')
         entry.bind("<Key>", lambda e: 'break')
 
         button_frame = ButtonFrame(frame, tk.HORIZONTAL)
@@ -75,7 +83,7 @@ class ValedictionFrame():
                 button_frame,
                 text='Use',
                 command=self._use_item,
-                style='valediction.TButton'),
+                style=f'{self.description}.TButton'),
             Button(
                 button_frame,
                 text=text.EDIT,
@@ -92,8 +100,8 @@ class ValedictionFrame():
         selection = event.widget.curselection()
         if not selection:
             return
-        self.selected_item = self.valedictions[selection[0]]
-        self.valediction.set(self.selected_item)
+        self.selected_item = self.text_list[selection[0]]
+        self.parent_var.set(self.selected_item)
         self.parent.mode = self.mode
         self.parent.parent.update_clipboard()
         self._use_item()
@@ -103,47 +111,44 @@ class ValedictionFrame():
         dlg = TextDialogFrame(self, 'New')
         self.root.wait_window(dlg.root)
         if dlg.text:
-            self.valedictions.append(dlg.text)
-            self.parent.valedictions = self.valedictions
-            self.valedictions_list.set(build_text_list(self.valedictions))
-            self.valediction.set(dlg.text)
+            self.text_list.append(dlg.text)
+            self.parent.valedictions = self.text_list
+            self.parent_var.set(dlg.text)
             self._use_item()
 
     def _edit_item(self, *args) -> None:
         dlg = TextDialogFrame(self, 'Edit', self.selected_item)
         self.root.wait_window(dlg.root)
         if dlg.status == DIALOG_STATUS['updated']:
-            index = self.valedictions.index(self.selected_item)
-            self.valedictions.remove(self.selected_item)
-            self.valedictions.insert(index, dlg.text)
-            self.parent.valedictions = self.valedictions
+            index = self.text_list.index(self.selected_item)
+            self.text_list.remove(self.selected_item)
+            self.text_list.insert(index, dlg.text)
+            self.parent.valedictions = self.text_list
             self._populate_text_items(dlg.text)
 
             self.selected_item = dlg.text
-            self.valediction.set(dlg.text)
+            self.parent_var.set(dlg.text)
             self._use_item()
             self._save()
 
     def _delete_item(self, *args) -> None:
         if messagebox.askyesno('Delete item', text.DELETE_ITEM):
-            self.valedictions.remove(self.selected_item)
-            self.parent.valedictions = self.valedictions
-            self.valedictions_list.set(build_text_list(self.valedictions))
-            self.valediction.set('')
+            self.text_list.remove(self.selected_item)
+            self.parent.valedictions = self.text_list
+            self.parent_var.set('')
             self._use_item()
 
     def _edit_all(self, *args) -> None:
         dlg = EditFrame(self, self.mode, self.selected_item)
         self.root.wait_window(dlg.root)
         if dlg.status == DIALOG_STATUS['updated']:
-            index = self.valedictions.index(self.selected_item)
-            self.valedictions.remove(self.selected_item)
-            self.valedictions.insert(index, dlg.selected_text)
-            self.valedictions_list = self.valedictions
+            index = self.text_list.index(self.selected_item)
+            self.text_list.remove(self.selected_item)
+            self.text_list.insert(index, dlg.selected_text)
 
             self._populate_text_items(dlg.selected_text)
             self.selected_item = dlg.selected_text
-            self.valediction.set(dlg.selected_text)
+            self.parent_var.set(dlg.selected_text)
             self._use_item()
 
     def _use_item(self, *args) -> None:
@@ -152,13 +157,13 @@ class ValedictionFrame():
 
     def _populate_text_items(self, selected_item: str = '') -> None:
         self.listbox.delete(0, tk.END)
-        for index, item in enumerate(self.valedictions):
+        for index, item in enumerate(self.text_list):
             self.listbox.insert('end', item)
             if selected_item and item == selected_item:
                 self.listbox.selection_set(index)
 
     def _save(self, *args) -> None:
-        self.data_store.data_sets[MODES[self.mode]] = self.valedictions
+        self.data_store.data_sets[MODES[self.mode]] = self.text_list
         self.data_store.save()
 
     def _context_menu(self) -> tk.Menu:

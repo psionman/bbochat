@@ -3,11 +3,12 @@
 import tkinter as tk
 from tkinter import ttk
 
+from constants import MODES
 from config import get_config
 
 from forms.frm_players import PlayersFrame
 from forms.frm_greeting import GreetingFrame
-from forms.frm_valediction import ValedictionFrame
+from forms.frm_valediction import TextSelectionFrame, TextFrameData
 from forms.frm_chat import ChatFrame
 
 FRAME_WIDTH = 4000
@@ -66,8 +67,16 @@ class MasterFrame():
         self.greetings_frame = GreetingFrame(self, frame).greeting_frame
         frame.add(self.greetings_frame, width=FRAME_WIDTH)
 
-        valediction_frame = ValedictionFrame(self, frame).valediction_frame
-        frame.add(valediction_frame, width=FRAME_WIDTH)
+        text_frame_data = TextFrameData(
+            self,
+            frame,
+            MODES['valediction'],
+            self.valediction,
+            self.valedictions,
+            'valediction'
+        )
+        valedictions = TextSelectionFrame(text_frame_data)
+        frame.add(valedictions.main_frame, width=FRAME_WIDTH)
 
         chat_frame = ChatFrame(self, frame)
         self.chat_frame = chat_frame.chat_frame
