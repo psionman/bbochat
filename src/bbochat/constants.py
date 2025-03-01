@@ -45,6 +45,8 @@ MODE_TEXT = {
     3: 'chat-detail',
 }
 
+FRAME_WIDTH = 4000
+
 GEOMETRY = {
     'frm_main': {
         'Linux': '1350x800',

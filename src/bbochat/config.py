@@ -9,6 +9,7 @@ DEFAULT_CONFIG = {
     'last_partner': '',
     'last_greeting': '',
     'last_valediction': '',
+    'last_chat': '',
     'randomize_name_order': True,
     'notes_path': '',
     'geometry': {

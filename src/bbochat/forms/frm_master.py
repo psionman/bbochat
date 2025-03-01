@@ -3,20 +3,20 @@
 import tkinter as tk
 from tkinter import ttk
 
-from constants import MODES
+from constants import MODES, FRAME_WIDTH
 from config import get_config
 
 from forms.frm_opponents import OpponentsFrame
 from forms.frm_text_selection import TextSelectionFrame
+# from forms.frm_chat import ChatFrame
 from forms.frm_chat import ChatFrame
-
-FRAME_WIDTH = 4000
 
 
 class MasterFrame():
     def __init__(self, parent, master):
         self.parent = parent
         self.root = parent.root
+        self.update_clipboard = parent.update_clipboard
         self.config = get_config()
         self.data_store = parent.data_store
 
@@ -43,15 +43,18 @@ class MasterFrame():
         self.search_entry = opponents_frame.search_entry
         frame.add(self.players_frame, width=FRAME_WIDTH)
 
-        greetings = TextSelectionFrame(self, frame, MODES['greeting'])
+        mode = 'greeting'
+        text_list = self.data_store.data_sets[mode]
+        greetings = TextSelectionFrame(self, frame, MODES[mode], text_list)
         frame.add(greetings.main_frame, width=FRAME_WIDTH)
 
-        valedictions = TextSelectionFrame(self, frame, MODES['valediction'])
+        mode = 'valediction'
+        text_list = self.data_store.data_sets[mode]
+        valedictions = TextSelectionFrame(self, frame, MODES[mode], text_list)
         frame.add(valedictions.main_frame, width=FRAME_WIDTH)
 
-        chat_frame = ChatFrame(self, frame)
-        self.chat_frame = chat_frame.chat_frame
-        self.chat_panel = chat_frame.chat_panel
-        frame.add(self.chat_frame, width=FRAME_WIDTH)
+        chat_frame = ChatFrame(self, frame, MODES['chat'])
+        self.chat_panel = chat_frame.chat_frame
+        frame.add(self.chat_panel, width=FRAME_WIDTH)
 
         return frame

@@ -369,6 +369,7 @@ class MainFrame():
         self.config = get_config()
         self.config.update('vertical_sashes', vertical_sashes)
         self.config.update('horizontal_sashes', horizontal_sashes)
+        self.config.update('last_chat', '')
         self.config.save()
 
     def dismiss(self, *args) -> None:
