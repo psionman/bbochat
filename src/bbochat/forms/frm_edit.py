@@ -11,11 +11,9 @@ from psiutils.menus import Menu, MenuItem
 from psiutils.utilities import window_resize
 
 from config import get_config
-from constants import MODES
 import text
 
 from forms.frm_text_dialog import TextDialogFrame
-from forms.frm_edit_detail import EditDetailFrame
 
 FRAME_TITLE = 'Edit'
 
@@ -190,10 +188,7 @@ class EditFrame():
             self._populate_text_items()
 
     def _edit_item(self, *args) -> None:
-        if self.mode == MODES['chat']:
-            self._edit_item_for_chat()
-        else:
-            self._edit_item_for_non_chat()
+        self._edit_item_for_non_chat()
 
     def _edit_item_for_non_chat(self) -> None:
         dlg = TextDialogFrame(self, 'Edit', self.selected_text)
@@ -207,15 +202,6 @@ class EditFrame():
         self.selected_text = dlg.text
         self._populate_text_items()
         self.listbox.select_set(index)
-
-    def _edit_item_for_chat(self) -> None:
-        dlg = EditDetailFrame(self, self.mode, self.selected_text)
-        self.root.wait_window(dlg.root)
-        if dlg.status != DIALOG_STATUS['updated']:
-            return
-
-        self.chat[self.selected_text] = dlg.data
-        self.parent.save()
 
     def _delete_item(self, *args) -> None:
         if messagebox.askyesno('Delete item', text.DELETE_ITEM):

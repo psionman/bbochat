@@ -30,10 +30,9 @@ class ChatFrame():
         chat_slave = TextSelectionFrame(self, frame, MODES[mode], [],
                                         True, False)
 
-        data_set = self.data_store.data_sets[mode]
-        text_list = data_set
+        text_list = self.data_store.data_sets[mode]
         chat_master = TextSelectionFrame(self, frame, MODES[mode], text_list,
-                                         False, True, data_set, chat_slave)
+                                         False, True, chat_slave)
         chat_slave.master = chat_master
 
         frame.add(chat_master.main_frame, height=FRAME_WIDTH)
