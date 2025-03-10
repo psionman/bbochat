@@ -225,6 +225,7 @@ class ConfigFrame():
         self.config.update('randomize_name_order', name_order)
         self.config.update('colours', dict(self.colours))
         save_config(self.config)
+        ic()
         self.dismiss()
 
     def dismiss(self, *args) -> None:

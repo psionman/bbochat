@@ -8,9 +8,9 @@ from psiutils.widgets import HAND
 from psiutils.buttons import ButtonFrame, Button
 from psiutils.menus import Menu, MenuItem
 
-from constants import MODES, MODE_TEXT
+from constants import MODE_TEXT
 from config import get_config
-from utilities import build_text_list
+from data_manager import DataManager
 import text
 
 from forms.frm_edit import EditFrame
@@ -22,18 +22,18 @@ class TextSelectionFrame():
                  parent: tk.Frame,
                  master: tk.Frame,
                  mode: int,
-                 text_data: list | dict = None,
+                 data_manager: DataManager,
                  show_use_frame: bool = True,
                  show_title: bool = True,
                  slave=None) -> None:
         self.parent = parent
         self.root = self.parent.root
-        self.data_store = self.parent.data_store
         self.show_use_frame = show_use_frame
         self.show_title = show_title
         self.slave_frame = slave
-        self.master = None
+        self.master_frame = None
 
+        self.data = data_manager
         self.mode = mode
         self.mode_text = MODE_TEXT[mode]
 
@@ -46,23 +46,10 @@ class TextSelectionFrame():
         # TODO sort this
         self.config.colours['chat-detail'] = self.config.colours['chat']
 
-        # text_data is the data held in the data store relevant to this mode
-        # might be a list or a dict of lists
-        if not text_data:
-            text_data = []
-        self.text_data = text_data
-
-        # self.data_store_text_list is text_data converted to  list
-        # might be set in self._item_selected is it's a slave frame
-        self.data_store_text_list = list(text_data)
-
-        # self.text_list is a cleaned version of the list in data store
-        # might be set in self._item_selected is it's a slave frame
-        # Used to display items in tghe relevant textbox.
-        self.text_list = build_text_list(self.data_store_text_list)
-
         # self.selected_text contains the text selected from the listbox
         self.selected_text = ''
+        # self.selected_index is the index of selected text in self.text_data
+        self.selected_index = -1
 
         self.main_frame = self._main_frame(master)
         self.context_menu = self._context_menu()
@@ -135,17 +122,14 @@ class TextSelectionFrame():
         if not selection:
             return
 
-        self.selected_text = self.text_list[selection[0]]
+        self.selected_text = self.data.text_list[selection[0]]
 
         self.text_var.set(self.selected_text)
         self._use_item()
         self.context_menu.enable()
         if self.slave_frame:
             # This is a master: it has a slave frame
-            self.slave_frame.text_list = self.text_data[self.selected_text]
-            self.slave_frame.data_store_text_list = list(
-                self.slave_frame.text_list)
-            self.slave_frame.populate_text_items()
+            self.data.update_slave_data(self.slave_frame, self.selected_text)
 
     def _new_item(self, *args) -> None:
         dlg = TextDialogFrame(self, 'New')
@@ -153,19 +137,13 @@ class TextSelectionFrame():
         if not dlg.text:
             return
 
-        self.text_list.append(dlg.text)
-        self.data_store_text_list.append(dlg.text)
-
-        if self.master:
-            # This is a slave frame: it has a master frame
-            self.master.text_data[self.master.selected_text].append(dlg.text)
+        self.data.add(self, dlg.text)
 
         self.text_var.set(dlg.text)
         self._use_item()
         self.selected_text = dlg.text
 
         self.populate_text_items(dlg.text)
-        self._save()
 
     def _edit_item(self, *args) -> None:
         dlg = TextDialogFrame(self, 'Edit', self.selected_text)
@@ -173,59 +151,41 @@ class TextSelectionFrame():
         if dlg.status != DIALOG_STATUS['updated']:
             return
 
-        self._update_text_list(self.text_list, self.selected_text, dlg.text)
-        self._update_text_list(
-            self.data_store_text_list, self.selected_text, dlg.text)
+        self.data.amend(self, self.selected_text, dlg.text)
 
-        if self.master:
-            # This is a slave frame: it has a master frame
-            self.master.text_data[self.master.selected_text] = self.text_list
-
-        self.populate_text_items(dlg.text)
+        self.populate_text_items(self.data.text_list)
 
         self.selected_text = dlg.text
         self.text_var.set(dlg.text)
         self._use_item()
-        self._save()
+        self.data.save(self)
 
     def _delete_item(self, *args) -> None:
         if not messagebox.askyesno('Delete item', text.DELETE_ITEM):
             return
 
-        self.text_list.remove(self.selected_text)
-        self.data_store_text_list.remove(self.selected_text)
+        self.data.delete(self)
 
         if self.slave_frame:
             # This is a master: it has a slave frame
-            self.slave_frame.text_list = []
             self.slave_frame.populate_text_items()
 
         self.text_var.set('')
         self._use_item()
         self.populate_text_items()
-        self._save()
+        # self.data.save(self)
 
     def _edit_all(self, *args) -> None:
         dlg = EditFrame(self)
         self.root.wait_window(dlg.root)
         if dlg.status != DIALOG_STATUS['updated']:
             return
-
-        self.text_list = build_text_list(dlg.text_list)
-        self.data_store_text_list = dlg.text_list
+        self.data.edit_all(self, dlg.text_list, dlg.meta_dict)
 
         self.populate_text_items(dlg.selected_text)
-        if not dlg.selected_text or dlg.selected_text[0] == '#':
-            return
-
-        if self.master:
-            ic(self.text_list)
-            # This is a slave frame: it has a master frame
-            self.master.text_data[self.master.selected_text] = self.text_list
         self.selected_text = dlg.selected_text
         self.text_var.set(dlg.selected_text)
         self._use_item()
-        self._save()
 
     def _update_text_list(
             self, text_list: list[str], old_text: str, new_text: str) -> None:
@@ -234,54 +194,23 @@ class TextSelectionFrame():
         text_list.insert(index, new_text)
 
     def _use_item(self, *args) -> None:
+        if self.text_var.get() and self.text_var.get()[0] == '#':
+            self.text_var.set('')
         self.parent.parent.update_clipboard(self.text_var.get(), self.mode)
         self.config = get_config()
         self.config.update(self.config_key, self.text_var.get())
         self.config.save()
 
     def populate_text_items(self, selected_item: str = '') -> None:
+        if self.master_frame:
+            # self.data.display_list = self._build_display_list()
+            ...
+
         self.listbox.delete(0, tk.END)
-        for index, item in enumerate(self.text_list):
+        for index, item in enumerate(self.data.display_list):
             self.listbox.insert('end', item)
             if selected_item and item == selected_item:
                 self.listbox.selection_set(index)
-
-    def _save(self, *args) -> None:
-        # if self.master:
-        #     # This is a slave frame: it has a master frame
-        #     mode = MODES[self.master.mode]
-        #     # self.master.data_store.data_sets[mode] = self.master.text_data
-        #     # ic(self.master.selected_text)
-        #     # ic(self.master.text_data[self.master.selected_text])
-        #     ic('save slave')
-        # else:
-        #     mode = MODES[self.mode]
-        #     if self.slave_frame:
-        #         # This is a master: it has a slave frame
-        #         if self.selected_text not in self.text_data:
-        #             self.text_data[self.selected_text] = []
-        #         # ic(self.text_data)  # data that needs to be saved
-        #         ic('save master')
-        #     else:
-        #         self.data_store.data_sets[mode] = self.data_store_text_list
-
-        # if self.master:
-        #     # This is a slave frame: it has a master frame
-        #     mode = MODES[self.master.mode]
-        #     # self.master.data_store.data_sets[mode] = self.master.text_data
-        #     # ic(self.master.selected_text)
-        #     # ic(self.master.text_data[self.master.selected_text])
-        #     ic('save slave')
-        # else:
-        mode = MODES[self.mode]
-        if self.slave_frame:
-            # This is a master: it has a slave frame
-            self.text_data.pop(self.selected_text)
-            # if self.selected_text not in self.text_data:
-            #     self.text_data[self.selected_text] = []
-        elif not self.master:
-            self.data_store.data_sets[mode] = self.data_store_text_list
-        self.data_store.save()
 
     def _context_menu(self) -> tk.Menu:
         menu_items = [

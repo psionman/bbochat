@@ -5,6 +5,7 @@ from tkinter import ttk
 
 from constants import MODES, FRAME_WIDTH, MODE_TEXT
 from config import get_config
+from data_manager import DataManager
 
 from forms.frm_text_selection import TextSelectionFrame
 
@@ -27,13 +28,16 @@ class ChatFrame():
         frame.columnconfigure(0, weight=1)
 
         mode = 'chat'
-        chat_slave = TextSelectionFrame(self, frame, MODES[mode], [],
-                                        True, False)
+        data_manager = DataManager(self.data_store, None, True, False)
+        chat_slave = TextSelectionFrame(
+            self, frame, MODES[mode], data_manager, True, False)
 
-        text_list = self.data_store.data_sets[mode]
-        chat_master = TextSelectionFrame(self, frame, MODES[mode], text_list,
-                                         False, True, chat_slave)
-        chat_slave.master = chat_master
+        mode = 'chat'
+        data_set = self.data_store.data_sets[mode]
+        data_manager = DataManager(self.data_store, data_set, False, True)
+        chat_master = TextSelectionFrame(
+            self, frame, MODES[mode], data_manager, False, True, chat_slave)
+        chat_slave.master_frame = chat_master
 
         frame.add(chat_master.main_frame, height=FRAME_WIDTH)
         frame.add(chat_slave.main_frame, height=FRAME_WIDTH)

@@ -8,6 +8,7 @@ from config import get_config
 
 from forms.frm_opponents import OpponentsFrame
 from forms.frm_text_selection import TextSelectionFrame
+from data_manager import DataManager
 # from forms.frm_chat import ChatFrame
 from forms.frm_chat import ChatFrame
 
@@ -44,13 +45,17 @@ class MasterFrame():
         frame.add(self.players_frame, width=FRAME_WIDTH)
 
         mode = 'greeting'
-        text_list = self.data_store.data_sets[mode]
-        greetings = TextSelectionFrame(self, frame, MODES[mode], text_list)
+        data_set = self.data_store.data_sets[mode]
+        data_manager = DataManager(self.data_store, data_set)
+        greetings = TextSelectionFrame(
+            self, frame, MODES[mode], data_manager)
         frame.add(greetings.main_frame, width=FRAME_WIDTH)
 
         mode = 'valediction'
-        text_list = self.data_store.data_sets[mode]
-        valedictions = TextSelectionFrame(self, frame, MODES[mode], text_list)
+        data_set = self.data_store.data_sets[mode]
+        data_manager = DataManager(self.data_store, data_set)
+        valedictions = TextSelectionFrame(
+            self, frame, MODES[mode], data_manager)
         frame.add(valedictions.main_frame, width=FRAME_WIDTH)
 
         chat_frame = ChatFrame(self, frame, MODES['chat'])

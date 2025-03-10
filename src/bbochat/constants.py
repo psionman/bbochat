@@ -57,3 +57,10 @@ GEOMETRY = {
         'Windows': '700x300',
     },
 }
+
+META_CODES = {
+    'uuid': 0,
+    'text': 1,
+    0: 'uuid',
+    1: 'text'
+}

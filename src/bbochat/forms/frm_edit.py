@@ -3,6 +3,8 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
 from pathlib import Path
+import uuid
+import copy
 
 from psiutils.constants import PAD, DIALOG_STATUS
 from psiutils.widgets import HAND
@@ -11,6 +13,7 @@ from psiutils.menus import Menu, MenuItem
 from psiutils.utilities import window_resize
 
 from config import get_config
+from constants import META_CODES
 import text
 
 from forms.frm_text_dialog import TextDialogFrame
@@ -32,10 +35,14 @@ class EditFrame():
         self.status = DIALOG_STATUS['null']
 
         # Original text in data store - used to check change
-        self.original_data = parent.data_store_text_list
+        self.original_data = [item for item in parent.data.text_list if item]
 
         # Current text in frame
-        self.text_list = [item for item in self.original_data if item]
+        self.text_list = [item for item in parent.data.text_list if item]
+
+        self.meta_dict = {}
+        if parent.data.meta_dict:
+            self.meta_dict = copy.deepcopy(parent.data.meta_dict)
 
         # self.selected_item is the index of the item selected in the listbox
         self.selected_item = None
@@ -185,16 +192,19 @@ class EditFrame():
         self.root.wait_window(dlg.root)
         if dlg.text:
             self.text_list.append(dlg.text)
+            uid = str(uuid.uuid4())
+            self.meta_dict[uid] = (META_CODES['uuid'], dlg.text)
+            self.meta_dict[dlg.text] = (META_CODES['text'], uid)
             self._populate_text_items()
 
     def _edit_item(self, *args) -> None:
-        self._edit_item_for_non_chat()
-
-    def _edit_item_for_non_chat(self) -> None:
         dlg = TextDialogFrame(self, 'Edit', self.selected_text)
         self.root.wait_window(dlg.root)
         if dlg.text == self.selected_text:
             return
+
+        if self.meta_dict:
+            self._update_meta_dict(dlg.text)
 
         index = self.text_list.index(self.selected_text)
         self.text_list.remove(self.selected_text)
@@ -203,10 +213,35 @@ class EditFrame():
         self._populate_text_items()
         self.listbox.select_set(index)
 
+    def _update_meta_dict(self, text: str):
+        # Get the meta_dict text item relating to the old value
+        meta_text_item = self.meta_dict[self.selected_text]
+
+        # Get the related uuid item
+        meta_uuid_key = meta_text_item[1]
+
+        # Rebuild the uuid item with the new text
+        self.meta_dict[meta_uuid_key] = (META_CODES['uuid'], text)
+
+        # Create a text item with the new text
+        self.meta_dict[text] = (META_CODES['text'], meta_uuid_key)
+        # ic(len(self.meta_dict))
+
+        # Remove the text item relating to the old value
+        self.meta_dict[self.selected_text]
+        self.meta_dict.pop(self.selected_text)
+
     def _delete_item(self, *args) -> None:
-        if messagebox.askyesno('Delete item', text.DELETE_ITEM):
-            self.text_list.remove(self.selected_text)
-            self._populate_text_items()
+        if not messagebox.askyesno('Delete item', text.DELETE_ITEM):
+            return
+
+        meta_text_item = self.meta_dict[self.selected_text]
+        self.meta_dict.pop(self.selected_text)
+        self.meta_dict.pop(meta_text_item[1])
+
+        self.text_list.remove(self.selected_text)
+        self.selected_text = ''
+        self._populate_text_items()
 
     def _move_up(self, *args) -> None:
         if self.selected_item is None:
@@ -246,6 +281,11 @@ class EditFrame():
             self.save_button.enable()
 
     def _save(self, *args) -> None:
+        if self.meta_dict:
+            for index, value in enumerate(self.text_list):
+                meta_item = self.meta_dict[value]
+                self.meta_dict[value] = (meta_item[0], meta_item[1], index)
+
         self.status = DIALOG_STATUS['updated']
         self.dismiss()
 

@@ -129,6 +129,7 @@ class PartnerFrame():
         self._update_partner_values()
         config.config['last_partner'] = self.partner.username
         save_config(config)
+        ic()
 
     def _update_partner_values(self) -> None:
         if not self.partner:
