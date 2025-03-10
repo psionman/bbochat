@@ -158,7 +158,7 @@ class TextSelectionFrame():
         self.selected_text = dlg.text
         self.text_var.set(dlg.text)
         self._use_item()
-        self.data.save(self)
+        # self.data.save(self)
 
     def _delete_item(self, *args) -> None:
         if not messagebox.askyesno('Delete item', text.DELETE_ITEM):

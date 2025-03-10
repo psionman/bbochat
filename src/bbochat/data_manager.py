@@ -41,6 +41,9 @@ class DataManager():
 
         if self.slave:
             self.data[text] = []
+        elif self.master:
+            data = frame.master_frame.data.data
+            data[frame.master_frame.selected_text].append(text)
         else:
             self.data.append(text)
 
@@ -54,12 +57,12 @@ class DataManager():
         if self.slave:
             self.data[new_value] = self.data[old_value]
             self.data.pop(old_value)
-
         elif self.master:
-            ic(frame.master_frame.selected_text)
+            data = frame.master_frame.data.data
+            self._update_text_list(
+                data[frame.master_frame.selected_text], old_value, new_value)
         else:
             self.data = self.text_list
-            ic(self.text_list)
 
         self.save(frame)
 
@@ -69,6 +72,9 @@ class DataManager():
 
         if self.slave:
             self.data.pop(frame.selected_text)
+        elif self.master:
+            data = frame.master_frame.data.data
+            data[frame.master_frame.selected_text].remove(frame.selected_text)
         else:
             self.data.remove(frame.selected_text)
         self.save(frame)
@@ -80,7 +86,6 @@ class DataManager():
         if self.slave:
             # This is a master frame: it has a slave frame
             self._rebuild_dict(meta_dict)
-            # self.slave._build_display_list()
         else:
             self.data = data
         self.save(frame)
