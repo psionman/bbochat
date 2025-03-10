@@ -235,9 +235,10 @@ class EditFrame():
         if not messagebox.askyesno('Delete item', text.DELETE_ITEM):
             return
 
-        meta_text_item = self.meta_dict[self.selected_text]
-        self.meta_dict.pop(self.selected_text)
-        self.meta_dict.pop(meta_text_item[1])
+        if self.meta_dict:
+            meta_text_item = self.meta_dict[self.selected_text]
+            self.meta_dict.pop(self.selected_text)
+            self.meta_dict.pop(meta_text_item[1])
 
         self.text_list.remove(self.selected_text)
         self.selected_text = ''

@@ -86,6 +86,9 @@ class DataManager():
         if self.slave:
             # This is a master frame: it has a slave frame
             self._rebuild_dict(meta_dict)
+        elif self.master:
+            data = frame.master_frame.data.data
+            data[frame.master_frame.selected_text] = self.text_list
         else:
             self.data = data
         self.save(frame)

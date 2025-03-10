@@ -96,7 +96,7 @@ class TextSelectionFrame():
             fieldbackground=colour,
             )
         entry.configure(style=f'{self.mode_text}.TEntry')
-        entry.bind("<Key>", lambda e: 'break')
+        entry.bind('<Key>', lambda e: 'break')
 
         button_frame = ButtonFrame(frame, tk.HORIZONTAL)
         buttons = [
