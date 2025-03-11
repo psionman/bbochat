@@ -110,7 +110,7 @@ class TextDialogFrame():
 
     def _hidden_item(self) -> None:
         text = self.text_value.get()
-        if text[0] == '#':
+        if text and text[0] == '#':
             self.hidden_item.set(True)
             text = text[1:].strip()
             self.text_value.set(text)
