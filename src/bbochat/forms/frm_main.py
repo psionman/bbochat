@@ -5,6 +5,8 @@ from tkinter import ttk, messagebox
 from pathlib import Path
 import random
 import clipboard
+import re
+import emoji
 
 from psiutils.constants import PAD
 from psiutils.buttons import ButtonFrame, Button
@@ -274,7 +276,20 @@ class MainFrame():
         self.copy_to_clipboard()
 
     def copy_to_clipboard(self, *args) -> None:
-        clipboard.copy(self.clipboard.get())
+        text = self.clipboard.get()
+        emoji_re = r':.*:'
+
+        found = True
+        while found:
+            match = re.search(emoji_re, text)
+            if not match:
+                break
+            emoji_text = match.group()
+            emoji_ = emoji.emojize(emoji_text)
+            text = text.replace(emoji_text, emoji_)
+            if emoji_text == emoji_:
+                found = False
+        clipboard.copy(text)
 
     def _get_opps(self) -> str:
         opp_1, opp_2 = self.name_1.get(), self.name_2.get()

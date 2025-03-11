@@ -122,7 +122,7 @@ class TextSelectionFrame():
         if not selection:
             return
 
-        self.selected_text = self.data.text_list[selection[0]]
+        self.selected_text = self.data.display_list[selection[0]]
 
         self.text_var.set(self.selected_text)
         self._use_item()
@@ -158,7 +158,6 @@ class TextSelectionFrame():
         self.selected_text = dlg.text
         self.text_var.set(dlg.text)
         self._use_item()
-        # self.data.save(self)
 
     def _delete_item(self, *args) -> None:
         if not messagebox.askyesno('Delete item', text.DELETE_ITEM):
@@ -173,7 +172,6 @@ class TextSelectionFrame():
         self.text_var.set('')
         self._use_item()
         self.populate_text_items()
-        # self.data.save(self)
 
     def _edit_all(self, *args) -> None:
         dlg = EditFrame(self)

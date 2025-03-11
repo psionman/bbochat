@@ -72,6 +72,7 @@ class DataManager():
 
         if self.slave:
             self.data.pop(frame.selected_text)
+            self._delete_slave_data(frame.slave_frame)
         elif self.master:
             data = frame.master_frame.data.data
             data[frame.master_frame.selected_text].remove(frame.selected_text)
@@ -102,6 +103,13 @@ class DataManager():
 
         slave.populate_text_items()
 
+    def _delete_slave_data(self, slave) -> None:
+        slave.data.text_data = []
+        slave.data.text_list = []
+        slave.data.display_list = []
+
+        slave.populate_text_items()
+
     def _update_text_list(
             self,
             text_list: list[str],
@@ -114,15 +122,13 @@ class DataManager():
     def save(self, frame, *args) -> None:
         if not self.master:
             self.data_store.data_sets[MODES[frame.mode]] = self.data
-        else:
-            ...
+
         self.data_store.save()
         if self.slave:
             self.meta_dict = self._meta_dict()
 
     def _rebuild_dict(self, new_meta_dict: dict) -> None:
         old_meta_dict = self._meta_dict()
-        # self._print_meta_dict(old_meta_dict)
         new_data = {}
         keys_to_sort = []
         for item in new_meta_dict.values():
