@@ -9,7 +9,6 @@ from config import get_config
 from forms.frm_opponents import OpponentsFrame
 from forms.frm_text_selection import TextSelectionFrame
 from data_manager import DataManager
-# from forms.frm_chat import ChatFrame
 from forms.frm_chat import ChatFrame
 
 

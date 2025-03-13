@@ -26,3 +26,10 @@ MOVE_DOWN = 'Move down'
 
 CHEVRON_UP = '\u25B4'
 CHEVRON_DOWN = '\u25BE'
+
+TOOLTIP = f"""
+To insert your partner's and your names, use '<names>';\n
+to insert your opponents' names, use '<opps>';\n
+to insert your system, use '<system>'.\n
+(To remove this hint goto {CONFIG}).
+"""

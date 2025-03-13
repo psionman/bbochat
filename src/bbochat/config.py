@@ -11,20 +11,21 @@ DEFAULT_CONFIG = {
     'last_valediction': '',
     'last_chat': '',
     'randomize_name_order': True,
+    'show_tooltips': True,
     'notes_path': '',
     'geometry': {
-        'frm_main': '1350x800',
+        'frm_main': '1250x700',
         'frm_edit': '500x600',
-        'frm_edit_tree': '500x600',
-        'frm_config': '700x300',
+        'frm_config': '700x350',
+        'frm_text_dialog': '500x150',
     },
     'colours': {
         'greeting': 'limegreen',
         'valediction': 'salmon',
         'chat': 'aqua',
     },
-    'vertical_sashes': [],
-    'horizontal_sashes': [],
+    'vertical_sashes': [(250, 1), (500, 1), (750, 1)],
+    'horizontal_sashes': [(1, 200)],
 }
 
 

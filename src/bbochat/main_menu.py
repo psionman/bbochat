@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import messagebox
+from tkinter import messagebox, simpledialog
 import webbrowser
 
 from psiutils.menus import Menu, MenuItem
@@ -8,6 +8,7 @@ from constants import AUTHOR, APP_TITLE, HELP_URI
 from _version import __version__
 import text
 from config import config
+from data import DataStore
 
 from forms.frm_config import ConfigFrame
 
@@ -33,9 +34,23 @@ class MainMenu():
 
     def _file_menu_items(self) -> list:
         return [
+            MenuItem(f'My name{text.ELLIPSIS}', self._get_my_name),
             MenuItem(f'{text.CONFIG}{text.ELLIPSIS}', self._show_config_frame),
             MenuItem(text.EXIT, self.dismiss),
         ]
+
+    def _get_my_name(self) -> None:
+        data_store = DataStore()
+        data_store.read()
+        if dlg := simpledialog.askstring(
+            f'{APP_TITLE} - Your name',
+            'Enter the name that you wish to be known by',
+            parent=self.root,
+            initialvalue=data_store.my_name,
+        ):
+            data_store.my_name = dlg
+            data_store.save()
+            self.parent.my_name_text.set(dlg)
 
     def _show_config_frame(self):
         """Display the config frame."""

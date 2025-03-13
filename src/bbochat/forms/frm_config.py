@@ -25,11 +25,13 @@ class ConfigFrame():
         self.data_directory = tk.StringVar(value=self.config.data_directory)
         self.randomize_name_order = tk.BooleanVar(
             value=self.config.randomize_name_order)
+        self.show_tooltips = tk.BooleanVar(value=self.config.show_tooltips)
         self.notes_path = tk.StringVar(value=self.config.notes_path)
 
         self.data_directory.trace_add('write', self._check_value_changed)
         self.notes_path.trace_add('write', self._check_value_changed)
         self.randomize_name_order.trace_add('write', self._check_value_changed)
+        self.show_tooltips.trace_add('write', self._check_value_changed)
 
         self.show()
 
@@ -95,6 +97,12 @@ class ConfigFrame():
         check_button = tk.Checkbutton(
             frame, text='Randomize opp\'s name order',
             variable=self.randomize_name_order)
+        check_button.grid(row=row, column=1, sticky=tk.W)
+
+        row += 1
+        check_button = tk.Checkbutton(
+            frame, text='Show tootips',
+            variable=self.show_tooltips)
         check_button.grid(row=row, column=1, sticky=tk.W)
 
         row += 1
@@ -189,6 +197,7 @@ class ConfigFrame():
             self.data_directory.get() != self.config.data_directory
             or self.notes_path.get() != self.config.notes_path
             or self.randomize_name_order.get() != name_order
+            or self.show_tooltips.get() != self.config.show_tooltips
             or self.colours != self.config.colours
         )
 
@@ -223,9 +232,10 @@ class ConfigFrame():
         self.config.update('data_directory', self.data_directory.get())
         self.config.update('notes_path', self.notes_path.get())
         self.config.update('randomize_name_order', name_order)
+        self.config.update('show_tooltips', self.show_tooltips.get())
         self.config.update('colours', dict(self.colours))
         save_config(self.config)
-        ic()
+        self.config = get_config()
         self.dismiss()
 
     def dismiss(self, *args) -> None:

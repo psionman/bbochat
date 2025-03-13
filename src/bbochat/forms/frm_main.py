@@ -1,7 +1,7 @@
 
 """MainFrame for BBO Chat."""
 import tkinter as tk
-from tkinter import ttk, messagebox
+from tkinter import ttk, messagebox, simpledialog
 from pathlib import Path
 import random
 import clipboard
@@ -63,6 +63,10 @@ class MainFrame():
         self._update_mode_colour()
         self._pair_username_change()
 
+        # On setup
+        if not self.data_store.data_sets['my_name']:
+            self._get_my_name()
+
     def _create_tk_variables(self) -> None:
         self.clipboard = tk.StringVar()
 
@@ -85,6 +89,7 @@ class MainFrame():
         # Partners
         self.partners_list = tk.StringVar(value=self.partners_names)
         self.selected_partner = tk.StringVar(value=self.config.last_partner)
+        self.my_name_text = tk.StringVar(value=self.my_name)
         self.partners_name = tk.StringVar(value='')
         self.partners_username = tk.StringVar()
 
@@ -134,12 +139,19 @@ class MainFrame():
                             command=self.copy_to_clipboard)
         button.grid(row=0, column=7)
 
-        label = ttk.Label(frame, text='Partner')
+        label = ttk.Label(frame, text='My name')
         label.grid(row=1, column=0, sticky=tk.E)
+
+        entry = ttk.Entry(frame, textvariable=self.my_name_text,
+                          state='readonly')
+        entry.grid(row=1, column=1, sticky=tk.W, padx=PAD)
+
+        label = ttk.Label(frame, text='Partner')
+        label.grid(row=2, column=0, sticky=tk.E)
 
         entry = ttk.Entry(frame, textvariable=self.partners_username,
                           state='readonly')
-        entry.grid(row=1, column=1, sticky=tk.W, padx=PAD)
+        entry.grid(row=2, column=1, sticky=tk.W, padx=PAD)
 
         label = ttk.Label(frame, text='Opponents')
         label.grid(row=1, column=2)
@@ -224,6 +236,17 @@ class MainFrame():
         self.mode = MODES['chat']
         self.update_clipboard()
 
+    def _get_my_name(self) -> None:
+        if dlg := simpledialog.askstring(
+            'Your name',
+            'Enter the name that you wish to be known by',
+            parent=self.root,
+        ):
+            self.my_name = dlg
+            self.my_name_text.set(dlg)
+            self.data_store.my_name = dlg
+            self.data_store.save()
+
     def save(self, *args) -> None:
         self.data_store.partners = self.partners
         self.data_store.players = self.players
@@ -252,8 +275,11 @@ class MainFrame():
 
     def update_clipboard(
             self, message: str = '', mode: int = None, *args) -> None:
-        if not self.partner:
-            return
+        names = f'{self.my_name}'
+        system = ''
+        if self.partner:
+            names = f'{self.partner.name} and {self.my_name}'
+            system = self.partner.system
 
         if mode:
             self._update_clipboard_colour(mode)
@@ -261,7 +287,6 @@ class MainFrame():
             self._update_mode_colour()
 
         opps = self._get_opps()
-        names = f'{self.partner.name} and {self.my_name}'
 
         if not message:
             if self.mode == MODES['chat']:
@@ -271,7 +296,7 @@ class MainFrame():
 
         message = message.replace('<opps>', opps)
         message = message.replace('<names>', names)
-        message = message.replace('<system>', self.partner.system)
+        message = message.replace('<system>', system)
         self.clipboard.set(message)
         self.copy_to_clipboard()
 

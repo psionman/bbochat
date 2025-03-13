@@ -104,7 +104,15 @@ class DataStore():
         if data == INVALID_JSON:
             return INVALID_JSON
 
-        self.data_sets = {}
+        self.data_sets = {
+            'partners': {},
+            'pairs': [],
+            'players': {},
+            'greeting': [],
+            'valediction': [],
+            'chat': {},
+            'my_name': '',
+        }
         if 'partners' in data:
             self.partners = self._get_partners(data['partners'])
             self.data_sets['partners'] = self.partners

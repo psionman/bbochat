@@ -3,11 +3,11 @@ import tkinter as tk
 from tkinter import ttk
 from pathlib import Path
 import emoji
-import re
 
 from psiutils.constants import PAD, DIALOG_STATUS
 from psiutils.buttons import ButtonFrame, Button
 from psiutils.utilities import window_resize
+from psiutils.widgets import Tooltip
 
 from constants import APP_TITLE
 from config import get_config
@@ -32,12 +32,13 @@ class TextDialogFrame():
 
         # tk variables
         self.text_value = tk.StringVar(value=default)
+        tooltip = text.TOOLTIP if self.config.show_tooltips else ''
+        self.tooltip_text = tk.StringVar(value=tooltip)
         self.hidden_item = tk.BooleanVar()
         self._hidden_item()
 
         self.text_value.trace_add('write', self._text_changed)
         self.hidden_item.trace_add('write', self._text_changed)
-
 
         self.show()
 
@@ -70,12 +71,8 @@ class TextDialogFrame():
         label = ttk.Label(frame, text='Text')
         label.grid(row=0, column=0, sticky=tk.E, padx=PAD, pady=PAD)
 
-        self.entry = ttk.Entry(frame, textvariable=self.text_value)
+        self.entry = self._get_entry(frame)
         self.entry.grid(row=0, column=1, sticky=tk.EW)
-        self.entry.select_range(start=0, end='end')
-        self.entry.icursor(len(self.default))
-        self.entry.focus_set()
-        self.entry.bind('<KeyRelease>', self._text_key_release)
 
         check_button = tk.Checkbutton(frame, text='Hidden item',
                                       variable=self.hidden_item)
@@ -100,6 +97,22 @@ class TextDialogFrame():
         ]
         frame.enable(False)
         return frame
+
+    def _get_entry(self, master: tk.Frame) -> ttk.Entry:
+        entry = ttk.Entry(master, textvariable=self.text_value)
+        entry.select_range(start=0, end='end')
+        entry.icursor(len(self.default))
+        entry.focus_set()
+        entry.bind('<KeyRelease>', self._text_key_release)
+
+        entry.tooltip = Tooltip(
+            entry,
+            textvariable=self.tooltip_text,
+            wrap_length=2000,
+            vertical_offset=17)
+        entry.bind('<Enter>', entry.tooltip.onEnter)
+        entry.bind('<Leave>', entry.tooltip.onLeave)
+        return entry
 
     def _text_changed(self, *args) -> None:
         self.button_frame.disable()
