@@ -18,6 +18,7 @@ DEFAULT_CONFIG = {
         'frm_edit': '500x600',
         'frm_config': '700x350',
         'frm_text_dialog': '500x150',
+        'frm_partner_edit': '500x600',
     },
     'colours': {
         'greeting': 'limegreen',

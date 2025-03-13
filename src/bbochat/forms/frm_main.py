@@ -46,7 +46,8 @@ class MainFrame():
         self.partners_names = sorted(list(self.partners.keys()))
         self.pair = []
         self.partner = ''
-        if self.config.last_partner:
+        if (self.config.last_partner
+                and self.config.last_partner in self.partners):
             self.partner = self.partners[self.config.last_partner]
 
         # tk variables
@@ -78,7 +79,7 @@ class MainFrame():
         self.name_2 = tk.StringVar()
         self.randomize = tk.BooleanVar(value=self.config.randomize_name_order)
 
-        greeting = self.partner.greeting if self.config.last_partner else ''
+        greeting = self.partner.greeting if self.partner else ''
         self.greetings_list = tk.StringVar(value=self.greetings)
         self.greeting = tk.StringVar(value=greeting)
         self.valediction = tk.StringVar(value=self.config.last_valediction)

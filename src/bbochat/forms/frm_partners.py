@@ -3,9 +3,10 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
 
-from psiutils.constants import PAD, PADT, DIALOG_STATUS
+from psiutils.constants import PAD, PADT, DIALOG_STATUS, MODES
 from psiutils.widgets import HAND, PsiText, clickable_widget
 from psiutils.buttons import ButtonFrame, Button
+from psiutils.menus import Menu, MenuItem
 
 from config import config, save_config
 import text
@@ -40,6 +41,8 @@ class PartnerFrame():
         self.partners_name.trace('w', self._partner_changed)
         self.notes_text.bind('<<TextModified>>', self._partner_changed)
 
+        self.context_menu = self._context_menu()
+
     def _get_partners_frame(self, master) -> ttk.Frame:
         frame = ttk.Frame(master)
         frame.rowconfigure(3, weight=1)
@@ -56,34 +59,41 @@ class PartnerFrame():
             cursor=HAND,
         )
         self.listbox.grid(row=1, column=0, rowspan=3,
-                          sticky=tk.N, padx=PAD, pady=PAD)
-        if config.last_partner:
+                          sticky=tk.NSEW, padx=PAD, pady=PAD)
+        if config.last_partner and config.last_partner in self.partners_names:
             index = self.partners_names.index(config.last_partner)
             self.listbox.select_set(index)
         self.listbox.bind('<<ListboxSelect>>', self._partner_selected)
+        self.listbox .bind('<Button-3>', self._show_context_menu)
 
         label = ttk.Label(frame, text='Name')
         label.grid(row=0, column=1, sticky=tk.E, padx=PAD)
 
-        entry = ttk.Entry(frame, width=30, textvariable=self.partners_name)
+        entry = ttk.Entry(
+            frame, width=30, textvariable=self.partners_name, state='readonly')
         entry.grid(row=0, column=2, sticky=tk.EW, pady=PADT)
 
         label = ttk.Label(frame, text='System')
         label.grid(row=1, column=1, sticky=tk.E, padx=PAD)
 
-        entry = ttk.Entry(frame, width=80, textvariable=self.system)
+        entry = ttk.Entry(
+            frame, width=80, textvariable=self.system, state='readonly')
         entry.grid(row=1, column=2, sticky=tk.EW, pady=PADT)
 
         label = ttk.Label(frame, text='Greeting')
         label.grid(row=2, column=1, sticky=tk.E, padx=PAD)
 
-        combobox = ttk.Combobox(
-            frame,
-            textvariable=self.greeting,
-            values=self.greetings,
-            )
-        combobox.grid(row=2, column=2, sticky=tk.EW, pady=PADT)
-        clickable_widget(combobox)
+        # combobox = ttk.Combobox(
+        #     frame,
+        #     textvariable=self.greeting,
+        #     values=self.greetings,
+        #     )
+        # combobox.grid(row=2, column=2, sticky=tk.EW, pady=PADT)
+        # clickable_widget(combobox)
+
+        entry = ttk.Entry(
+            frame, width=80, textvariable=self.greeting, state='readonly')
+        entry.grid(row=2, column=2, sticky=tk.EW, pady=PADT)
 
         self.notes_text = PsiText(frame, height=18)
         self.notes_text.grid(row=3, column=1, columnspan=4,
@@ -97,7 +107,7 @@ class PartnerFrame():
 
     def _button_frame(self, master: tk.Frame) -> tk.Frame:
         frame = ButtonFrame(master, tk.VERTICAL)
-        buttons = [
+        frame.buttons = [
             Button(
                 frame,
                 text=text.NEW,
@@ -105,17 +115,17 @@ class PartnerFrame():
                 underline=0),
             Button(
                 frame,
-                text=text.DELETE,
-                command=self._delete,
+                text=text.EDIT,
+                command=self._edit,
+                dimmable=True,
                 underline=0),
             Button(
                 frame,
-                text=text.SAVE,
-                command=self._save,
-                underline=0,
-                dimmable=False),
+                text=text.DELETE,
+                command=self._delete,
+                dimmable=True,
+                underline=0),
         ]
-        frame.buttons = buttons
         frame.enable(False)
         return frame
 
@@ -154,22 +164,51 @@ class PartnerFrame():
                 or self.partners_name.get() != self.partner.system
                 or notes != self.partner.notes):
             self.button_frame.enable()
+            self.context_menu.enable()
+
+    def _item_selected(self, event: tk.Event) -> None:
+        selection = event.widget.curselection()
+        if not selection:
+            return
+
+        self.partner = self.partners[selection[0]]
+
+        # self.text_var.set(self.selected_text)
+        self.context_menu.enable()
 
     def _new(self, *args) -> None:
-        dlg = PartnerEditFrame(self)
+        dlg = PartnerEditFrame(self, MODES['new'])
         self.root.wait_window(dlg.root)
         if dlg.status != DIALOG_STATUS['ok']:
             return
         self.partner = dlg.partner
-        partners_names = sorted([username
-                                 for username in self.partners.keys()])
+        partners_names = sorted(list(self.partners))
         self.partners_list.set(partners_names)
 
-        selection = self.listbox.curselection()
-        self.listbox.select_clear(selection[0])
+        if selection := self.listbox.curselection():
+            self.listbox.select_clear(selection[0])
         index = partners_names.index(self.partner.username)
         self.listbox.select_set(index)
         self.listbox.event_generate("<<ListboxSelect>>")
+        self.partner = dlg.partner
+        self._update_partner_values()
+
+    def _edit(self, *args) -> None:
+        dlg = PartnerEditFrame(self, MODES['edit'], partner=self.partner)
+        self.root.wait_window(dlg.root)
+        if dlg.status != DIALOG_STATUS['ok']:
+            return
+        self.partner = dlg.partner
+        self._update_partner_values()
+
+    # def _update_values(self, partner: Partner) -> None:
+    #     self.partner = partner
+    #     self.partners_name.set(partner.name)
+    #     self.system.set(partner.system)
+    #     self.greeting.set(partner.greeting)
+    #     self.partners_username = parent.partners_username
+    #     self.partners_names = parent.partners_names
+
 
     def _delete(self, *args) -> None:
         ...
@@ -187,3 +226,16 @@ class PartnerFrame():
             'Partner saved',
             parent=self.parent.root,
         )
+
+    def _context_menu(self) -> tk.Menu:
+        menu_items = [
+            MenuItem(text.NEW, self._new, dimmable=False),
+            MenuItem(text.EDIT, self._edit, dimmable=True),
+            MenuItem(text.DELETE, self._delete, dimmable=True),
+        ]
+        context_menu = Menu(self.root, menu_items)
+        context_menu.enable(False)
+        return context_menu
+
+    def _show_context_menu(self, event: tk.Event) -> None:
+        self.context_menu.tk_popup(event.x_root, event.y_root)

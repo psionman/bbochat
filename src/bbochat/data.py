@@ -116,6 +116,7 @@ class DataStore():
         if 'partners' in data:
             self.partners = self._get_partners(data['partners'])
             self.data_sets['partners'] = self.partners
+            print(self.partners)
 
         if 'players' in data:
             self.players = self._get_players(data['players'])
@@ -142,6 +143,7 @@ class DataStore():
             self.data_sets['my_name'] = self.my_name
 
     def _read_data_file(self) -> str | int | None:
+        print(DATA_FILE)
         try:
             with open(DATA_FILE, 'r') as f_data:
                 return f_data.read()
