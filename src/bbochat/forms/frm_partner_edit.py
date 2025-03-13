@@ -46,6 +46,8 @@ class PartnerEditFrame():
         self.notes.trace_add('write', self._value_changed)
 
         self.show()
+        self.notes_text.delete('0.0', tk.END)
+        self.notes_text.insert('0.0', self.partner.notes)
         self._value_changed()
 
     def show(self) -> None:

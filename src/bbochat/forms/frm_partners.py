@@ -4,10 +4,11 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 
 from psiutils.constants import PAD, PADT, DIALOG_STATUS, MODES
-from psiutils.widgets import HAND, PsiText, clickable_widget
+from psiutils.widgets import HAND, PsiText
 from psiutils.buttons import ButtonFrame, Button
 from psiutils.menus import Menu, MenuItem
 
+from data import Partner
 from config import config, save_config
 import text
 
@@ -42,6 +43,10 @@ class PartnerFrame():
         self.notes_text.bind('<<TextModified>>', self._partner_changed)
 
         self.context_menu = self._context_menu()
+
+        if self.partner:
+            self.button_frame.enable()
+            self.context_menu.enable()
 
     def _get_partners_frame(self, master) -> ttk.Frame:
         frame = ttk.Frame(master)
@@ -82,14 +87,6 @@ class PartnerFrame():
 
         label = ttk.Label(frame, text='Greeting')
         label.grid(row=2, column=1, sticky=tk.E, padx=PAD)
-
-        # combobox = ttk.Combobox(
-        #     frame,
-        #     textvariable=self.greeting,
-        #     values=self.greetings,
-        #     )
-        # combobox.grid(row=2, column=2, sticky=tk.EW, pady=PADT)
-        # clickable_widget(combobox)
 
         entry = ttk.Entry(
             frame, width=80, textvariable=self.greeting, state='readonly')
@@ -172,8 +169,6 @@ class PartnerFrame():
             return
 
         self.partner = self.partners[selection[0]]
-
-        # self.text_var.set(self.selected_text)
         self.context_menu.enable()
 
     def _new(self, *args) -> None:
@@ -201,17 +196,17 @@ class PartnerFrame():
         self.partner = dlg.partner
         self._update_partner_values()
 
-    # def _update_values(self, partner: Partner) -> None:
-    #     self.partner = partner
-    #     self.partners_name.set(partner.name)
-    #     self.system.set(partner.system)
-    #     self.greeting.set(partner.greeting)
-    #     self.partners_username = parent.partners_username
-    #     self.partners_names = parent.partners_names
-
-
     def _delete(self, *args) -> None:
-        ...
+        if not messagebox.askyesno('Delete item', text.DELETE_ITEM):
+            return
+        self.partners.pop(self.partner.username)
+        if self.partners:
+            self.partner = self.partners[sorted(list(self.partners))[0]]
+        else:
+            self.partner = Partner()
+        self._update_partner_values()
+        self.partners_list.set(sorted(list(self.partners)))
+        self.parent.save()
 
     def _save(self, *args) -> None:
         self.partner.name = self.partners_name.get()
