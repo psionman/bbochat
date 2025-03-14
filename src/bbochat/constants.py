@@ -1,6 +1,7 @@
 """Constants for the BBOChat app."""
 from pathlib import Path
 from appdirs import user_config_dir, user_data_dir
+import userpaths
 
 from psiutils.known_paths import resolve_path
 
@@ -14,10 +15,14 @@ HELP_URI = ''
 # Config
 CONFIG_PATH = Path(user_config_dir(APP_NAME, APP_AUTHOR), 'config.toml')
 USER_DATA_DIR = user_data_dir(APP_NAME, APP_AUTHOR)
+DOCS_DIR = userpaths.get_my_documents()
 
 # GUI
 APP_TITLE = 'BBO Chat'
 ICON_FILE = resolve_path('images/icon.png', __file__)
+
+# Dates
+YYYYMMDD = '%Y%m%d'
 
 # Data
 DATA_FILE = Path(USER_DATA_DIR, 'data.json')

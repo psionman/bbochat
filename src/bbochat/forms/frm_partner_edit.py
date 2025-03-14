@@ -22,14 +22,18 @@ class PartnerEditFrame():
         self.root = tk.Toplevel(parent.root)
         self.parent = parent
         self.mode = mode
+        self.data_store = parent.data_store
+        self.data_store.read()
         self.partners = parent.partners
-        self.greetings = parent.greetings
+        self.greetings = self.data_store.greetings
+        ic(self.greetings)
         self.status = DIALOG_STATUS['null']
         self.config = get_config()
 
         if not partner:
             partner = Partner()
-            partner.greeting = self.greetings[0]
+            if self.greetings:
+                partner.greeting = self.greetings[0]
         self.partner = partner
 
         # tk variables

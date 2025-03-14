@@ -38,6 +38,7 @@ class MasterFrame():
         frame = tk.PanedWindow(master, orient=tk.HORIZONTAL)
 
         opponents_frame = OpponentsFrame(self, frame)
+        self.opponents_frame = opponents_frame
         self.players_frame = opponents_frame.opponents_frame
         self.pair_tree = opponents_frame.pair_tree
         self.search_entry = opponents_frame.search_entry

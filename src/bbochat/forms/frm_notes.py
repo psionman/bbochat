@@ -10,11 +10,10 @@ from pathlib import Path
 from psiutils.constants import PAD
 from psiutils.widgets import PsiText
 from psiutils.buttons import Button
-from psiutils.utilities import create_directories
 
 from config import config
 import text
-from constants import TXT_FILE_TYPES
+from constants import TXT_FILE_TYPES, DOCS_DIR, APP_NAME, YYYYMMDD
 from data import Partner
 
 
@@ -23,9 +22,17 @@ class NotesFrame():
         self.parent = parent
         self.root = parent.root
         self.partner = parent.partner
+        # self.docs_path = Path(DOCS_DIR, APP_NAME, self.partner.username)
 
         # Tk variables
-        self.path = tk.StringVar(value='')
+        path = Path(DOCS_DIR, APP_NAME)
+        date = datetime.now().strftime(YYYYMMDD)
+        # if self.partner:
+        #     path = Path(self.docs_path, f'{date}.txt')
+
+        self.path = tk.StringVar(value=path)
+        self.notes = tk.StringVar(value='')
+        self.notes.trace_add('write', self._value_changed)
 
         self.notes_frame = self._get_notes_frame(master)
         self._get_partners_notes()
@@ -59,16 +66,26 @@ class NotesFrame():
 
     def _save(self, *args) -> None:
         notes = self.notes_text.get('1.0', tk.END)
-        create_directories(Path(self.path.get()).parent)
+        path = Path(self.path.get())
+        Path(path.parent).mkdir(parents=True, exist_ok=True)
+        f_notes = filedialog.asksaveasfile(
+            initialfile=path,
+            mode='w', defaultextension=".txt")
+        if f_notes is None:
+            return
         with open(self.path.get(), 'w') as f_notes:
             f_notes.write(notes)
         self.save_button.enable(False)
 
     def _get_path(self, *args) -> None:
-        file_path = Path(self.path.get())
+        path = Path(self.path.get()).parent
+        ic(path)
+        while not path.is_dir():
+            path = Path(self.path.get()).parent.parent
+
         if path := filedialog.askopenfilename(
-            initialdir=file_path.parent,
-            initialfile=file_path,
+            initialdir=path,
+            # initialfile=self.path.get(),
             parent=self.root,
             filetypes=TXT_FILE_TYPES,
         ):
@@ -79,7 +96,7 @@ class NotesFrame():
         if not config.notes_path:
             return
 
-        date = datetime.now().strftime('%Y%m%d')
+        date = datetime.now().strftime(YYYYMMDD)
         file_name = f'{self.partner.username}_{date}.txt'
         path = str(Path(config.notes_path, file_name))
         self.path.set(value=path)
@@ -95,3 +112,8 @@ class NotesFrame():
     def change_partner(self, partner: Partner) -> None:
         self.partner = partner
         self._get_partners_notes()
+
+    def _value_changed(self, *args):  # *args essential here to make it work
+        notes = self.notes_text.get('1.0', tk.END)
+        if self.notes.get() != notes:
+            self.save_button.enable()

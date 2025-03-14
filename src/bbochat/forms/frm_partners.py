@@ -20,8 +20,9 @@ class PartnerFrame():
         self.parent = parent
         self.root = parent.root
         self.partner = parent.partner
-        self.partners = parent.partners
-        self.greetings = parent.greetings
+        self.data_store = parent.data_store
+        self.partners = self.data_store.partners
+        self.greetings = self.data_store.greetings
         self.partners_names = self.parent.partners_names
         self.last_partner = config.last_partner
         self.greeting = parent.greeting
@@ -177,6 +178,7 @@ class PartnerFrame():
         if dlg.status != DIALOG_STATUS['ok']:
             return
         self.partner = dlg.partner
+        self.partners[self.partner.username] = self.partner
         partners_names = sorted(list(self.partners))
         self.partners_list.set(partners_names)
 

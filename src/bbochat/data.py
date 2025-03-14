@@ -101,9 +101,6 @@ class DataStore():
             return FILE_NOT_FOUND
 
         data = self._get_json(raw_data)
-        if data == INVALID_JSON:
-            return INVALID_JSON
-
         self.data_sets = {
             'partners': {},
             'pairs': [],
@@ -113,6 +110,8 @@ class DataStore():
             'chat': {},
             'my_name': '',
         }
+        if data == INVALID_JSON:
+            return INVALID_JSON
         if 'partners' in data:
             self.partners = self._get_partners(data['partners'])
             self.data_sets['partners'] = self.partners

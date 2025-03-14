@@ -97,7 +97,10 @@ class MainFrame():
     def show(self):
         root = self.root
         root.protocol("WM_DELETE_WINDOW", self.dismiss)
-        root.geometry(self.config.geometry[Path(__file__).stem])
+        try:
+            root.geometry(self.config.geometry[Path(__file__).stem])
+        except tk.TclError:
+            root.geometry('1250x700')
         root.title(FRAME_TITLE)
         root.bind('<Control-x>', self.dismiss)
         root.bind('<Control-g>', self._greeting)
@@ -162,14 +165,14 @@ class MainFrame():
 
         entry = ttk.Entry(frame, textvariable=self.name_1)
         entry.grid(row=2, column=3, pady=PAD)
-        entry.bind('<KeyRelease>', self.update_clipboard)
+        entry.bind('<KeyRelease>', self._update_clipboard)
 
         entry = ttk.Entry(frame, textvariable=self.username_2)
         entry.grid(row=1, column=4, padx=PAD)
 
         entry = ttk.Entry(frame, textvariable=self.name_2)
         entry.grid(row=2, column=4, pady=PAD)
-        entry.bind('<KeyRelease>', self.update_clipboard)
+        entry.bind('<KeyRelease>', self._update_clipboard)
 
         self.save_button = ttk.Button(frame, text=text.SAVE,
                                       command=self._save_names)
@@ -274,6 +277,9 @@ class MainFrame():
             )
         self.clipboard_entry.configure(style='style.TEntry')
 
+    def _update_clipboard(self, *args) -> None:
+        self.update_clipboard()
+
     def update_clipboard(
             self, message: str = '', mode: int = None, *args) -> None:
         names = f'{self.my_name}'
@@ -345,8 +351,8 @@ class MainFrame():
         self.search.set('')
         self.pair_tree.delete(*self.pair_tree.get_children())
         self.search.set(self.username_1.get())
-        self.master_tab.name_search()
         self.search_entry.focus_set()
+        self.master_tab.opponents_frame.name_search()
         self.update_clipboard()
 
     def _delete_pair(self, *args) -> None:
