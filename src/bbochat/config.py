@@ -27,6 +27,7 @@ DEFAULT_CONFIG = {
     },
     'vertical_sashes': [(250, 1), (500, 1), (750, 1)],
     'horizontal_sashes': [(1, 200)],
+    'notes_sashes': [(620, 1)],
 }
 
 

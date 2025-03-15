@@ -43,7 +43,7 @@ class OpponentsFrame():
         frame.rowconfigure(2, weight=1)
 
         label = ttk.Label(frame, text='Opponents')
-        label.grid(row=0, column=0, padx=PAD, pady=PAD)
+        label.grid(row=0, column=0, padx=PAD)
 
         self.search_entry = ttk.Entry(frame, textvariable=self.search)
         self.search_entry.grid(row=1, column=0, sticky=tk.EW)
@@ -52,7 +52,7 @@ class OpponentsFrame():
 
         self.pair_tree = self._pair_tree(frame)
         self.pair_tree.grid(row=2, column=0,
-                            sticky=tk.NSEW)
+                            sticky=tk.NSEW, pady=PAD)
 
         return frame
 

@@ -26,7 +26,6 @@ class PartnerEditFrame():
         self.data_store.read()
         self.partners = parent.partners
         self.greetings = self.data_store.greetings
-        ic(self.greetings)
         self.status = DIALOG_STATUS['null']
         self.config = get_config()
 

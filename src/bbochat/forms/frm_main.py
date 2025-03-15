@@ -97,10 +97,7 @@ class MainFrame():
     def show(self):
         root = self.root
         root.protocol("WM_DELETE_WINDOW", self.dismiss)
-        try:
-            root.geometry(self.config.geometry[Path(__file__).stem])
-        except tk.TclError:
-            root.geometry('1250x700')
+        root.geometry(self._geometry())
         root.title(FRAME_TITLE)
         root.bind('<Control-x>', self.dismiss)
         root.bind('<Control-g>', self._greeting)
@@ -125,6 +122,15 @@ class MainFrame():
 
         sizegrip = ttk.Sizegrip(root)
         sizegrip.grid(sticky=tk.SE)
+
+    def _geometry(self) -> str:
+        default = '1250x700'
+        try:
+            geometry = self.config.geometry[Path(__file__).stem]
+            width = int(geometry.split('x')[0])
+            return default if width < 10 else geometry
+        except tk.TclError:
+            return default
 
     def _main_frame(self, master: tk.Frame) -> ttk.Frame:
         frame = ttk.Frame(master)
@@ -412,10 +418,14 @@ class MainFrame():
         horizontal_sashes = [
             self.master_tab.chat_panel.sash_coord(index)
             for index in range(1)]
+        notes_sashes = [
+            self.notes_tab.notes_panel.sash_coord(index)
+            for index in range(1)]
 
         self.config = get_config()
         self.config.update('vertical_sashes', vertical_sashes)
         self.config.update('horizontal_sashes', horizontal_sashes)
+        self.config.update('notes_sashes', notes_sashes)
         self.config.save()
 
     def dismiss(self, *args) -> None:

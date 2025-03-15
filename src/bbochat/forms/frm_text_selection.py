@@ -63,7 +63,7 @@ class TextSelectionFrame():
 
         if self.show_title:
             label = ttk.Label(frame, text=f'{self.mode_text.capitalize()}s')
-            label.grid(row=0, column=0, pady=PAD)
+            label.grid(row=0, column=0)
 
         self.listbox = tk.Listbox(
             frame,
@@ -99,7 +99,7 @@ class TextSelectionFrame():
         entry.bind('<Key>', lambda e: 'break')
 
         button_frame = ButtonFrame(frame, tk.HORIZONTAL)
-        buttons = [
+        button_frame.buttons = [
             Button(
                 button_frame,
                 text='Use',
@@ -111,8 +111,6 @@ class TextSelectionFrame():
                 command=self._edit_all,
                 underline=0),
         ]
-
-        button_frame.buttons = buttons
         button_frame.grid(row=2, column=0, pady=PAD)
 
         return frame
