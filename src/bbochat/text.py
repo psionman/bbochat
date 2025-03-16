@@ -1,4 +1,5 @@
 OK = 'OK'
+HELP = 'Help'
 EXIT = 'Exit'
 QUIT = 'Quit'
 CANCEL = 'Cancel'
@@ -6,6 +7,7 @@ CLOSE = 'Close'
 COPY = 'Copy'
 EVENT = 'Event'
 SAVE = 'Save'
+SAVE_PDF = 'Save as PDF'
 NEW = 'New'
 EDIT = 'Edit'
 EDIT_ALL = 'Edit all'
@@ -34,4 +36,9 @@ To insert your partner's and your names, use '<names>';\n
 to insert your opponents' names, use '<opps>';\n
 to insert your system, use '<system>'.\n
 (To remove this hint goto {CONFIG}).
+"""
+
+REPORT_HELP = """
+To format board number in the report, enter board number as 'b1'. etc.; \n
+to display suit symbols in the report, enter suits as '!s', '!h' etc.
 """

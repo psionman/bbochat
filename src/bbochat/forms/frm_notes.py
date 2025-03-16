@@ -7,16 +7,19 @@ from tkinter import ttk, filedialog, messagebox
 from datetime import datetime
 from pathlib import Path
 import json
-import pypandoc
+import re
+from dateutil.parser import parse   # type: ignore
 
 from psiutils.constants import PAD
-from psiutils.widgets import PsiText
+from psiutils.widgets import PsiText, Tooltip
 from psiutils.buttons import Button, ButtonFrame
 
 from config import get_config
 import text
 from constants import TXT_FILE_TYPES, DOCS_DIR, APP_NAME, YYYYMMDD, FRAME_WIDTH
 from data import Partner
+
+from forms.frm_report import ReportFrame
 
 
 class NotesFrame():
@@ -25,6 +28,7 @@ class NotesFrame():
         self.root = parent.root
         self.partner = parent.partner
         self.config = get_config()
+        self.report_date = datetime.now()
 
         # Tk variables
         path = Path(DOCS_DIR, APP_NAME)
@@ -35,6 +39,7 @@ class NotesFrame():
 
         self.path = tk.StringVar()
         self.set_path()
+        self.tooltip_text = tk.StringVar(value=text.REPORT_HELP)
 
         self.notes_frame = self._get_notes_frame(master)
 
@@ -51,6 +56,7 @@ class NotesFrame():
         date = datetime.now().strftime(YYYYMMDD)
         path = Path(path, f'{date}.txt')
         self.path.set(path)
+        self._get_date_from_path()
 
     def _get_notes_frame(self, master: ttk.Frame) -> ttk.Frame:
         frame = ttk.Frame(master)
@@ -73,6 +79,15 @@ class NotesFrame():
 
     def _button_frame(self, master: ttk.Frame) -> ttk.Frame:
         button_frame = ButtonFrame(master, tk.HORIZONTAL)
+
+        help_button = ttk.Button(
+                button_frame,
+                text=text.HELP,)
+        help_button.tooltip = Tooltip(
+            help_button,
+            textvariable=self.tooltip_text,
+            wrap_length=3500,
+            vertical_offset=0)
         button_frame.buttons = [
             Button(button_frame, text=text.OPEN, command=self._open_file),
             Button(
@@ -85,7 +100,9 @@ class NotesFrame():
                 text=text.REPORT,
                 command=self._report,
                 dimmable=True),
+            # help_button,
             ]
+        help_button.grid(row=0, column=9, padx=PAD)
         button_frame.disable()
         return button_frame
 
@@ -157,11 +174,7 @@ class NotesFrame():
         if f_notes is None:
             return
 
-        # with open(self.path.get(), 'w') as f_notes:
-        #     f_notes.write(notes)
-
-        json_path = self.path.get().replace('txt', 'json')
-        with open(json_path, 'w') as f_notes:
+        with open(self.path.get(), 'w') as f_notes:
             json.dump(notes, f_notes)
 
         self.button_frame.enable(False)
@@ -185,25 +198,38 @@ class NotesFrame():
                 return
             self.path.set(path)
             self._notes_contents()
+            self._get_date_from_path()
+
+    def _get_date_from_path(self) -> datetime:
+        if match := re.search(r'[0-9]' * 8, str(self.path.get())):
+            self.date = parse(match.group())
 
     def _get_notes_and_display(self) -> None:
-        json_path = Path(self.path.get().replace('txt', 'json'))
-        if not json_path.is_file():
+        if not self.path.get().is_file():
             return
 
     def _notes_contents(self) -> str:
         self.general_notes.delete('0.0', tk.END)
         self.board_notes.delete('0.0', tk.END)
-        with contextlib.suppress(FileNotFoundError):
-            json_path = self.path.get().replace('txt', 'json')
-            with open(json_path, 'r') as f_notes:
-                notes = json.load(f_notes)
+
+        notes = self.get_notes_content()
+        if 'board_notes' in notes:
             self.board_notes.insert('1.0', notes['board_notes'])
+        if 'general_notes' in notes:
             self.general_notes.insert('1.0', notes['general_notes'])
 
+    def get_notes_content(self) -> dict[str]:
+        with contextlib.suppress(FileNotFoundError):
+            with open(self.path.get(), 'r') as f_notes:
+                return json.load(f_notes)
+        return {}
+
     def _report(self, *args) -> None:
-        output = pypandoc.convert_file(
-            'input.md', 'pdf', outputfile='output.pdf')
+        dlg = ReportFrame(self)
+        self.root.wait_window(dlg.root)
+
+        # output = pypandoc.convert_file(
+        #     'input.md', 'pdf', outputfile='output.pdf')
 
     def _value_changed(self, *args):  # *args essential here to make it work
         board_notes = self. board_notes.get('1.0', tk.END)
