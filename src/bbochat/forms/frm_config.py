@@ -25,6 +25,8 @@ class ConfigFrame():
         self.parent = parent
         self.config = get_config()
         self.colours = dict(self.config.colours)
+        self.css = self.config.css
+        self.css_element = None
 
         # tk variables
         self.data_directory = tk.StringVar(value=self.config.data_directory)
@@ -267,20 +269,22 @@ class ConfigFrame():
         self.config.update('randomize_name_order', name_order)
         self.config.update('show_tooltips', self.show_tooltips.get())
         self.config.update('colours', dict(self.colours))
+        self.config.update('css', dict(self.css))
         save_config(self.config)
         self.config = get_config()
         self.dismiss()
 
     def display_html(self) -> None:
-        display_html(self.html_frame, HTML_TEST, self.config.css)
+        display_html(self.html_frame, HTML_TEST, self.css)
 
     def _css_edit(self) -> None:
         dlg = ConfigCssFrame(self)
         self.root.wait_window(dlg.root)
         if dlg.status != DIALOG_STATUS['ok']:
             return
-        self.config.update('css', dlg.css)
-        self.config.css = dlg.css
+
+        self.css_element = dlg.element.get()
+        self.css = dlg.css
         self.display_html()
 
     def dismiss(self, *args) -> None:

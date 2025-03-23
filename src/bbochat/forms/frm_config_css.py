@@ -2,6 +2,7 @@
 import tkinter as tk
 from tkinter import ttk
 from tkinter.colorchooser import askcolor
+from tkinterweb import HtmlFrame
 from pathlib import Path
 from copy import deepcopy
 
@@ -10,7 +11,8 @@ from psiutils.buttons import ButtonFrame, Button
 from psiutils.utilities import window_resize
 from psiutils.widgets import clickable_widget
 
-from constants import APP_TITLE
+from constants import APP_TITLE, HTML_TEST
+from utilities_bbochat import display_html
 import text
 
 FRAME_TITLE = f'{APP_TITLE} - css  {text.CONFIG}'
@@ -31,8 +33,7 @@ class ConfigCssFrame():
         self.root = tk.Toplevel(parent.root)
         self.parent = parent
         self.config = parent.config
-        self.css = deepcopy(self.parent.config.css)
-        ic(self.css['h2'])
+        self.css = deepcopy(parent.css)
         self.status = DIALOG_STATUS['null']
 
         # tk variables
@@ -47,6 +48,13 @@ class ConfigCssFrame():
         self.colour_entries = {
             'color': self.colour_entry,
         }
+        self.display_html()
+        if parent.css_element:
+            self.element.set(parent.css_element)
+            self.font_size.set(self.css[parent.css_element]['font-size'])
+            self.element_css = self.css[self.element.get()]
+            self._update_attribute_colours()
+            self._enable_properties()
 
     def show(self) -> None:
         root = self.root
@@ -68,7 +76,7 @@ class ConfigCssFrame():
 
     def _main_frame(self, master: tk.Frame) -> ttk.Frame:
         frame = ttk.Frame(master)
-        frame.rowconfigure(0, weight=1)
+        frame.rowconfigure(1, weight=1)
         frame.columnconfigure(1, weight=1)
 
         elements = self._element_frame(frame)
@@ -77,17 +85,20 @@ class ConfigCssFrame():
         self.property_frame = self._property_frame(frame)
         self.property_frame.grid(
             row=0, column=1, sticky=tk.N, padx=PAD)
+        self._enable_properties(False)
+
+        self.html_frame = HtmlFrame(frame, messages_enabled=False, height=200)
+        self.html_frame.grid(row=1, column=0, columnspan=2, sticky=tk.NSEW)
+        self.html_frame.grid_propagate(0)
 
         self.button_frame = self._button_frame(frame)
-        self.button_frame.grid(row=1, column=0, columnspan=2,
+        self.button_frame.grid(row=2, column=0, columnspan=2,
                                sticky=tk.EW, padx=PAD, pady=PAD)
 
         return frame
 
     def _element_frame(self, master: tk.Frame) -> ttk.Frame:
         frame = ttk.Frame(master)
-        # # frame.rowconfigure(0, weight=1)
-        # frame.columnconfigure(1, weight=1)
         for row, (value, text_) in enumerate(ELEMENTS.items()):
             button = ttk.Radiobutton(
                 frame,
@@ -102,8 +113,6 @@ class ConfigCssFrame():
 
     def _property_frame(self, master: tk.Frame) -> ttk.Frame:
         frame = ttk.Frame(master)
-        # # frame.rowconfigure(0, weight=1)
-        # frame.columnconfigure(1, weight=1)
 
         row = 0
         label = ttk.Label(frame, text='Font size')
@@ -152,7 +161,7 @@ class ConfigCssFrame():
         return frame
 
     def _element_selected(self, *args) -> None:
-        self.element_css = self.config.css[self.element.get()]
+        self.element_css = self.css[self.element.get()]
         self.font_size.set(self.element_css['font-size'])
 
         self.colours['color'] = 'black'
@@ -160,6 +169,7 @@ class ConfigCssFrame():
             self.colours['color'] = self.element_css['color']
 
         self._update_attribute_colours()
+        self._enable_properties()
 
     def _font_size_changed(self, *args) -> None:
         self.css[self.element.get()]['font-size'] = self.font_size.get()
@@ -172,8 +182,8 @@ class ConfigCssFrame():
         if colour[1]:
             self.element_css[attribute] = colour[1]
             self.css[self.element.get()][attribute] = colour[1]
-            ic(self.css[self.element.get()][attribute])
             self._update_attribute_colours()
+            self._check_value_changed()
 
     def _update_attribute_colours(self) -> None:
         for attribute, entry in self.colour_entries.items():
@@ -189,12 +199,19 @@ class ConfigCssFrame():
             )
         entry.configure(style=f'style_{attribute}.TEntry')
 
+    def display_html(self) -> None:
+        display_html(self.html_frame, HTML_TEST, self.css)
+
+    def _enable_properties(self, enable: bool = True) -> None:
+        state = '' if enable else 'disable'
+        for child in self.property_frame.winfo_children():
+            child.configure(state=state)
+
     def _check_value_changed(self) -> None:
         self.button_frame.disable()
-        ic(self.css[self.element.get()]['color'])
-        ic(self.config.css[self.element.get()]['color'])
         if self.css != self.config.css:
             self.button_frame.enable()
+        self.display_html()
 
     def _ok(self, *args) -> None:
         self.status = DIALOG_STATUS['ok']
