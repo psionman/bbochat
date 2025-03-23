@@ -1,8 +1,9 @@
 import tkinter as tk
-from tkinter import messagebox, simpledialog
+from tkinter import simpledialog
 import webbrowser
 
 from psiutils.menus import Menu, MenuItem
+from psiutils import messagebox
 
 from constants import AUTHOR, APP_TITLE, HELP_URI
 from _version import __version__
@@ -69,14 +70,14 @@ class MainMenu():
         webbrowser.open(HELP_URI)
 
     def _show_data_directory(self):
-        dir = f'Data directory: {config.data_directory} {SPACES}'
-        messagebox.showinfo(title='Data directory', message=dir)
+        directory = f'Data directory: {config.data_directory} {SPACES}'
+        messagebox.showinfo(self, title='Data directory', message=directory)
 
     def _show_about(self):
         about = (f'{APP_TITLE}\n'
                  f'Version: {__version__}\n'
                  f'Author: {AUTHOR} {SPACES}')
-        messagebox.showinfo(title=f'About {APP_TITLE}', message=about)
+        messagebox.showinfo(self, title=f'About {APP_TITLE}', message=about)
 
     def dismiss(self, *args):
         self.root.destroy()

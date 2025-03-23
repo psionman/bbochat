@@ -16,7 +16,7 @@ import text
 
 class TextDialogFrame():
     def __init__(self,
-                 parent: tk.Frame,
+                 parent: ttk.Frame,
                  title: str = 'Text dialog',
                  default: str = '') -> None:
         self.root = tk.Toplevel(parent.root)
@@ -64,7 +64,7 @@ class TextDialogFrame():
         sizegrip = ttk.Sizegrip(root)
         sizegrip.grid(sticky=tk.SE)
 
-    def _main_frame(self, master: tk.Frame) -> ttk.Frame:
+    def _main_frame(self, master: ttk.Frame) -> ttk.Frame:
         frame = ttk.Frame(master)
         frame.columnconfigure(1, weight=1)
 
@@ -74,13 +74,13 @@ class TextDialogFrame():
         self.entry = self._get_entry(frame)
         self.entry.grid(row=0, column=1, sticky=tk.EW)
 
-        check_button = tk.Checkbutton(frame, text='Hidden item',
+        check_button = ttk.Checkbutton(frame, text='Hidden item',
                                       variable=self.hidden_item)
         check_button.grid(row=1, column=1, sticky=tk.W)
 
         return frame
 
-    def _button_frame(self, master: tk.Frame) -> tk.Frame:
+    def _button_frame(self, master: ttk.Frame) -> ttk.Frame:
         frame = ButtonFrame(master, tk.HORIZONTAL)
         frame.buttons = [
             Button(
@@ -98,7 +98,7 @@ class TextDialogFrame():
         frame.enable(False)
         return frame
 
-    def _get_entry(self, master: tk.Frame) -> ttk.Entry:
+    def _get_entry(self, master: ttk.Frame) -> ttk.Entry:
         entry = ttk.Entry(master, textvariable=self.text_value)
         entry.select_range(start=0, end='end')
         entry.icursor(len(self.default))

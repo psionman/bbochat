@@ -1,0 +1,206 @@
+""" ConfigCssFrame for BBO Chat."""
+import tkinter as tk
+from tkinter import ttk
+from tkinter.colorchooser import askcolor
+from pathlib import Path
+from copy import deepcopy
+
+from psiutils.constants import PAD, Pad, DIALOG_STATUS
+from psiutils.buttons import ButtonFrame, Button
+from psiutils.utilities import window_resize
+from psiutils.widgets import clickable_widget
+
+from constants import APP_TITLE
+import text
+
+FRAME_TITLE = f'{APP_TITLE} - css  {text.CONFIG}'
+
+ELEMENTS = {
+    'h1': 'Heading 1',
+    'h2': 'Heading 2',
+    'h3': 'Heading 3',
+    'p,ul': 'Text',
+}
+
+COLOURS = ['color', 'background-color']
+
+
+class ConfigCssFrame():
+    def __init__(self, parent: tk.Frame) -> None:
+        self.focus = False
+        self.root = tk.Toplevel(parent.root)
+        self.parent = parent
+        self.config = parent.config
+        self.css = deepcopy(self.parent.config.css)
+        ic(self.css['h2'])
+        self.status = DIALOG_STATUS['null']
+
+        # tk variables
+        self.element = tk.StringVar()
+        self.font_size = tk.IntVar()
+        self.colours = {colour: '' for colour in COLOURS}
+
+        self.font_size.trace_add('write', self._font_size_changed)
+
+        self.show()
+
+        self.colour_entries = {
+            'color': self.colour_entry,
+        }
+
+    def show(self) -> None:
+        root = self.root
+        root.geometry(self.config.geometry[Path(__file__).stem])
+        root.transient(self.parent.root)
+        root.title(FRAME_TITLE)
+        root.bind('<Configure>',
+                  lambda event, arg=None: window_resize(self, __file__))
+        root.bind('<Control-x>', self.dismiss)
+
+        root.rowconfigure(0, weight=1)
+        root.columnconfigure(0, weight=1)
+
+        main_frame = self._main_frame(root)
+        main_frame.grid(row=0, column=0, sticky=tk.NSEW, padx=PAD, pady=PAD)
+
+        sizegrip = ttk.Sizegrip(root)
+        sizegrip.grid(sticky=tk.SE)
+
+    def _main_frame(self, master: tk.Frame) -> ttk.Frame:
+        frame = ttk.Frame(master)
+        frame.rowconfigure(0, weight=1)
+        frame.columnconfigure(1, weight=1)
+
+        elements = self._element_frame(frame)
+        elements.grid(row=0, column=0, sticky=tk.N)
+
+        self.property_frame = self._property_frame(frame)
+        self.property_frame.grid(
+            row=0, column=1, sticky=tk.N, padx=PAD)
+
+        self.button_frame = self._button_frame(frame)
+        self.button_frame.grid(row=1, column=0, columnspan=2,
+                               sticky=tk.EW, padx=PAD, pady=PAD)
+
+        return frame
+
+    def _element_frame(self, master: tk.Frame) -> ttk.Frame:
+        frame = ttk.Frame(master)
+        # # frame.rowconfigure(0, weight=1)
+        # frame.columnconfigure(1, weight=1)
+        for row, (value, text_) in enumerate(ELEMENTS.items()):
+            button = ttk.Radiobutton(
+                frame,
+                text=text_,
+                variable=self.element,
+                value=value,
+                command=self._element_selected,
+            )
+            button.grid(row=row, column=0, sticky=tk.W)
+
+        return frame
+
+    def _property_frame(self, master: tk.Frame) -> ttk.Frame:
+        frame = ttk.Frame(master)
+        # # frame.rowconfigure(0, weight=1)
+        # frame.columnconfigure(1, weight=1)
+
+        row = 0
+        label = ttk.Label(frame, text='Font size')
+        label.grid(row=row, column=0, sticky=tk.E, padx=PAD, pady=PAD)
+        spinbox = ttk.Spinbox(
+            frame,
+            format='',
+            from_=1,
+            to=36,
+            increment=1,
+            textvariable=self.font_size,)
+        spinbox.grid(row=row, column=1, sticky=tk.E, padx=PAD)
+        clickable_widget(spinbox)
+
+        row += 1
+        label = ttk.Label(frame, text='Text colour')
+        label.grid(row=row, column=0, sticky=tk.E, padx=PAD, pady=PAD)
+        self.colour_entry = ttk.Entry(frame)
+        self.colour_entry.grid(row=row, column=1,
+                               sticky=tk.EW, padx=PAD, pady=PAD)
+
+        button = ttk.Button(frame, text=text.ELLIPSIS)
+        button.grid(row=row, column=2, padx=Pad.W)
+        button.bind('<Button-1>',
+                    lambda e: self._ask_colour('color'))
+
+        return frame
+
+    def _button_frame(self, master: tk.Frame) -> tk.Frame:
+        frame = ButtonFrame(master, tk.HORIZONTAL)
+        frame.buttons = [
+            Button(
+                frame,
+                text=text.OK,
+                command=self._ok,
+                dimmable=True,
+                underline=1),
+            Button(
+                frame,
+                text=text.EXIT,
+                command=self.dismiss,
+                sticky=tk.E,
+                underline=1),
+        ]
+        frame.enable(False)
+        return frame
+
+    def _element_selected(self, *args) -> None:
+        self.element_css = self.config.css[self.element.get()]
+        self.font_size.set(self.element_css['font-size'])
+
+        self.colours['color'] = 'black'
+        if 'color' in self.element_css:
+            self.colours['color'] = self.element_css['color']
+
+        self._update_attribute_colours()
+
+    def _font_size_changed(self, *args) -> None:
+        self.css[self.element.get()]['font-size'] = self.font_size.get()
+        self._check_value_changed()
+
+    def _ask_colour(self, attribute: str) -> None:
+        colour = askcolor(
+            initialcolor=self.colours[attribute],
+            title=f'{attribute.capitalize()} colour',)
+        if colour[1]:
+            self.element_css[attribute] = colour[1]
+            self.css[self.element.get()][attribute] = colour[1]
+            ic(self.css[self.element.get()][attribute])
+            self._update_attribute_colours()
+
+    def _update_attribute_colours(self) -> None:
+        for attribute, entry in self.colour_entries.items():
+            self._update_attribute_colour(attribute, entry)
+
+    def _update_attribute_colour(
+            self, attribute: str, entry: ttk.Entry) -> None:
+        colour = self.element_css[attribute]
+        entry_style = ttk.Style()
+        entry_style.configure(
+            f'style_{attribute}.TEntry',
+            fieldbackground=colour,
+            )
+        entry.configure(style=f'style_{attribute}.TEntry')
+
+    def _check_value_changed(self) -> None:
+        self.button_frame.disable()
+        ic(self.css[self.element.get()]['color'])
+        ic(self.config.css[self.element.get()]['color'])
+        if self.css != self.config.css:
+            self.button_frame.enable()
+
+    def _ok(self, *args) -> None:
+        self.status = DIALOG_STATUS['ok']
+        # self.config.update('css', self.css)
+        self.dismiss()
+
+    def dismiss(self, *args) -> None:
+        self.focus = False
+        self.root.destroy()

@@ -1,12 +1,13 @@
 """Text Selection frame for BBO Chat."""
 
 import tkinter as tk
-from tkinter import ttk, messagebox
+from tkinter import ttk
 
 from psiutils.constants import PAD, DIALOG_STATUS
 from psiutils.widgets import HAND
 from psiutils.buttons import ButtonFrame, Button
 from psiutils.menus import Menu, MenuItem
+from psiutils import messagebox
 
 from constants import MODE_TEXT
 from config import get_config
@@ -19,8 +20,8 @@ from forms.frm_text_dialog import TextDialogFrame
 
 class TextSelectionFrame():
     def __init__(self,
-                 parent: tk.Frame,
-                 master: tk.Frame,
+                 parent: ttk.Frame,
+                 master: ttk.Frame,
                  mode: int,
                  data_manager: DataManager,
                  show_use_frame: bool = True,
@@ -80,7 +81,7 @@ class TextSelectionFrame():
 
         return frame
 
-    def _use_frame(self, master) -> tk.Frame:
+    def _use_frame(self, master) -> ttk.Frame:
         frame = ttk.Frame(master)
         frame.columnconfigure(0, weight=1)
 
@@ -158,7 +159,7 @@ class TextSelectionFrame():
         self._use_item()
 
     def _delete_item(self, *args) -> None:
-        if not messagebox.askyesno('Delete item', text.DELETE_ITEM):
+        if not messagebox.askyesno(self, text.DELETE_TITLE, text.DELETE_ITEM):
             return
 
         self.data.delete(self)

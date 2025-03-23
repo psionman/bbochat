@@ -2,19 +2,24 @@
 import tkinter as tk
 from tkinter import ttk, filedialog
 from tkinter.colorchooser import askcolor
+from tkinterweb import HtmlFrame
 from pathlib import Path
 
 from psiutils.buttons import ButtonFrame, Button, enable_buttons
 from psiutils.widgets import separator_frame
-from psiutils.constants import PAD, PADT, Pad
+from psiutils.constants import PAD, PADT, Pad, DIALOG_STATUS
 from psiutils.utilities import window_resize
 
 from config import get_config, save_config
+from utilities_bbochat import display_html
+from constants import HTML_TEST
 import text
+
+from forms.frm_config_css import ConfigCssFrame
 
 
 class ConfigFrame():
-    """ConfigFrame for <application>."""
+    """ConfigFrame for BBO Chat."""
     def __init__(self, parent):
         self.root = tk.Toplevel(parent.root)
         self.parent = parent
@@ -26,21 +31,25 @@ class ConfigFrame():
         self.randomize_name_order = tk.BooleanVar(
             value=self.config.randomize_name_order)
         self.show_tooltips = tk.BooleanVar(value=self.config.show_tooltips)
-        self.notes_path = tk.StringVar(value=self.config.notes_path)
+        self.tournament_notes_directory = tk.StringVar(
+            value=self.config.tournament_notes_directory)
 
         self.data_directory.trace_add('write', self._check_value_changed)
-        self.notes_path.trace_add('write', self._check_value_changed)
+        self.tournament_notes_directory.trace_add(
+            'write', self._check_value_changed)
         self.randomize_name_order.trace_add('write', self._check_value_changed)
         self.show_tooltips.trace_add('write', self._check_value_changed)
 
         self.show()
 
-        self.modes = {
+        self.colour_entries = {
             'greeting': self.greeting_entry,
             'valediction': self.valediction_entry,
             'chat': self.chat_entry,
         }
         self._update_mode_colours()
+
+        self.display_html()
 
     def show(self) -> None:
         root = self.root
@@ -53,54 +62,40 @@ class ConfigFrame():
         root.bind('<Configure>',
                   lambda e: window_resize(self, __file__))
 
-        root.rowconfigure(1, weight=1)
+        root.rowconfigure(0, weight=1)
         root.columnconfigure(0, weight=1)
 
-        main_frame = self._main_frame(root)
+        frame = ttk.Frame(root)
+        frame.grid(row=0, column=0, padx=0, sticky=tk.NSEW)
+        frame.rowconfigure(0, weight=1)
+        frame.columnconfigure(0, weight=1)
+
+        main_frame = self._main_frame(frame)
         main_frame.grid(row=0, column=0, sticky=tk.NSEW, padx=PAD, pady=PAD)
-        self.button_frame = self._button_frame(root)
+
+        self.button_frame = self._button_frame(frame)
         self.button_frame.grid(row=8, column=0, columnspan=9,
                                sticky=tk.EW, padx=PAD, pady=PAD)
 
-        sizegrip = ttk.Sizegrip(root)
+        sizegrip = ttk.Sizegrip(frame)
         sizegrip.grid(sticky=tk.SE)
 
-    def _main_frame(self, master: tk.Frame) -> ttk.Frame:
+    def _main_frame(self, master: ttk.Frame) -> ttk.Frame:
         frame = ttk.Frame(master)
-        frame.rowconfigure(0, weight=1)
         frame.columnconfigure(3, weight=1)
 
         row = 0
-        label = ttk.Label(frame, text='Data directory')
-        label.grid(row=row, column=0, sticky=tk.E, pady=PADT)
-
-        entry = ttk.Entry(frame, textvariable=self.data_directory)
-        entry.grid(row=row, column=1, columnspan=3, sticky=tk.EW, padx=PADT)
-        self.root.after(1, lambda: entry.focus_force())
-
-        button = ttk.Button(frame, text='...',
-                            command=self._get_data_directory)
-        button.grid(row=row, column=4, padx=PAD, pady=PADT)
+        separator = separator_frame(frame, 'Options')
+        separator.grid(row=row, column=0, columnspan=5, sticky=tk.EW, padx=PAD)
 
         row += 1
-        label = ttk.Label(frame, text='Notes directory')
-        label.grid(row=row, column=0, sticky=tk.E, pady=PADT)
-
-        entry = ttk.Entry(frame, textvariable=self.notes_path)
-        entry.grid(row=row, column=1, columnspan=3, sticky=tk.EW, padx=PADT)
-
-        button = ttk.Button(frame, text='...',
-                            command=self._get_notes_directory)
-        button.grid(row=row, column=4, padx=PAD, pady=PADT)
-
-        row += 1
-        check_button = tk.Checkbutton(
+        check_button = ttk.Checkbutton(
             frame, text='Randomize opp\'s name order',
             variable=self.randomize_name_order)
         check_button.grid(row=row, column=1, sticky=tk.W)
 
         row += 1
-        check_button = tk.Checkbutton(
+        check_button = ttk.Checkbutton(
             frame, text='Show tootips',
             variable=self.show_tooltips)
         check_button.grid(row=row, column=1, sticky=tk.W)
@@ -115,7 +110,6 @@ class ConfigFrame():
         self.greeting_entry = ttk.Entry(frame)
         self.greeting_entry.grid(row=row, column=1,
                                  sticky=tk.EW, padx=PAD, pady=PAD)
-
         button = ttk.Button(frame, text=text.ELLIPSIS)
         button.grid(row=row, column=2, padx=Pad.W)
         button.bind('<Button-1>',
@@ -127,8 +121,6 @@ class ConfigFrame():
         self.valediction_entry = ttk.Entry(frame)
         self.valediction_entry.grid(row=row, column=1,
                                     sticky=tk.EW, padx=PAD, pady=PAD)
-        button = ttk.Button(frame, text=text.ELLIPSIS)
-        button.grid(row=row, column=2, padx=Pad.W)
 
         button = ttk.Button(frame, text=text.ELLIPSIS)
         button.grid(row=row, column=2, padx=Pad.W)
@@ -149,9 +141,48 @@ class ConfigFrame():
         button.bind('<Button-1>',
                     lambda e: self._ask_colour('chat'))
 
+        row += 1
+        separator = separator_frame(frame, 'css')
+        separator.grid(row=row, column=0, columnspan=5, sticky=tk.EW, padx=PAD)
+
+        row += 1
+        self.html_frame = HtmlFrame(frame, messages_enabled=False, height=200)
+        self.html_frame.grid(row=row, column=1, columnspan=3, sticky=tk.EW)
+        self.html_frame.grid_propagate(0)
+
+        button = ttk.Button(frame, text=text.EDIT, command=self._css_edit)
+        button.grid(row=row, column=4, sticky=tk.N, padx=PAD)
+
+        row += 1
+        separator = separator_frame(frame, 'File locations')
+        separator.grid(row=row, column=0, columnspan=5, sticky=tk.EW, padx=PAD)
+
+        row += 1
+        label = ttk.Label(frame, text='Data directory')
+        label.grid(row=row, column=0, sticky=tk.E, pady=PADT)
+
+        entry = ttk.Entry(frame, textvariable=self.data_directory)
+        entry.grid(row=row, column=1, columnspan=3, sticky=tk.EW, padx=PADT)
+        # self.root.after(1, lambda: entry.focus_force())
+
+        button = ttk.Button(frame, text='...',
+                            command=self._get_data_directory)
+        button.grid(row=row, column=4, padx=PAD, pady=PADT)
+
+        row += 1
+        label = ttk.Label(frame, text='Tournament notes directory')
+        label.grid(row=row, column=0, sticky=tk.E, pady=PADT)
+
+        entry = ttk.Entry(frame, textvariable=self.tournament_notes_directory)
+        entry.grid(row=row, column=1, columnspan=3, sticky=tk.EW, padx=PADT)
+
+        button = ttk.Button(frame, text='...',
+                            command=self._get_partner_notes_directory)
+        button.grid(row=row, column=4, padx=PAD, pady=PADT)
+
         return frame
 
-    def _button_frame(self, master: tk.Frame) -> tk.Frame:
+    def _button_frame(self, master: ttk.Frame) -> tk.Frame:
         frame = ButtonFrame(master, tk.HORIZONTAL)
         self.buttons = [
             Button(
@@ -181,21 +212,22 @@ class ConfigFrame():
         self.data_directory.set(directory)
         return directory
 
-    def _get_notes_directory(self) -> str:
+    def _get_partner_notes_directory(self) -> str:
         """Return a directory."""
-        original_directory = self.notes_path.get()
+        original_directory = self.tournament_notes_directory.get()
         directory = filedialog.askdirectory(
             initialdir=original_directory,
             parent=self.root,
         )
-        self.notes_path.set(directory)
+        self.tournament_notes_directory.set(directory)
         return directory
 
     def _value_changed(self) -> bool:
         name_order = self.config.randomize_name_order
+        notes_directory = self.config.tournament_notes_directory
         return (
             self.data_directory.get() != self.config.data_directory
-            or self.notes_path.get() != self.config.notes_path
+            or self.tournament_notes_directory.get() != notes_directory
             or self.randomize_name_order.get() != name_order
             or self.show_tooltips.get() != self.config.show_tooltips
             or self.colours != self.config.colours
@@ -211,7 +243,7 @@ class ConfigFrame():
             self._check_value_changed()
 
     def _update_mode_colours(self) -> None:
-        for mode, entry in self.modes.items():
+        for mode, entry in self.colour_entries.items():
             self._update_mode_colour(mode, entry)
 
     def _update_mode_colour(self, mode: str, entry: ttk.Entry) -> None:
@@ -230,13 +262,26 @@ class ConfigFrame():
     def _save_config(self, *args) -> None:
         name_order = self.randomize_name_order.get()
         self.config.update('data_directory', self.data_directory.get())
-        self.config.update('notes_path', self.notes_path.get())
+        self.config.update(
+            'tournament_notes_directory', self.tournament_notes_directory.get())
         self.config.update('randomize_name_order', name_order)
         self.config.update('show_tooltips', self.show_tooltips.get())
         self.config.update('colours', dict(self.colours))
         save_config(self.config)
         self.config = get_config()
         self.dismiss()
+
+    def display_html(self) -> None:
+        display_html(self.html_frame, HTML_TEST, self.config.css)
+
+    def _css_edit(self) -> None:
+        dlg = ConfigCssFrame(self)
+        self.root.wait_window(dlg.root)
+        if dlg.status != DIALOG_STATUS['ok']:
+            return
+        self.config.update('css', dlg.css)
+        self.config.css = dlg.css
+        self.display_html()
 
     def dismiss(self, *args) -> None:
         self.root.destroy()

@@ -1,9 +1,10 @@
 """Config for BBO Chat."""
+from pathlib import Path
 
 from psiconfig import TomlConfig
 
-from constants import CONFIG_PATH, USER_DATA_DIR
-
+from constants import CONFIG_PATH, USER_DATA_DIR, APP_NAME, DOCS_DIR
+print(str(Path(DOCS_DIR, APP_NAME)))
 DEFAULT_CONFIG = {
     'data_directory': USER_DATA_DIR,
     'last_partner': '',
@@ -12,23 +13,39 @@ DEFAULT_CONFIG = {
     'last_chat': '',
     'randomize_name_order': True,
     'show_tooltips': True,
-    'notes_path': '',
+    'tournament_notes_directory': str(Path(DOCS_DIR, APP_NAME)),
     'geometry': {
-        'frm_main': '1250x700',
-        'frm_edit': '500x600',
-        'frm_config': '700x350',
+        'frm_main': '1100x540',
+        'frm_edit': '500x500',
+        'frm_config': '700x540',
+        'frm_config_css': '500x400',
         'frm_text_dialog': '500x150',
-        'frm_partner_edit': '500x600',
-        'frm_report': '880x660',
+        'frm_partner_edit': '500x500',
+        'frm_report': '880x550',
+        'frm_notes_edit': '880x550',
     },
     'colours': {
-        'greeting': 'limegreen',
+        'greeting': 'limegreen;',
         'valediction': 'salmon',
         'chat': 'aqua',
     },
-    'vertical_sashes': [(250, 1), (500, 1), (750, 1)],
-    'horizontal_sashes': [(1, 200)],
-    'notes_sashes': [(620, 1)],
+    'vertical_sashes': [(250, 1), (465, 1), (720, 1)],
+    'horizontal_sashes': [(1, 165)],
+    'notes_sashes': [(530, 1)],
+    # 'css': {
+    #     'body': '{color: black; font-size: 12px;}',
+    #     'h1': '{color: green; font-size: 20px;}',
+    #     'h2': '{color: green; font-size: 18px;}',
+    #     'h3': '{color: green; font-size: 16px;}',
+    #     'p,ul': '{color: black; font-size: 15px; font-weight: normal;}',
+    # },
+    'css': {
+        'body': {'color': 'black', 'font-size': 12},
+        'h1': {'color': 'green', 'font-size': 20},
+        'h2': {'color': 'green', 'font-size': 18},
+        'h3': {'color': 'green', 'font-size': 16},
+        'p,ul': {'color': 'black', 'font-size': 15, 'font-weight': 'normal'},
+    },
 }
 
 

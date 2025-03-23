@@ -77,7 +77,7 @@ class PartnerEditFrame():
         sizegrip = ttk.Sizegrip(root)
         sizegrip.grid(sticky=tk.SE)
 
-    def _main_frame(self, master: tk.Frame) -> ttk.Frame:
+    def _main_frame(self, master: ttk.Frame) -> ttk.Frame:
         frame = ttk.Frame(master)
         frame.rowconfigure(5, weight=1)
         frame.columnconfigure(1, weight=1)
@@ -124,7 +124,7 @@ class PartnerEditFrame():
 
         return frame
 
-    def _button_frame(self, master: tk.Frame) -> tk.Frame:
+    def _button_frame(self, master: ttk.Frame) -> tk.Frame:
         frame = ButtonFrame(master, tk.HORIZONTAL)
         save_button = Button(
                 frame,

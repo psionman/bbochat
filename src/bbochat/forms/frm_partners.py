@@ -1,12 +1,13 @@
 """Partners tab for BBO Chat."""
 
 import tkinter as tk
-from tkinter import ttk, messagebox
+from tkinter import ttk
 
 from psiutils.constants import PAD, PADT, DIALOG_STATUS, MODES
 from psiutils.widgets import HAND, PsiText
 from psiutils.buttons import ButtonFrame, Button
 from psiutils.menus import Menu, MenuItem
+from psiutils import messagebox
 
 from data import Partner
 from config import config, save_config
@@ -60,7 +61,6 @@ class PartnerFrame():
         self.listbox = tk.Listbox(
             frame,
             listvariable=self.partners_list,
-            height=20,
             selectmode=tk.BROWSE,
             cursor=HAND,
         )
@@ -103,7 +103,7 @@ class PartnerFrame():
 
         return frame
 
-    def _button_frame(self, master: tk.Frame) -> tk.Frame:
+    def _button_frame(self, master: ttk.Frame) -> tk.Frame:
         frame = ButtonFrame(master, tk.VERTICAL)
         frame.buttons = [
             Button(
@@ -128,12 +128,13 @@ class PartnerFrame():
         return frame
 
     def _partner_selected(self, event: object = None) -> None:
+        # TODO What happens if a tournament file is open?
         selection = event.widget.curselection()
         if not selection:
             return
-        partners_names = sorted(list(self.partners.keys()))
+        partners_names = sorted(list(self.partners))
         self.partner = self.partners[partners_names[selection[0]]]
-        self.parent.notes_tab.change_partner(self.partner)
+        self.parent.tournament_tab.change_partner(self.partner)
         self._update_partner_values()
         config.config['last_partner'] = self.partner.username
         save_config(config)
@@ -199,7 +200,7 @@ class PartnerFrame():
         self._update_partner_values()
 
     def _delete(self, *args) -> None:
-        if not messagebox.askyesno('Delete item', text.DELETE_ITEM):
+        if not messagebox.askyesno(self, text.DELETE_TITLE, text.DELETE_ITEM):
             return
         self.partners.pop(self.partner.username)
         if self.partners:
@@ -218,11 +219,7 @@ class PartnerFrame():
         self.partners[self.partner.username] = self.partner
         self._update_partner_values()
         self.parent.save()
-        messagebox.showinfo(
-            '',
-            'Partner saved',
-            parent=self.parent.root,
-        )
+        messagebox.showinfo(self, '', 'Partner saved')
 
     def _context_menu(self) -> tk.Menu:
         menu_items = [

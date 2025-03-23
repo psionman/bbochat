@@ -62,7 +62,7 @@ class OpponentsFrame():
             values = (pair[0], pair[1])
             self.pair_tree.insert('', 'end', values=values)
 
-    def _pair_tree(self, master: tk.Frame) -> ttk.Treeview:
+    def _pair_tree(self, master: ttk.Frame) -> ttk.Treeview:
         """Return  a tree widget for pairs."""
         tree = ttk.Treeview(
             master,

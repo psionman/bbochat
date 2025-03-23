@@ -1,7 +1,7 @@
 
 """Text Edit Frame for BBO Chat."""
 import tkinter as tk
-from tkinter import ttk, messagebox
+from tkinter import ttk
 from pathlib import Path
 import uuid
 import copy
@@ -11,6 +11,7 @@ from psiutils.widgets import HAND
 from psiutils.buttons import ButtonFrame, Button
 from psiutils.menus import Menu, MenuItem
 from psiutils.utilities import window_resize
+from psiutils import messagebox
 
 from config import get_config
 from constants import META_CODES
@@ -75,7 +76,7 @@ class EditFrame():
         sizegrip = ttk.Sizegrip(root)
         sizegrip.grid(sticky=tk.SE)
 
-    def _main_frame(self, master: tk.Frame) -> ttk.Frame:
+    def _main_frame(self, master: ttk.Frame) -> ttk.Frame:
         frame = ttk.Frame(master)
         frame.rowconfigure(0, weight=1)
         frame.columnconfigure(0, weight=1)
@@ -108,7 +109,7 @@ class EditFrame():
         button.grid(row=1, column=0, sticky=tk.NS)
         return frame
 
-    def _button_frame(self, master: tk.Frame) -> tk.Frame:
+    def _button_frame(self, master: ttk.Frame) -> tk.Frame:
         frame = ButtonFrame(master, tk.VERTICAL)
         self.save_button = Button(
                 frame,
@@ -232,7 +233,7 @@ class EditFrame():
         self.meta_dict.pop(self.selected_text)
 
     def _delete_item(self, *args) -> None:
-        if not messagebox.askyesno('Delete item', text.DELETE_ITEM):
+        if not messagebox.askyesno(self, text.DELETE_TITLE, text.DELETE_ITEM):
             return
 
         if self.meta_dict:

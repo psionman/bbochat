@@ -93,14 +93,12 @@ class DataStore():
         self.greetings = []
         self.valedictions = []
         self.chat = []
+        self.notes = {}
         self.my_name = ''
 
     def read(self):
         raw_data = self._read_data_file()
-        if raw_data == FILE_NOT_FOUND:
-            return FILE_NOT_FOUND
-
-        data = self._get_json(raw_data)
+        data = {} if raw_data == FILE_NOT_FOUND else self._get_json(raw_data)
         self.data_sets = {
             'partners': {},
             'pairs': [],
@@ -108,6 +106,7 @@ class DataStore():
             'greeting': [],
             'valediction': [],
             'chat': {},
+            'notes': {},
             'my_name': '',
         }
         if data == INVALID_JSON:
@@ -132,6 +131,10 @@ class DataStore():
             self.valedictions = data['valedictions']
             self.data_sets['valediction'] = self.valedictions
 
+        if 'notes' in data:
+            self.notes = data['notes']
+            self.data_sets['notes'] = self.notes
+
         if 'chat' in data:
             self.chat = data['chat']
             self.data_sets['chat'] = self.chat
@@ -153,6 +156,7 @@ class DataStore():
         try:
             return json.loads(data)
         except json.decoder.JSONDecodeError:
+            print(f'*** Invalid json in {DATA_FILE}***')
             return INVALID_JSON
 
     @staticmethod
@@ -194,6 +198,7 @@ class DataStore():
             'greetings': self.data_sets['greeting'],
             'valedictions': self.data_sets['valediction'],
             'chat': self.data_sets['chat'],
+            'notes': self.data_sets['notes'],
             'my_name': self.my_name,
         }
         json_data = self._data_to_json(output)

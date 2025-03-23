@@ -19,6 +19,8 @@ REPORT = 'Report'
 DELETE_RECORD = 'Are you sure you wish to delete this record?'
 DELETE_ITEM = 'Are you sure you wish to delete this item?'
 DELETE_THESE_ITEMS = 'Are you sure you want to delete these item(s)?'
+DELETE_PAIR = 'Are you sure you wish to delete this pair?'
+DELETE_TITLE = 'Delete item'
 
 SELECT = 'Select'
 CONFIG = 'Settings'

@@ -1,7 +1,7 @@
 
 """MainFrame for BBO Chat."""
 import tkinter as tk
-from tkinter import ttk, messagebox, simpledialog
+from tkinter import ttk, simpledialog
 from pathlib import Path
 import random
 import clipboard
@@ -11,6 +11,7 @@ import emoji
 from psiutils.constants import PAD
 from psiutils.buttons import ButtonFrame, Button
 from psiutils.utilities import window_resize
+from psiutils import messagebox
 
 import text
 
@@ -22,8 +23,10 @@ from main_menu import MainMenu
 from forms.frm_master import MasterFrame
 from forms.frm_partners import PartnerFrame
 from forms.frm_notes import NotesFrame
+from forms.frm_tournament import TournamentFrame
 
 FRAME_TITLE = 'BBO Chat'
+DEFAULT_GEOMETRY = '1250x700'
 
 
 class MainFrame():
@@ -107,47 +110,52 @@ class MainFrame():
         root.bind('<Configure>',
                   lambda e: window_resize(self, __file__))
 
-        main_menu = MainMenu(self)
-        main_menu.create()
-
         root.rowconfigure(0, weight=1)
         root.columnconfigure(0, weight=1)
 
-        main_frame = self._main_frame(root)
-        main_frame.grid(row=0, column=0, sticky=tk.NSEW, padx=PAD, pady=PAD)
+        main_menu = MainMenu(self)
+        main_menu.create()
 
-        self.button_frame = self._button_frame(root)
-        self.button_frame.grid(row=8, column=0, columnspan=3,
+        frame = ttk.Frame(root)
+        frame.grid(row=0, column=0, padx=0)
+        frame.rowconfigure(0, weight=1)
+        frame.columnconfigure(0, weight=1)
+
+        main_frame = self._main_frame(frame)
+        main_frame.grid(row=0, column=0, sticky=tk.NSEW, padx=0, pady=PAD)
+
+        self.button_frame = self._button_frame(frame)
+        self.button_frame.grid(row=1, column=0,
                                sticky=tk.EW, padx=PAD, pady=PAD)
 
-        sizegrip = ttk.Sizegrip(root)
+        sizegrip = ttk.Sizegrip(frame)
         sizegrip.grid(sticky=tk.SE)
 
     def _geometry(self) -> str:
-        default = '1250x700'
+        # Handles cases when size gets corrupted, e.g. after stop on error
         try:
             geometry = self.config.geometry[Path(__file__).stem]
             width = int(geometry.split('x')[0])
-            return default if width < 10 else geometry
+            return DEFAULT_GEOMETRY if width < 10 else geometry
         except tk.TclError:
-            return default
+            return DEFAULT_GEOMETRY
 
-    def _main_frame(self, master: tk.Frame) -> ttk.Frame:
+    def _main_frame(self, master: ttk.Frame) -> ttk.Frame:
         frame = ttk.Frame(master)
         frame.rowconfigure(4, weight=1)  # Notebook row
         frame.columnconfigure(6, weight=1)
 
         label = ttk.Label(frame, text='Clipboard')
-        label.grid(row=0, column=0, sticky=tk.E)
+        label.grid(row=0, column=0, sticky=tk.E, padx=PAD)
 
         self.clipboard_entry = ttk.Entry(frame, textvariable=self.clipboard)
         self.clipboard_entry.grid(row=0, column=1, columnspan=6,
-                                  sticky=tk.EW, padx=PAD, pady=PAD)
+                                  sticky=tk.EW, padx=0, pady=PAD)
         self.clipboard_entry.bind('<KeyRelease>', self.copy_to_clipboard)
 
         button = ttk.Button(frame, text='Copy',
                             command=self.copy_to_clipboard)
-        button.grid(row=0, column=7)
+        button.grid(row=0, column=7, padx=PAD)
 
         label = ttk.Label(frame, text='My name')
         label.grid(row=1, column=0, sticky=tk.E)
@@ -188,7 +196,7 @@ class MainFrame():
                                         command=self._delete_pair)
         self.delete_button.grid(row=2, column=5, padx=PAD)
 
-        check_button = tk.Checkbutton(
+        check_button = ttk.Checkbutton(
             frame,
             text='Randomize opp\'s names order',
             variable=self.randomize)
@@ -199,7 +207,7 @@ class MainFrame():
                       sticky=tk.NSEW, padx=PAD)
         return frame
 
-    def _get_notebook(self, master: tk.Frame) -> ttk.Notebook:
+    def _get_notebook(self, master: ttk.Frame) -> ttk.Notebook:
         notebook = ttk.Notebook(master)
 
         self.master_tab = MasterFrame(self, notebook)
@@ -211,10 +219,14 @@ class MainFrame():
         self.notes_tab = NotesFrame(self, notebook)
         notebook.add(self.notes_tab.notes_frame, text='Notes')
 
+        self.tournament_tab = TournamentFrame(self, notebook)
+        notebook.add(self.tournament_tab.notes_frame, text='Tournament')
+
         return notebook
 
-    def _button_frame(self, master: tk.Frame) -> tk.Frame:
+    def _button_frame(self, master: ttk.Frame) -> ttk.Frame:
         style = ttk.Style()
+        # style.theme_use('clam')
         style.configure('greeting.TButton',
                         background=self.config.colours['greeting'])
         style.configure('valediction.TButton',
@@ -281,7 +293,10 @@ class MainFrame():
             'style.TEntry',
             fieldbackground=colour,
             )
-        self.clipboard_entry.configure(style='style.TEntry')
+        try:
+            self.clipboard_entry.configure(style='style.TEntry')
+        except tk.TclError:
+            pass
 
     def _update_clipboard(self, *args) -> None:
         self.update_clipboard()
@@ -362,12 +377,7 @@ class MainFrame():
         self.update_clipboard()
 
     def _delete_pair(self, *args) -> None:
-        response = messagebox.askyesno(
-            'Delete pair',
-            'Are you sure you wish to delete this pair?',
-            parent=self.root,
-        )
-        if not response:
+        if not messagebox.askyesno(self, text.DELETE_TITLE, text.DELETE_PAIR):
             return
 
         pair = Pair(self.username_1.get(), self.username_2.get())
@@ -419,7 +429,7 @@ class MainFrame():
             self.master_tab.chat_panel.sash_coord(index)
             for index in range(1)]
         notes_sashes = [
-            self.notes_tab.notes_panel.sash_coord(index)
+            self.tournament_tab.notes_panel.sash_coord(index)
             for index in range(1)]
 
         self.config = get_config()

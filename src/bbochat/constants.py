@@ -13,7 +13,8 @@ APP_AUTHOR = 'psionman'
 HELP_URI = ''
 
 # Config
-CONFIG_PATH = Path(user_config_dir(APP_NAME, APP_AUTHOR), 'config.toml')
+CONFIG_DIR = user_config_dir(APP_NAME, APP_AUTHOR)
+CONFIG_PATH = Path(CONFIG_DIR, 'config.toml')
 USER_DATA_DIR = user_data_dir(APP_NAME, APP_AUTHOR)
 DOCS_DIR = userpaths.get_my_documents()
 
@@ -69,3 +70,35 @@ META_CODES = {
     0: 'uuid',
     1: 'text'
 }
+
+HTML_STYLE = """
+    <style>
+        body {
+            font-size: 12px;
+        }
+        h1 {
+            color: green;
+            font-size: 20px;
+            }
+        h2 {
+            color: green;
+            font-size: 16px;
+            }
+        p, ul {
+            color: black;
+            font-size: 15px;
+            font-weight: normal;
+            }
+    </style>
+    """
+xxx = 'body{font-size:12px;}h1{color:green;font-size:20px;}h2{color:green;font-size:16px;}p,ul{color:black;font-size:15px;font-weight:normal;}'
+
+HTML_TEST = """
+# Heading 1
+
+## Heading 2
+
+### Heading 3
+
+Text as it will appear
+"""
