@@ -4,7 +4,8 @@ from pathlib import Path
 from psiconfig import TomlConfig
 
 from constants import CONFIG_PATH, USER_DATA_DIR, APP_NAME, DOCS_DIR
-print(str(Path(DOCS_DIR, APP_NAME)))
+
+
 DEFAULT_CONFIG = {
     'data_directory': USER_DATA_DIR,
     'last_partner': '',
@@ -32,13 +33,6 @@ DEFAULT_CONFIG = {
     'vertical_sashes': [(250, 1), (465, 1), (720, 1)],
     'horizontal_sashes': [(1, 165)],
     'notes_sashes': [(530, 1)],
-    # 'css': {
-    #     'body': '{color: black; font-size: 12px;}',
-    #     'h1': '{color: green; font-size: 20px;}',
-    #     'h2': '{color: green; font-size: 18px;}',
-    #     'h3': '{color: green; font-size: 16px;}',
-    #     'p,ul': '{color: black; font-size: 15px; font-weight: normal;}',
-    # },
     'css': {
         'body': {'color': 'black', 'font-size': 12},
         'h1': {'color': 'green', 'font-size': 20},
@@ -49,12 +43,16 @@ DEFAULT_CONFIG = {
 }
 
 
-def get_config() -> TomlConfig:
+def get_config(restore_defaults: bool = False) -> TomlConfig:
     """Return the config file."""
-    return TomlConfig(path=CONFIG_PATH, defaults=DEFAULT_CONFIG)
+    return TomlConfig(
+        path=CONFIG_PATH,
+        defaults=DEFAULT_CONFIG,
+        restore_defaults=restore_defaults)
 
 
 def save_config(config: TomlConfig) -> TomlConfig | None:
+    ic()
     result = config.save()
     return None if result != config.STATUS_OK else config
 

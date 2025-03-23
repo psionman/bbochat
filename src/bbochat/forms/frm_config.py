@@ -9,8 +9,9 @@ from psiutils.buttons import ButtonFrame, Button, enable_buttons
 from psiutils.widgets import separator_frame
 from psiutils.constants import PAD, PADT, Pad, DIALOG_STATUS
 from psiutils.utilities import window_resize
+from psiutils import messagebox
 
-from config import get_config, save_config
+from config import get_config, save_config, DEFAULT_CONFIG
 from utilities_bbochat import display_html
 from constants import HTML_TEST
 import text
@@ -195,6 +196,12 @@ class ConfigFrame():
                 dimmable=True),
             Button(
                 frame,
+                text=text.RESTORE,
+                command=self._restore_defaults,
+                underline=0,
+                dimmable=False),
+            Button(
+                frame,
                 text=text.EXIT,
                 command=self.dismiss,
                 sticky=tk.E,
@@ -233,6 +240,7 @@ class ConfigFrame():
             or self.randomize_name_order.get() != name_order
             or self.show_tooltips.get() != self.config.show_tooltips
             or self.colours != self.config.colours
+            or self.css != self.config.css
         )
 
     def _ask_colour(self, mode: str) -> None:
@@ -285,6 +293,24 @@ class ConfigFrame():
 
         self.css_element = dlg.element.get()
         self.css = dlg.css
+        self.display_html()
+        self._check_value_changed()
+
+    def _restore_defaults(self, *args) -> None:
+        message = ' Restore defaults (cannot undo)?'
+        if messagebox.askyesno(
+                self, title='Restore defaults', message=message):
+            self.config = get_config(restore_defaults=True)
+        self.colours = dict(self.config.colours)
+        self.css = self.config.css
+
+        self.data_directory.set(self.config.data_directory)
+        self.randomize_name_order.set(self.config.randomize_name_order)
+        self.show_tooltips.set(self.config.show_tooltips)
+        self.tournament_notes_directory.set(
+            self.config.tournament_notes_directory)
+
+        self._update_mode_colours()
         self.display_html()
 
     def dismiss(self, *args) -> None:
