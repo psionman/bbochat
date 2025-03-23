@@ -1,5 +1,7 @@
 
 """MainFrame for BBO Chat."""
+
+import contextlib
 import tkinter as tk
 from tkinter import ttk, simpledialog
 from pathlib import Path
@@ -26,6 +28,8 @@ from forms.frm_notes import NotesFrame
 from forms.frm_tournament import TournamentFrame
 
 FRAME_TITLE = 'BBO Chat'
+
+# Handles cases when size gets corrupted, e.g. after stop on error
 DEFAULT_GEOMETRY = '1250x700'
 
 
@@ -132,7 +136,6 @@ class MainFrame():
         sizegrip.grid(sticky=tk.SE)
 
     def _geometry(self) -> str:
-        # Handles cases when size gets corrupted, e.g. after stop on error
         try:
             geometry = self.config.geometry[Path(__file__).stem]
             width = int(geometry.split('x')[0])
@@ -290,13 +293,11 @@ class MainFrame():
         colour = self.config.colours[MODES[mode]]
         entry_style = ttk.Style()
         entry_style.configure(
-            'style.TEntry',
+            'clipboard_entry.TEntry',
             fieldbackground=colour,
             )
-        try:
-            self.clipboard_entry.configure(style='style.TEntry')
-        except tk.TclError:
-            pass
+        with contextlib.suppress(tk.TclError):
+            self.clipboard_entry.configure(style='clipboard_entry.TEntry')
 
     def _update_clipboard(self, *args) -> None:
         self.update_clipboard()

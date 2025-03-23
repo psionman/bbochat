@@ -26,7 +26,7 @@ DEFAULT_CONFIG = {
         'frm_notes_edit': '880x550',
     },
     'colours': {
-        'greeting': 'limegreen;',
+        'greeting': 'limegreen',
         'valediction': 'salmon',
         'chat': 'aqua',
     },

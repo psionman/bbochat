@@ -11,7 +11,7 @@ from psiutils.constants import PAD, PADT, Pad, DIALOG_STATUS
 from psiutils.utilities import window_resize
 from psiutils import messagebox
 
-from config import get_config, save_config, DEFAULT_CONFIG
+from config import get_config, save_config
 from utilities_bbochat import display_html
 from constants import HTML_TEST
 import text
