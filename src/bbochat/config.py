@@ -52,7 +52,6 @@ def get_config(restore_defaults: bool = False) -> TomlConfig:
 
 
 def save_config(config: TomlConfig) -> TomlConfig | None:
-    ic()
     result = config.save()
     return None if result != config.STATUS_OK else config
 

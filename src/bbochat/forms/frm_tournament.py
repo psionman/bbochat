@@ -98,6 +98,10 @@ class TournamentFrame():
             Button(button_frame, text=text.OPEN, command=self._open_file),
             Button(
                 button_frame,
+                text=f'{text.OPEN} today\'s',
+                command=self._open_todays_file),
+            Button(
+                button_frame,
                 text=text.SAVE,
                 command=self._save,
                 dimmable=True),
@@ -202,6 +206,12 @@ class TournamentFrame():
             self._notes_contents()
             self._get_date_from_path()
             self.button_frame.enable()
+
+    def _open_todays_file(self, *args) -> None:
+        self.set_path()
+        self._notes_contents()
+        self._get_date_from_path()
+        self.button_frame.enable()
 
     def _get_date_from_path(self) -> datetime:
         if match := re.search(r'[0-9]' * 8, str(self.path.get())):
