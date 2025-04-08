@@ -62,6 +62,12 @@ class MainFrame():
         self.username_1.trace_add('write', self._pair_username_change)
         self.username_2.trace_add('write', self._pair_username_change)
 
+        self.last_mode_text = {
+            MODES['greeting']: self.config.last_greeting,
+            MODES['valediction']: self.config.last_valediction,
+            MODES['chat']: self.config.last_chat
+        }
+
         self.button_frame = None
         self.show()
 
@@ -87,8 +93,8 @@ class MainFrame():
         self.randomize = tk.BooleanVar(value=self.config.randomize_name_order)
 
         greeting = self.partner.greeting if self.partner else ''
-        self.greetings_list = tk.StringVar(value=self.greetings)
         self.greeting = tk.StringVar(value=greeting)
+        self.greetings_list = tk.StringVar(value=self.greetings)
         self.valediction = tk.StringVar(value=self.config.last_valediction)
         self.chat_list = tk.StringVar(value=self.chat)
         self.system = tk.StringVar()
@@ -304,25 +310,29 @@ class MainFrame():
 
     def update_clipboard(
             self, message: str = '', mode: int = None, *args) -> None:
-        names = f'{self.my_name}'
-        system = ''
-        if self.partner:
-            names = f'{self.partner.name} and {self.my_name}'
-            system = self.partner.system
-
-        if mode:
+        if mode is not None:
+            self.last_mode_text[mode] = message
             self._update_clipboard_colour(mode)
         else:
             self._update_mode_colour()
 
-        opps = self._get_opps()
-
         if not message:
-            if self.mode == MODES['chat']:
-                message = self.chat_line.get()
-            elif self.mode == MODES['greeting']:
-                message = self.config.last_greeting
+            if mode is None:
+                message = self.last_mode_text[MODES['greeting']]
+            else:
+                message = self.last_mode_text[mode]
 
+        self._create_message(message)
+
+    def _create_message(self, message: str) -> None:
+        if self.partner:
+            names = f'{self.partner.name} and {self.my_name}'
+            system = self.partner.system
+        else:
+            names = f'{self.my_name}'
+            system = ''
+
+        opps = self._get_opps()
         message = message.replace('<opps>', opps)
         message = message.replace('<names>', names)
         message = message.replace('<system>', system)

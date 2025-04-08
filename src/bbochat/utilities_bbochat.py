@@ -67,7 +67,6 @@ def _parse_suit(text: str) -> str:
 def _css_from_dict(css: dict) -> str:
     css_str = ''
     for element, item in css.items():
-        # css_str = f'{css_str}{element}{item}'
         css_str = f'{css_str}{element}{{'
         for attribute, value in item.items():
             if attribute == 'font-size':
