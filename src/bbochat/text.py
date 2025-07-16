@@ -27,6 +27,7 @@ SELECT = 'Select'
 CONFIG = 'Settings'
 ELLIPSIS = ' ...'
 NO_SUCH_FILE = 'no such file or directory'
+USE = 'Use'
 
 MOVE_UP = 'Move up'
 MOVE_DOWN = 'Move down'

@@ -5,7 +5,7 @@ from tkinter import ttk
 
 from psiutils.constants import PAD, DIALOG_STATUS
 from psiutils.widgets import HAND
-from psiutils.buttons import ButtonFrame, Button
+from psiutils.buttons import ButtonFrame, Button, IconButton
 from psiutils.menus import Menu, MenuItem
 from psiutils import messagebox
 
@@ -100,17 +100,11 @@ class TextSelectionFrame():
         entry.bind('<Key>', lambda e: 'break')
 
         button_frame = ButtonFrame(frame, tk.HORIZONTAL)
+        use_button = IconButton(button_frame, text.USE, 'done', self._use_item)
+        use_button.widget.configure(style=f'{self.mode_text}.TButton')
         button_frame.buttons = [
-            Button(
-                button_frame,
-                text='Use',
-                command=self._use_item,
-                style=f'{self.mode_text}.TButton'),
-            Button(
-                button_frame,
-                text=text.EDIT,
-                command=self._edit_all,
-                underline=0),
+            use_button,
+            IconButton(button_frame, text.EDIT, 'edit', self._edit_all),
         ]
         button_frame.grid(row=2, column=0, pady=PAD)
 

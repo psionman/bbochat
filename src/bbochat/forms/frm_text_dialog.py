@@ -75,7 +75,7 @@ class TextDialogFrame():
         self.entry.grid(row=0, column=1, sticky=tk.EW)
 
         check_button = ttk.Checkbutton(frame, text='Hidden item',
-                                      variable=self.hidden_item)
+                                       variable=self.hidden_item)
         check_button.grid(row=1, column=1, sticky=tk.W)
 
         return frame

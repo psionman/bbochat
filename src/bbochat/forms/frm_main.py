@@ -11,7 +11,7 @@ import re
 import emoji
 
 from psiutils.constants import PAD
-from psiutils.buttons import ButtonFrame, Button
+from psiutils.buttons import ButtonFrame, IconButton
 from psiutils.utilities import window_resize
 from psiutils import messagebox
 
@@ -74,7 +74,7 @@ class MainFrame():
         self.pair_tree = self.master_tab.pair_tree
         self.search_entry = self.master_tab.search_entry
 
-        self._update_mode_colour()
+        self._update_clipboard_colour()
         self._pair_username_change()
 
         # On setup
@@ -109,10 +109,10 @@ class MainFrame():
 
     def show(self):
         root = self.root
-        root.protocol("WM_DELETE_WINDOW", self.dismiss)
+        root.protocol("WM_DELETE_WINDOW", self._dismiss)
         root.geometry(self._geometry())
         root.title(FRAME_TITLE)
-        root.bind('<Control-x>', self.dismiss)
+        root.bind('<Control-x>', self._dismiss)
         root.bind('<Control-g>', self._greeting)
         root.bind('<Control-v>', self._valediction)
         root.bind('<Control-c>', self._chat)
@@ -162,8 +162,9 @@ class MainFrame():
                                   sticky=tk.EW, padx=0, pady=PAD)
         self.clipboard_entry.bind('<KeyRelease>', self.copy_to_clipboard)
 
-        button = ttk.Button(frame, text='Copy',
-                            command=self.copy_to_clipboard)
+        # button = ttk.Button(frame, text='Copy',
+        #                     command=self.copy_to_clipboard)
+        button = IconButton(frame, 'Copy', 'copy_clipboard', self.copy_to_clipboard)
         button.grid(row=0, column=7, padx=PAD)
 
         label = ttk.Label(frame, text='My name')
@@ -197,13 +198,18 @@ class MainFrame():
         entry.grid(row=2, column=4, pady=PAD)
         entry.bind('<KeyRelease>', self._update_clipboard)
 
-        self.save_button = ttk.Button(frame, text=text.SAVE,
-                                      command=self._save_names)
-        self.save_button.grid(row=1, column=5, padx=PAD)
+        # self.save_button = ttk.Button(frame, text=text.SAVE,
+        #                               command=self._save_names)
+        self.save_button = IconButton(
+            frame, text.SAVE, 'save', self._save_names)
+        self.save_button.grid(row=1, column=5, padx=PAD, sticky=tk.EW)
 
-        self.delete_button = ttk.Button(frame, text=text.DELETE,
-                                        command=self._delete_pair)
-        self.delete_button.grid(row=2, column=5, padx=PAD)
+        # self.delete_button = ttk.Button(frame, text=text.DELETE,
+        #                                 command=self._delete_pair)
+
+        self.delete_button = IconButton(
+            frame, text.DELETE, 'delete', command=self._delete_pair)
+        self.delete_button.grid(row=2, column=5, padx=PAD, pady=PAD)
 
         check_button = ttk.Checkbutton(
             frame,
@@ -217,7 +223,11 @@ class MainFrame():
         return frame
 
     def _get_notebook(self, master: ttk.Frame) -> ttk.Notebook:
-        notebook = ttk.Notebook(master)
+        style = ttk.Style()
+        # style.configure("TNotebook", foreground="blue")
+        style.map('master.TNotebook.Tab', background=[("selected", "yellow")])
+
+        notebook = ttk.Notebook(master, style='master.TNotebook')
 
         self.master_tab = MasterFrame(self, notebook)
         notebook.add(self.master_tab.master_frame, text='Master')
@@ -241,17 +251,16 @@ class MainFrame():
         style.configure('valediction.TButton',
                         background=self.config.colours['valediction'])
         style.configure('chat.TButton', background=self.config.colours['chat'])
+        style.configure('greeting.TFrame',
+                        background=self.config.colours['greeting'])
+        style.configure('valediction.TFrame',
+                        background=self.config.colours['valediction'])
+        style.configure('chat.TFrame', background=self.config.colours['chat'])
 
         frame = ButtonFrame(master, tk.HORIZONTAL)
-        buttons = [
-            Button(
-                frame,
-                text=text.EXIT,
-                command=self.dismiss,
-                sticky=tk.E,
-                underline=1),
+        frame.buttons = [
+            frame.icon_button('close', False, self._dismiss),
         ]
-        frame.buttons = buttons
         frame.enable(False)
         return frame
 
@@ -289,14 +298,14 @@ class MainFrame():
         self.data_store.save()
         self.enable_buttons(False)
 
-    def _update_mode_colour(self) -> None:
-        self._set_clipboard_colour(self.mode)
+    # def _update_mode_colour(self) -> None:
+    #     self._set_clipboard_colour(self.mode)
 
-    def _update_clipboard_colour(self, mode: int):
-        self._set_clipboard_colour(mode)
+    def _update_clipboard_colour(self):
+        self._set_clipboard_colour()
 
-    def _set_clipboard_colour(self, mode: int):
-        colour = self.config.colours[MODES[mode]]
+    def _set_clipboard_colour(self):
+        colour = self.config.colours[MODES[self.mode]]
         entry_style = ttk.Style()
         entry_style.configure(
             'clipboard_entry.TEntry',
@@ -308,13 +317,16 @@ class MainFrame():
     def _update_clipboard(self, *args) -> None:
         self.update_clipboard()
 
+    def pair_tree_clicked(self) -> None:
+        self.mode = MODES['greeting']
+        self.update_clipboard()
+
     def update_clipboard(
             self, message: str = '', mode: int = None, *args) -> None:
         if mode is not None:
             self.last_mode_text[mode] = message
-            self._update_clipboard_colour(mode)
-        else:
-            self._update_mode_colour()
+            self.mode = mode
+        self._update_clipboard_colour()
 
         if not message:
             if mode is None:
@@ -358,11 +370,17 @@ class MainFrame():
     def _get_opps(self) -> str:
         opp_1, opp_2 = self.name_1.get(), self.name_2.get()
         if self.randomize.get():
-            opps = [self.name_1.get(), self.name_2.get()]
+            opps = [opp_1, opp_2]
             choice = random.choice([0, 1])
             opp_1 = opps[choice]
             choice = (choice + 1) % 2
             opp_2 = opps[choice]
+
+        if opp_1.lower() == 'robot':
+            opp_1, opp_2 = opp_2, opp_1
+        if opp_2.lower() == 'robot':
+            opp_2 = ''
+
         if opp_1:
             return f'{opp_1} and {opp_2}' if opp_2 else opp_1
         return opp_2
@@ -416,11 +434,11 @@ class MainFrame():
         if username_2 in self.players:
             self.name_2.set(self.players[username_2].name)
 
-        self.save_button.state(['disabled'])
-        self.delete_button.state(['disabled'])
+        self.save_button.widget.state(['disabled'])
+        self.delete_button.widget.state(['disabled'])
         if username_1 or username_2:
-            self.save_button.state(['!disabled'])
-            self.delete_button.state(['!disabled'])
+            self.save_button.widget.state(['!disabled'])
+            self.delete_button.widget.state(['!disabled'])
 
     def enable_buttons(self, enable: bool = True) -> None:
         if not self.button_frame:
@@ -449,6 +467,6 @@ class MainFrame():
         self.config.update('notes_sashes', notes_sashes)
         self.config.save()
 
-    def dismiss(self, *args) -> None:
+    def _dismiss(self, *args) -> None:
         self._save_sashes()
         self.root.destroy()

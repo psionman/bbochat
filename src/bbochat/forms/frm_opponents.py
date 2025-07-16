@@ -108,4 +108,4 @@ class OpponentsFrame():
         self.username_2.set(self.pair[1].username)
         self.name_2.set(self.pair[1].name)
 
-        self.parent.parent.update_clipboard()
+        self.parent.parent.pair_tree_clicked()

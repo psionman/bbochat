@@ -16,6 +16,7 @@ class MasterFrame():
     def __init__(self, parent, master):
         self.parent = parent
         self.root = parent.root
+        # used in text_selection
         self.update_clipboard = parent.update_clipboard
         self.config = get_config()
         self.data_store = parent.data_store

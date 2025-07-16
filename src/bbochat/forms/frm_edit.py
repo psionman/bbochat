@@ -8,7 +8,7 @@ import copy
 
 from psiutils.constants import PAD, DIALOG_STATUS
 from psiutils.widgets import HAND
-from psiutils.buttons import ButtonFrame, Button
+from psiutils.buttons import ButtonFrame, Button, IconButton
 from psiutils.menus import Menu, MenuItem
 from psiutils.utilities import window_resize
 from psiutils import messagebox
@@ -111,38 +111,14 @@ class EditFrame():
 
     def _button_frame(self, master: ttk.Frame) -> tk.Frame:
         frame = ButtonFrame(master, tk.VERTICAL)
-        self.save_button = Button(
-                frame,
-                text=text.SAVE,
-                command=self._save,
-                underline=0,
-                dimmable=True)
+        self.save_button = IconButton(
+            frame, text.SAVE, 'save', True, self._save)
         frame.buttons = [
-            Button(
-                frame,
-                text=text.NEW,
-                command=self._new_item,
-                underline=0,
-                dimmable=False),
-            Button(
-                frame,
-                text=text.EDIT,
-                command=self._edit_item,
-                underline=0,
-                dimmable=True),
-            Button(
-                frame,
-                text=text.DELETE,
-                command=self._delete_item,
-                underline=0,
-                dimmable=True),
+            frame.icon_button('new', False, self._new_item),
+            frame.icon_button('edit', True, self._edit_item),
+            frame.icon_button('delete', True, self._delete_item),
             self.save_button,
-            Button(
-                frame,
-                text=text.EXIT,
-                command=self.dismiss,
-                sticky=tk.S,
-                underline=1),
+            frame.icon_button('exit', False, self.dismiss),
         ]
         return frame
 
@@ -168,7 +144,7 @@ class EditFrame():
 
     def _enable_menu(self, *args) -> None:
         self.context_menu.enable()
-        self.button_frame.enable()
+        self._enable_buttons()
 
     def _show_context_menu(self, event: tk.Event) -> None:
         self.context_menu.tk_popup(event.x_root, event.y_root)
@@ -185,7 +161,6 @@ class EditFrame():
         if self.master_selected_text:
             self.master_selected_text = ''
             self._enable_menu()
-
         self._enable_buttons()
 
     def _new_item(self, *args) -> None:
