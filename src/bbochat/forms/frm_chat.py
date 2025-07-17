@@ -3,7 +3,7 @@
 import tkinter as tk
 from tkinter import ttk
 
-from constants import MODES, FRAME_WIDTH, MODE_TEXT
+from constants import MODES, FRAME_WIDTH, MODES
 from config import get_config
 from data_manager import DataManager
 
@@ -16,8 +16,7 @@ class ChatFrame():
         self.root = parent.root
         self.config = get_config()
         self.data_store = parent.data_store
-        self.mode_text = MODE_TEXT[mode]
-        self.config_key = f'last_{self.mode_text}'
+        self.config_key = f'last_{MODES[mode]}'
 
         self.chat_line = parent.chat_line
         self.chat_frame = self._main_frame(master)

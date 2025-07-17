@@ -9,7 +9,7 @@ from psiutils.buttons import ButtonFrame, Button, IconButton
 from psiutils.menus import Menu, MenuItem
 from psiutils import messagebox
 
-from constants import MODE_TEXT
+from constants import MODE_TEXT, MODES
 from config import get_config
 from data_manager import DataManager
 import text
@@ -35,10 +35,10 @@ class TextSelectionFrame():
         self.master_frame = None
 
         self.data = data_manager
-        self.mode = mode
+        self.mode = MODES[mode]
         self.mode_text = MODE_TEXT[mode]
 
-        self.config_key = f'last_{self.mode_text}'
+        self.config_key = f'last_{self.mode}'
         self.config = get_config()
 
         last_value = self.config.config[self.config_key]
@@ -90,18 +90,18 @@ class TextSelectionFrame():
 
         entry = ttk.Entry(frame, textvariable=self.text_var)
         entry.grid(row=1, column=0, sticky=tk.EW)
-        colour = self.config.colours[self.mode_text]
+        colour = self.config.colours[self.mode]
         entry_style = ttk.Style()
         entry_style.configure(
-            f'{self.mode_text}.TEntry',
+            f'{self.mode}.TEntry',
             fieldbackground=colour,
             )
-        entry.configure(style=f'{self.mode_text}.TEntry')
+        entry.configure(style=f'{self.mode}.TEntry')
         entry.bind('<Key>', lambda e: 'break')
 
         button_frame = ButtonFrame(frame, tk.HORIZONTAL)
         use_button = IconButton(button_frame, text.USE, 'done', self._use_item)
-        use_button.widget.configure(style=f'{self.mode_text}.TButton')
+        use_button.widget.configure(style=f'{self.mode}.TButton')
         button_frame.buttons = [
             use_button,
             IconButton(button_frame, text.EDIT, 'edit', self._edit_all),
@@ -187,7 +187,8 @@ class TextSelectionFrame():
     def _use_item(self, *args) -> None:
         if self.text_var.get() and self.text_var.get()[0] == '#':
             self.text_var.set('')
-        self.parent.parent.update_clipboard(self.text_var.get(), self.mode)
+        self.parent.parent.update_clipboard(
+            self.text_var.get(), MODES[self.mode])
         self.config = get_config()
         self.config.update(self.config_key, self.text_var.get())
         self.config.save()

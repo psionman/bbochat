@@ -47,7 +47,7 @@ MODES = {
 MODE_TEXT = {
     0: 'greeting',
     1: 'valediction',
-    2: 'chat',
+    2: 'general text',
     3: 'chat-detail',
 }
 
