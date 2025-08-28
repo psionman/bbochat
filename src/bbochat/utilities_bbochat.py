@@ -1,8 +1,8 @@
 """ Common utility functions for BBO Chat."""
 
 import re
-from tkinterweb import HtmlFrame
 from pathlib import Path
+from tkinterweb import HtmlFrame
 import markdown
 
 from bbochat.constants import USER_DATA_DIR
@@ -14,10 +14,8 @@ SUIT_CONVERSION = {
     'C': ('&clubs;', 'black'),
 }
 
-
 def build_text_list(data: list[str]) -> list[str]:
-    return [u'{unicodes_value}'.format(unicodes_value=item)
-            for item in data if item and item[0] != '#']
+    return [f'{item}' for item in data if item and item[0] != '#']
 
 
 def display_html(html_frame: HtmlFrame, text: str, css: dict = None) -> None:
@@ -46,22 +44,22 @@ def display_html(html_frame: HtmlFrame, text: str, css: dict = None) -> None:
 def _write_html_file(html_frame: HtmlFrame, file: str, text: str) -> None:
     temp_path = Path(USER_DATA_DIR, file)
     path = str(temp_path)
-    with open(path, 'w') as f_html:
+    with open(path, 'w', encoding='utf-8') as f_html:
         f_html.write(text)
     html_frame.load_file(path)
 
 
-def _parse_suit(text: str) -> str:
+def _parse_suit(suit_text: str) -> str:
     for suit in 'shdcSHDC':
-        match = re.findall(f'[!][{suit}]', text)
+        match = re.findall(f'[!][{suit}]', suit_text)
         for item in match:
             if item[1].upper() in SUIT_CONVERSION:
                 conversion = SUIT_CONVERSION[item[1].upper()]
-                text = text.replace(
+                suit_text = suit_text.replace(
                     item,
                     (f'<span style="color:{conversion[1]}">'
                         f'{conversion[0]}</span>'))
-    return text
+    return suit_text
 
 
 def _css_from_dict(css: dict) -> str:
