@@ -12,7 +12,7 @@ from psiutils import messagebox
 from bbochat.constants import MODE_TEXT, MODES
 from bbochat.config import get_config
 from bbochat.data_manager import DataManager
-import text as txt
+import bbochat.text as txt
 
 from bbochat.forms.frm_edit import EditFrame
 from bbochat.forms.frm_text_dialog import TextDialogFrame
@@ -27,6 +27,7 @@ class TextSelectionFrame():
                  show_use_frame: bool = True,
                  show_title: bool = True,
                  slave=None) -> None:
+        # pylint: disable=no-member)
         self.parent = parent
         self.root = self.parent.root
         self.show_use_frame = show_use_frame
@@ -82,6 +83,7 @@ class TextSelectionFrame():
         return frame
 
     def _use_frame(self, master) -> ttk.Frame:
+        # pylint: disable=no-member)
         frame = ttk.Frame(master)
         frame.columnconfigure(0, weight=1)
 

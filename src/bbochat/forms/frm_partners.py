@@ -10,14 +10,15 @@ from psiutils.menus import Menu, MenuItem
 from psiutils import messagebox
 
 from bbochat.data import Partner
-from bbochat.config import config, save_config
-import text
+from bbochat.config import get_config
+import bbochat.text as txt
 
 from bbochat.forms.frm_partner_edit import PartnerEditFrame
 
 
 class PartnerFrame():
     def __init__(self, parent, master):
+        # pylint: disable=no-member)
         self.parent = parent
         self.root = parent.root
         self.partner = parent.partner
@@ -25,7 +26,8 @@ class PartnerFrame():
         self.partners = self.data_store.partners
         self.greetings = self.data_store.greetings
         self.partners_names = self.parent.partners_names
-        self.last_partner = config.last_partner
+        self.config = get_config()
+        self.last_partner = self.config.last_partner
         self.greeting = parent.greeting
 
         # tk variables
@@ -51,6 +53,7 @@ class PartnerFrame():
             self.context_menu.enable()
 
     def _get_partners_frame(self, master) -> ttk.Frame:
+        # pylint: disable=no-member)
         frame = ttk.Frame(master)
         frame.rowconfigure(3, weight=1)
         frame.columnconfigure(3, weight=1)
@@ -66,8 +69,8 @@ class PartnerFrame():
         )
         self.listbox.grid(row=1, column=0, rowspan=3,
                           sticky=tk.NSEW, padx=PAD, pady=PAD)
-        if config.last_partner and config.last_partner in self.partners_names:
-            index = self.partners_names.index(config.last_partner)
+        if self.config.last_partner and self.config.last_partner in self.partners_names:
+            index = self.partners_names.index(self.config.last_partner)
             self.listbox.select_set(index)
         self.listbox.bind('<<ListboxSelect>>', self._partner_selected)
         self.listbox .bind('<Button-3>', self._show_context_menu)
@@ -108,18 +111,18 @@ class PartnerFrame():
         frame.buttons = [
             Button(
                 frame,
-                text=text.NEW,
+                text=txt.NEW,
                 command=self._new,
                 underline=0),
             Button(
                 frame,
-                text=text.EDIT,
+                text=txt.EDIT,
                 command=self._edit,
                 dimmable=True,
                 underline=0),
             Button(
                 frame,
-                text=text.DELETE,
+                text=txt.DELETE,
                 command=self._delete,
                 dimmable=True,
                 underline=0),
@@ -136,8 +139,8 @@ class PartnerFrame():
         self.partner = self.partners[partners_names[selection[0]]]
         self.parent.tournament_tab.change_partner(self.partner)
         self._update_partner_values()
-        config.config['last_partner'] = self.partner.username
-        save_config(config)
+        self.config.config['last_partner'] = self.partner.username
+        self.config.save()
 
     def _update_partner_values(self) -> None:
         if not self.partner:
@@ -200,7 +203,7 @@ class PartnerFrame():
         self._update_partner_values()
 
     def _delete(self, *args) -> None:
-        if not messagebox.askyesno(self, text.DELETE_TITLE, text.DELETE_ITEM):
+        if not messagebox.askyesno(self, txt.DELETE_TITLE, txt.DELETE_ITEM):
             return
         self.partners.pop(self.partner.username)
         if self.partners:
@@ -223,9 +226,9 @@ class PartnerFrame():
 
     def _context_menu(self) -> tk.Menu:
         menu_items = [
-            MenuItem(text.NEW, self._new, dimmable=False),
-            MenuItem(text.EDIT, self._edit, dimmable=True),
-            MenuItem(text.DELETE, self._delete, dimmable=True),
+            MenuItem(txt.NEW, self._new, dimmable=False),
+            MenuItem(txt.EDIT, self._edit, dimmable=True),
+            MenuItem(txt.DELETE, self._delete, dimmable=True),
         ]
         context_menu = Menu(self.root, menu_items)
         context_menu.enable(False)

@@ -11,7 +11,7 @@ from psiutils.constants import PAD, PADT, Pad, DIALOG_STATUS
 from psiutils.utilities import window_resize
 from psiutils import messagebox
 
-from bbochat.config import get_config, save_config
+from bbochat.config import get_config
 from bbochat.utilities_bbochat import display_html
 from bbochat.constants import HTML_TEST
 import bbochat.text as txt
@@ -271,7 +271,7 @@ class ConfigFrame():
         self.config.update('show_tooltips', self.show_tooltips.get())
         self.config.update('colours', dict(self.colours))
         self.config.update('css', dict(self.css))
-        save_config(self.config)
+        self.config.save()
         self.config = get_config()
         self._dismiss()
 

@@ -90,14 +90,4 @@ def _get_css(toml_config: TomlConfig) -> TomlConfig:
     return css
 
 
-def save_config(new_config: TomlConfig) -> TomlConfig | None:
-    # new_config.update('css_body', {'name': 'css_body', **new_config.css.body})
-    quit()
-    new_config.config.pop('css')
-    new_config.config.css = None
-
-    result = new_config.save()
-    return None if result != new_config.STATUS_OK else new_config
-
-
 config = get_config()
