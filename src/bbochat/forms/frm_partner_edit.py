@@ -9,9 +9,9 @@ from psiutils.buttons import ButtonFrame, Button
 from psiutils.widgets import PsiText, clickable_widget
 from psiutils.utilities import window_resize
 
-from data import Partner
-from constants import ICON_FILE
-from config import get_config
+from bbochat.data import Partner
+from bbochat.constants import ICON_FILE
+from bbochat.config import get_config
 import text
 
 FRAME_TITLE = 'New partner'
@@ -61,7 +61,7 @@ class PartnerEditFrame():
         root.wait_visibility()
         root.grab_set()
         root.transient(self.parent.root)
-        root.bind('<Control-x>', self.dismiss)
+        root.bind('<Control-x>', self._dismiss)
         root.bind('<Configure>',
                   lambda e: window_resize(self, __file__))
 
@@ -137,7 +137,7 @@ class PartnerEditFrame():
             Button(
                 frame,
                 text=text.EXIT,
-                command=self.dismiss,
+                command=self._dismiss,
                 sticky=tk.E,
                 underline=1),
         ]
@@ -168,7 +168,7 @@ class PartnerEditFrame():
         self.partners[self.partner.username] = self.partner
         self.parent.parent.save()
         self.status = DIALOG_STATUS['ok']
-        self.dismiss()
+        self._dismiss()
 
-    def dismiss(self, *args) -> None:
+    def _dismiss(self, *args) -> None:
         self.root.destroy()

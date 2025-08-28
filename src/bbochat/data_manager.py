@@ -1,7 +1,7 @@
 """Handle data management for BBO Chat."""
 import uuid
 
-from constants import MODES, META_CODES
+from bbochat.constants import MODES, META_CODES
 
 
 class DataManager():

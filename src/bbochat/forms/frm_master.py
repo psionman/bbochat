@@ -3,13 +3,13 @@
 import tkinter as tk
 from tkinter import ttk
 
-from constants import MODES, FRAME_WIDTH
-from config import get_config
+from bbochat.constants import MODES, FRAME_WIDTH
+from bbochat.config import get_config
 
-from forms.frm_opponents import OpponentsFrame
-from forms.frm_text_selection import TextSelectionFrame
-from data_manager import DataManager
-from forms.frm_chat import ChatFrame
+from bbochat.forms.frm_opponents import OpponentsFrame
+from bbochat.forms.frm_text_selection import TextSelectionFrame
+from bbochat.data_manager import DataManager
+from bbochat.forms.frm_chat import ChatFrame
 
 
 class MasterFrame():

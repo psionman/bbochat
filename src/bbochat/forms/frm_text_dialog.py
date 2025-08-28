@@ -9,9 +9,9 @@ from psiutils.buttons import ButtonFrame, Button
 from psiutils.utilities import window_resize
 from psiutils.widgets import Tooltip
 
-from constants import APP_TITLE
-from config import get_config
-import text
+from bbochat.constants import APP_TITLE
+from bbochat.config import get_config
+import text as txt
 
 
 class TextDialogFrame():
@@ -28,11 +28,13 @@ class TextDialogFrame():
         self.text_ = default
         self.hidden = False
 
+        self.entry = None
+
         self.status = DIALOG_STATUS['null']
 
         # tk variables
         self.text_value = tk.StringVar(value=default)
-        tooltip = text.TOOLTIP if self.config.show_tooltips else ''
+        tooltip = txt.TOOLTIP if self.config.show_tooltips else ''
         self.tooltip_text = tk.StringVar(value=tooltip)
         self.hidden_item = tk.BooleanVar()
         self._hidden_item()
@@ -40,9 +42,9 @@ class TextDialogFrame():
         self.text_value.trace_add('write', self._text_changed)
         self.hidden_item.trace_add('write', self._text_changed)
 
-        self.show()
+        self._show()
 
-    def show(self) -> None:
+    def _show(self) -> None:
         root = self.root
         root.geometry(self.config.geometry[Path(__file__).stem])
         root.transient(self.parent.root)
@@ -50,7 +52,7 @@ class TextDialogFrame():
         root.bind('<Configure>',
                   lambda e: window_resize(self, __file__))
 
-        root.bind('<Control-x>', self.dismiss)
+        root.bind('<Control-x>', self._dismiss)
 
         root.rowconfigure(0, weight=1)
         root.columnconfigure(0, weight=1)
@@ -85,14 +87,14 @@ class TextDialogFrame():
         frame.buttons = [
             Button(
                 frame,
-                text=text.OK,
+                text=txt.OK,
                 command=self._process,
                 underline=0,
                 dimmable=True),
             Button(
                 frame,
-                text=text.CANCEL,
-                command=self.dismiss,
+                text=txt.CANCEL,
+                command=self._dismiss,
                 sticky=tk.E,),
         ]
         frame.enable(False)
@@ -140,11 +142,11 @@ class TextDialogFrame():
         if self.hidden_item .get():
             self.text_ = f'# {self.text_}'
         self.status = DIALOG_STATUS['updated']
-        self.dismiss()
+        self._dismiss()
 
     @property
     def text(self) -> str:
         return self.text_
 
-    def dismiss(self, *args) -> None:
+    def _dismiss(self, *args) -> None:
         self.root.destroy()

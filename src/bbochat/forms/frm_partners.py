@@ -9,11 +9,11 @@ from psiutils.buttons import ButtonFrame, Button
 from psiutils.menus import Menu, MenuItem
 from psiutils import messagebox
 
-from data import Partner
-from config import config, save_config
+from bbochat.data import Partner
+from bbochat.config import config, save_config
 import text
 
-from forms.frm_partner_edit import PartnerEditFrame
+from bbochat.forms.frm_partner_edit import PartnerEditFrame
 
 
 class PartnerFrame():

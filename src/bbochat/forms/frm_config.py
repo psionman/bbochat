@@ -1,33 +1,40 @@
 
+from pathlib import Path
 import tkinter as tk
 from tkinter import ttk, filedialog
 from tkinter.colorchooser import askcolor
 from tkinterweb import HtmlFrame
-from pathlib import Path
 
-from psiutils.buttons import ButtonFrame, Button, enable_buttons
+from psiutils.buttons import ButtonFrame, IconButton
 from psiutils.widgets import separator_frame
 from psiutils.constants import PAD, PADT, Pad, DIALOG_STATUS
 from psiutils.utilities import window_resize
 from psiutils import messagebox
 
-from config import get_config, save_config
-from utilities_bbochat import display_html
-from constants import HTML_TEST
-import text
+from bbochat.config import get_config, save_config
+from bbochat.utilities_bbochat import display_html
+from bbochat.constants import HTML_TEST
+import bbochat.text as txt
 
-from forms.frm_config_css import ConfigCssFrame
+from bbochat.forms.frm_config_css import ConfigCssFrame
 
 
 class ConfigFrame():
     """ConfigFrame for BBO Chat."""
     def __init__(self, parent):
+        # pylint: disable=no-member)
         self.root = tk.Toplevel(parent.root)
         self.parent = parent
         self.config = get_config()
         self.colours = dict(self.config.colours)
         self.css = self.config.css
         self.css_element = None
+
+        self.button_frame = None
+        self.greeting_entry = None
+        self.valediction_entry = None
+        self.chat_entry = None
+        self.html_frame = None
 
         # tk variables
         self.data_directory = tk.StringVar(value=self.config.data_directory)
@@ -43,7 +50,7 @@ class ConfigFrame():
         self.randomize_name_order.trace_add('write', self._check_value_changed)
         self.show_tooltips.trace_add('write', self._check_value_changed)
 
-        self.show()
+        self._show()
 
         self.colour_entries = {
             'greeting': self.greeting_entry,
@@ -54,13 +61,14 @@ class ConfigFrame():
 
         self.display_html()
 
-    def show(self) -> None:
+    def _show(self) -> None:
+        # pylint: disable=no-member)
         root = self.root
         root.geometry(self.config.geometry[Path(__file__).stem])
-        root.title(text.CONFIG)
+        root.title(txt.CONFIG)
         root.transient(self.parent.root)
 
-        root.bind('<Control-x>', self.dismiss)
+        root.bind('<Control-x>', self._dismiss)
         root.bind('<Control-s>', self._save_config)
         root.bind('<Configure>',
                   lambda e: window_resize(self, __file__))
@@ -113,7 +121,7 @@ class ConfigFrame():
         self.greeting_entry = ttk.Entry(frame)
         self.greeting_entry.grid(row=row, column=1,
                                  sticky=tk.EW, padx=PAD, pady=PAD)
-        button = ttk.Button(frame, text=text.ELLIPSIS)
+        button = ttk.Button(frame, text=txt.ELLIPSIS)
         button.grid(row=row, column=2, padx=Pad.W)
         button.bind('<Button-1>',
                     lambda e: self._ask_colour('greeting'))
@@ -125,7 +133,7 @@ class ConfigFrame():
         self.valediction_entry.grid(row=row, column=1,
                                     sticky=tk.EW, padx=PAD, pady=PAD)
 
-        button = ttk.Button(frame, text=text.ELLIPSIS)
+        button = ttk.Button(frame, text=txt.ELLIPSIS)
         button.grid(row=row, column=2, padx=Pad.W)
         button.bind('<Button-1>',
                     lambda e: self._ask_colour('valediction'))
@@ -136,10 +144,10 @@ class ConfigFrame():
         self.chat_entry = ttk.Entry(frame)
         self.chat_entry.grid(row=row, column=1,
                              sticky=tk.EW, padx=PAD, pady=PAD)
-        button = ttk.Button(frame, text=text.ELLIPSIS)
+        button = ttk.Button(frame, text=txt.ELLIPSIS)
         button.grid(row=row, column=2, padx=Pad.W)
 
-        button = ttk.Button(frame, text=text.ELLIPSIS)
+        button = ttk.Button(frame, text=txt.ELLIPSIS)
         button.grid(row=row, column=2, padx=Pad.W)
         button.bind('<Button-1>',
                     lambda e: self._ask_colour('chat'))
@@ -153,7 +161,7 @@ class ConfigFrame():
         self.html_frame.grid(row=row, column=1, columnspan=3, sticky=tk.EW)
         self.html_frame.grid_propagate(0)
 
-        button = ttk.Button(frame, text=text.EDIT, command=self._css_edit)
+        button = IconButton(frame, txt.EDIT, 'edit', self._css_edit)
         button.grid(row=row, column=4, sticky=tk.N, padx=PAD)
 
         row += 1
@@ -187,27 +195,11 @@ class ConfigFrame():
 
     def _button_frame(self, master: ttk.Frame) -> tk.Frame:
         frame = ButtonFrame(master, tk.HORIZONTAL)
-        self.buttons = [
-            Button(
-                frame,
-                text=text.SAVE,
-                command=self._save_config,
-                underline=0,
-                dimmable=True),
-            Button(
-                frame,
-                text=text.RESTORE,
-                command=self._restore_defaults,
-                underline=0,
-                dimmable=False),
-            Button(
-                frame,
-                text=text.EXIT,
-                command=self.dismiss,
-                sticky=tk.E,
-                underline=1),
+        frame.buttons = [
+            frame.icon_button('save', True, self._save_config),
+            frame.icon_button('revert', True, self._restore_defaults),
+            frame.icon_button('exit', False, self._dismiss),
         ]
-        frame.buttons = self.buttons
         frame.enable(False)
         return frame
 
@@ -232,6 +224,7 @@ class ConfigFrame():
         return directory
 
     def _value_changed(self) -> bool:
+        # pylint: disable=no-member)
         name_order = self.config.randomize_name_order
         notes_directory = self.config.tournament_notes_directory
         return (
@@ -267,7 +260,7 @@ class ConfigFrame():
 
     def _check_value_changed(self, *args) -> None:
         enable = bool(self._value_changed())
-        enable_buttons(self.buttons, enable)
+        self.button_frame.enable(enable)
 
     def _save_config(self, *args) -> None:
         name_order = self.randomize_name_order.get()
@@ -280,7 +273,7 @@ class ConfigFrame():
         self.config.update('css', dict(self.css))
         save_config(self.config)
         self.config = get_config()
-        self.dismiss()
+        self._dismiss()
 
     def display_html(self) -> None:
         display_html(self.html_frame, HTML_TEST, self.css)
@@ -297,6 +290,7 @@ class ConfigFrame():
         self._check_value_changed()
 
     def _restore_defaults(self, *args) -> None:
+        # pylint: disable=no-member)
         message = ' Restore defaults (cannot undo)?'
         if messagebox.askyesno(
                 self, title='Restore defaults', message=message):
@@ -313,5 +307,5 @@ class ConfigFrame():
         self._update_mode_colours()
         self.display_html()
 
-    def dismiss(self, *args) -> None:
+    def _dismiss(self, *args) -> None:
         self.root.destroy()

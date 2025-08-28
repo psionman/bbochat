@@ -8,16 +8,16 @@ import copy
 
 from psiutils.constants import PAD, DIALOG_STATUS
 from psiutils.widgets import HAND
-from psiutils.buttons import ButtonFrame, Button, IconButton
+from psiutils.buttons import ButtonFrame, IconButton
 from psiutils.menus import Menu, MenuItem
 from psiutils.utilities import window_resize
 from psiutils import messagebox
 
-from config import get_config
-from constants import META_CODES
-import text
+from bbochat.config import get_config
+from bbochat.constants import META_CODES
+import text as txt
 
-from forms.frm_text_dialog import TextDialogFrame
+from bbochat.forms.frm_text_dialog import TextDialogFrame
 
 FRAME_TITLE = 'Edit'
 
@@ -27,6 +27,10 @@ class EditFrame():
         self.root = tk.Toplevel(parent.root)
         self.parent = parent
         self.mode = parent.mode
+
+        self.save_button = None
+        self.listbox = None
+        self.button_frame = None
 
         # self.master_selected_text is the value of the text selected
         # in the calling function
@@ -51,18 +55,18 @@ class EditFrame():
         # self.selected_text contains the text selected from the listbox
         self.selected_text = ''
 
-        self.show()
+        self._show()
         self.context_menu = self._context_menu()
         self.button_frame.disable()
         self._populate_text_items()
 
-    def show(self) -> None:
+    def _show(self) -> None:
         root = self.root
         root.geometry(self.config.geometry[Path(__file__).stem])
         root.transient(self.parent.root)
         root.title(FRAME_TITLE)
 
-        root.bind('<Control-x>', self.dismiss)
+        root.bind('<Control-x>', self._dismiss)
         root.bind('<Control-s>', self._save)
         root.bind('<Configure>',
                   lambda e: window_resize(self, __file__))
@@ -100,11 +104,11 @@ class EditFrame():
         frame.rowconfigure(0, weight=1)
         frame.rowconfigure(1, weight=1)
 
-        button = ttk.Button(frame, text=text.CHEVRON_UP,
+        button = ttk.Button(frame, text=txt.CHEVRON_UP,
                             command=self._move_up, width=1)
         button.grid(row=0, column=0, sticky=tk.NS)
 
-        button = ttk.Button(frame, text=text.CHEVRON_DOWN,
+        button = ttk.Button(frame, text=txt.CHEVRON_DOWN,
                             command=self._move_down, width=1)
         button.grid(row=1, column=0, sticky=tk.NS)
         return frame
@@ -112,23 +116,23 @@ class EditFrame():
     def _button_frame(self, master: ttk.Frame) -> tk.Frame:
         frame = ButtonFrame(master, tk.VERTICAL)
         self.save_button = IconButton(
-            frame, text.SAVE, 'save', True, self._save)
+            frame, txt.SAVE, 'save', True, self._save)
         frame.buttons = [
             frame.icon_button('new', False, self._new_item),
             frame.icon_button('edit', True, self._edit_item),
             frame.icon_button('delete', True, self._delete_item),
             self.save_button,
-            frame.icon_button('exit', False, self.dismiss),
+            frame.icon_button('exit', False, self._dismiss),
         ]
         return frame
 
     def _context_menu(self) -> tk.Menu:
         menu_items = [
-            MenuItem(text.NEW, self._new_item, dimmable=False),
-            MenuItem(text.EDIT, self._edit_item, dimmable=True),
-            MenuItem(text.DELETE, self._delete_item, dimmable=True),
-            MenuItem(text.MOVE_UP, self._move_up, dimmable=True),
-            MenuItem(text.MOVE_DOWN, self._move_down, dimmable=True),
+            MenuItem(txt.NEW, self._new_item, dimmable=False),
+            MenuItem(txt.EDIT, self._edit_item, dimmable=True),
+            MenuItem(txt.DELETE, self._delete_item, dimmable=True),
+            MenuItem(txt.MOVE_UP, self._move_up, dimmable=True),
+            MenuItem(txt.MOVE_DOWN, self._move_down, dimmable=True),
         ]
         context_menu = Menu(self.root, menu_items)
         context_menu.enable(False)
@@ -204,11 +208,10 @@ class EditFrame():
         # ic(len(self.meta_dict))
 
         # Remove the text item relating to the old value
-        self.meta_dict[self.selected_text]
         self.meta_dict.pop(self.selected_text)
 
     def _delete_item(self, *args) -> None:
-        if not messagebox.askyesno(self, text.DELETE_TITLE, text.DELETE_ITEM):
+        if not messagebox.askyesno(self, txt.DELETE_TITLE, txt.DELETE_ITEM):
             return
 
         if self.meta_dict:
@@ -264,7 +267,7 @@ class EditFrame():
                 self.meta_dict[value] = (meta_item[0], meta_item[1], index)
 
         self.status = DIALOG_STATUS['updated']
-        self.dismiss()
+        self._dismiss()
 
-    def dismiss(self, *args) -> None:
+    def _dismiss(self, *args) -> None:
         self.root.destroy()

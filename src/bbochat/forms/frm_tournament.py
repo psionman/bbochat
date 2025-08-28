@@ -15,12 +15,12 @@ from psiutils.widgets import PsiText, Tooltip
 from psiutils.buttons import Button, ButtonFrame
 from psiutils import messagebox
 
-from config import get_config
+from bbochat.config import get_config
 import text
-from constants import TXT_FILE_TYPES, DOCS_DIR, APP_NAME, YYYYMMDD, FRAME_WIDTH
-from data import Partner
+from bbochat.constants import TXT_FILE_TYPES, DOCS_DIR, APP_NAME, YYYYMMDD, FRAME_WIDTH
+from bbochat.data import Partner
 
-from forms.frm_report import ReportFrame
+from bbochat.forms.frm_report import ReportFrame
 
 
 class TournamentFrame():

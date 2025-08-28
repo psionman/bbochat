@@ -9,8 +9,8 @@ from psiutils.buttons import ButtonFrame, Button
 from psiutils.utilities import window_resize
 from psiutils import messagebox
 
-from constants import APP_TITLE
-from config import get_config
+from bbochat.constants import APP_TITLE
+from bbochat.config import get_config
 import text
 
 
@@ -43,7 +43,7 @@ class NotesEditFrame():
         root.bind('<Configure>',
                   lambda e: window_resize(self, __file__))
 
-        root.bind('<Control-x>', self.dismiss)
+        root.bind('<Control-x>', self._dismiss)
 
         root.rowconfigure(0, weight=1)
         root.columnconfigure(0, weight=1)
@@ -91,7 +91,7 @@ class NotesEditFrame():
             Button(
                 frame,
                 text=text.CANCEL,
-                command=self.dismiss,
+                command=self._dismiss,
                 sticky=tk.E,),
         ]
         frame.enable(False)
@@ -112,5 +112,5 @@ class NotesEditFrame():
         self.status = DIALOG_STATUS['updated']
         self.root.destroy()
 
-    def dismiss(self, *args) -> None:
+    def _dismiss(self, *args) -> None:
         self.root.destroy()

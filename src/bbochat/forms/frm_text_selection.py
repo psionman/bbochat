@@ -5,17 +5,17 @@ from tkinter import ttk
 
 from psiutils.constants import PAD, DIALOG_STATUS
 from psiutils.widgets import HAND
-from psiutils.buttons import ButtonFrame, Button, IconButton
+from psiutils.buttons import ButtonFrame, IconButton
 from psiutils.menus import Menu, MenuItem
 from psiutils import messagebox
 
-from constants import MODE_TEXT, MODES
-from config import get_config
-from data_manager import DataManager
-import text
+from bbochat.constants import MODE_TEXT, MODES
+from bbochat.config import get_config
+from bbochat.data_manager import DataManager
+import text as txt
 
-from forms.frm_edit import EditFrame
-from forms.frm_text_dialog import TextDialogFrame
+from bbochat.forms.frm_edit import EditFrame
+from bbochat.forms.frm_text_dialog import TextDialogFrame
 
 
 class TextSelectionFrame():
@@ -55,7 +55,7 @@ class TextSelectionFrame():
         self.main_frame = self._main_frame(master)
         self.context_menu = self._context_menu()
 
-        self.populate_text_items()
+        self._populate_text_items()
 
     def _main_frame(self, master: ttk.Frame) -> ttk.Frame:
         frame = ttk.Frame(master)
@@ -100,11 +100,11 @@ class TextSelectionFrame():
         entry.bind('<Key>', lambda e: 'break')
 
         button_frame = ButtonFrame(frame, tk.HORIZONTAL)
-        use_button = IconButton(button_frame, text.USE, 'done', self._use_item)
+        use_button = IconButton(button_frame, txt.USE, 'done', self._use_item)
         use_button.widget.configure(style=f'{self.mode}.TButton')
         button_frame.buttons = [
             use_button,
-            IconButton(button_frame, text.EDIT, 'edit', self._edit_all),
+            IconButton(button_frame, txt.EDIT, 'edit', self._edit_all),
         ]
         button_frame.grid(row=2, column=0, pady=PAD)
 
@@ -136,7 +136,7 @@ class TextSelectionFrame():
         self._use_item()
         self.selected_text = dlg.text
 
-        self.populate_text_items(dlg.text)
+        self._populate_text_items(dlg.text)
 
     def _edit_item(self, *args) -> None:
         dlg = TextDialogFrame(self, 'Edit', self.selected_text)
@@ -146,25 +146,25 @@ class TextSelectionFrame():
 
         self.data.amend(self, self.selected_text, dlg.text)
 
-        self.populate_text_items(self.data.text_list)
+        self._populate_text_items(self.data.text_list)
 
         self.selected_text = dlg.text
         self.text_var.set(dlg.text)
         self._use_item()
 
     def _delete_item(self, *args) -> None:
-        if not messagebox.askyesno(self, text.DELETE_TITLE, text.DELETE_ITEM):
+        if not messagebox.askyesno(self, txt.DELETE_TITLE, txt.DELETE_ITEM):
             return
 
         self.data.delete(self)
 
         if self.slave_frame:
             # This is a master: it has a slave frame
-            self.slave_frame.populate_text_items()
+            self.slave_frame._populate_text_items()
 
         self.text_var.set('')
         self._use_item()
-        self.populate_text_items()
+        self._populate_text_items()
 
     def _edit_all(self, *args) -> None:
         dlg = EditFrame(self)
@@ -173,7 +173,7 @@ class TextSelectionFrame():
             return
         self.data.edit_all(self, dlg.text_list, dlg.meta_dict)
 
-        self.populate_text_items(dlg.selected_text)
+        self._populate_text_items(dlg.selected_text)
         self.selected_text = dlg.selected_text
         self.text_var.set(dlg.selected_text)
         self._use_item()
@@ -193,7 +193,7 @@ class TextSelectionFrame():
         self.config.update(self.config_key, self.text_var.get())
         self.config.save()
 
-    def populate_text_items(self, selected_item: str = '') -> None:
+    def _populate_text_items(self, selected_item: str = '') -> None:
         if self.master_frame:
             # self.data.display_list = self._build_display_list()
             ...
@@ -206,10 +206,10 @@ class TextSelectionFrame():
 
     def _context_menu(self) -> tk.Menu:
         menu_items = [
-            MenuItem(text.NEW, self._new_item, dimmable=False),
-            MenuItem(text.EDIT_ALL, self._edit_all, dimmable=False),
-            MenuItem(text.EDIT_ITEM, self._edit_item, dimmable=True),
-            MenuItem(text.DELETE, self._delete_item, dimmable=True),
+            MenuItem(txt.NEW, self._new_item, dimmable=False),
+            MenuItem(txt.EDIT_ALL, self._edit_all, dimmable=False),
+            MenuItem(txt.EDIT_ITEM, self._edit_item, dimmable=True),
+            MenuItem(txt.DELETE, self._delete_item, dimmable=True),
         ]
         context_menu = Menu(self.root, menu_items)
         context_menu.enable(False)

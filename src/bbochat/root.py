@@ -4,16 +4,15 @@ Tkinter root for BBO Chat.
 """
 import sys
 import tkinter as tk
-from tkinter import ttk
 from pathlib import Path
 
 from psiutils.widgets import get_styles
 from psiutils.utilities import display_icon
 
-from constants import ICON_FILE, USER_DATA_DIR
+from bbochat.constants import ICON_FILE, USER_DATA_DIR
 from module_caller import ModuleCaller
 
-from forms.frm_main import MainFrame
+from bbochat.forms.frm_main import MainFrame
 
 
 class Root():

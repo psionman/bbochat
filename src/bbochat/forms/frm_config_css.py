@@ -1,21 +1,21 @@
 """ ConfigCssFrame for BBO Chat."""
+from pathlib import Path
+from copy import deepcopy
 import tkinter as tk
 from tkinter import ttk
 from tkinter.colorchooser import askcolor
 from tkinterweb import HtmlFrame
-from pathlib import Path
-from copy import deepcopy
 
 from psiutils.constants import PAD, Pad, DIALOG_STATUS
-from psiutils.buttons import ButtonFrame, Button
+from psiutils.buttons import ButtonFrame
 from psiutils.utilities import window_resize
 from psiutils.widgets import clickable_widget
 
-from constants import APP_TITLE, HTML_TEST
-from utilities_bbochat import display_html
-import text
+from bbochat.constants import APP_TITLE, HTML_TEST
+from bbochat.utilities_bbochat import display_html
+import bbochat.text as txt
 
-FRAME_TITLE = f'{APP_TITLE} - css  {text.CONFIG}'
+FRAME_TITLE = f'{APP_TITLE} - css  {txt.CONFIG}'
 
 ELEMENTS = {
     'h1': 'Heading 1',
@@ -36,6 +36,11 @@ class ConfigCssFrame():
         self.css = deepcopy(parent.css)
         self.status = DIALOG_STATUS['null']
 
+        self.colour_entry = None
+        self.property_frame = None
+        self.html_frame = None
+        self.button_frame = None
+
         # tk variables
         self.element = tk.StringVar()
         self.font_size = tk.IntVar()
@@ -43,7 +48,7 @@ class ConfigCssFrame():
 
         self.font_size.trace_add('write', self._font_size_changed)
 
-        self.show()
+        self._show()
 
         self.colour_entries = {
             'color': self.colour_entry,
@@ -56,14 +61,14 @@ class ConfigCssFrame():
             self._update_attribute_colours()
             self._enable_properties()
 
-    def show(self) -> None:
+    def _show(self) -> None:
         root = self.root
         root.geometry(self.config.geometry[Path(__file__).stem])
         root.transient(self.parent.root)
         root.title(FRAME_TITLE)
         root.bind('<Configure>',
                   lambda event, arg=None: window_resize(self, __file__))
-        root.bind('<Control-x>', self.dismiss)
+        root.bind('<Control-x>', self._dismiss)
 
         root.rowconfigure(0, weight=1)
         root.columnconfigure(0, weight=1)
@@ -134,7 +139,7 @@ class ConfigCssFrame():
         self.colour_entry.grid(row=row, column=1,
                                sticky=tk.EW, padx=PAD, pady=PAD)
 
-        button = ttk.Button(frame, text=text.ELLIPSIS)
+        button = ttk.Button(frame, text=txt.ELLIPSIS)
         button.grid(row=row, column=2, padx=Pad.W)
         button.bind('<Button-1>',
                     lambda e: self._ask_colour('color'))
@@ -144,18 +149,8 @@ class ConfigCssFrame():
     def _button_frame(self, master: tk.Frame) -> tk.Frame:
         frame = ButtonFrame(master, tk.HORIZONTAL)
         frame.buttons = [
-            Button(
-                frame,
-                text=text.OK,
-                command=self._ok,
-                dimmable=True,
-                underline=1),
-            Button(
-                frame,
-                text=text.EXIT,
-                command=self.dismiss,
-                sticky=tk.E,
-                underline=1),
+            frame.icon_button('use', True, self._ok),
+            frame.icon_button('exit', False, self._dismiss),
         ]
         frame.enable(False)
         return frame
@@ -216,8 +211,8 @@ class ConfigCssFrame():
     def _ok(self, *args) -> None:
         self.status = DIALOG_STATUS['ok']
         # self.config.update('css', self.css)
-        self.dismiss()
+        self._dismiss()
 
-    def dismiss(self, *args) -> None:
+    def _dismiss(self, *args) -> None:
         self.focus = False
         self.root.destroy()

@@ -2,7 +2,7 @@
 
 import json
 
-from constants import DATA_FILE
+from bbochat.constants import DATA_FILE
 
 OK = 0
 FILE_NOT_FOUND = 1

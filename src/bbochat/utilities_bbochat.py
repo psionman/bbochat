@@ -5,7 +5,7 @@ from tkinterweb import HtmlFrame
 from pathlib import Path
 import markdown
 
-from constants import USER_DATA_DIR
+from bbochat.constants import USER_DATA_DIR
 
 SUIT_CONVERSION = {
     'S': ('&spades;', 'black'),

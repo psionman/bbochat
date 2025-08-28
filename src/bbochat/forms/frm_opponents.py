@@ -6,7 +6,7 @@ from tkinter import ttk
 from psiutils.constants import PAD
 from psiutils.treeview import sort_treeview
 
-from config import get_config
+from bbochat.config import get_config
 
 
 PAIR_TREE_COLUMNS = (

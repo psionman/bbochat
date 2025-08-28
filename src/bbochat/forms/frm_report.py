@@ -1,18 +1,18 @@
 """ReportFrame for BBO Chat."""
+from pathlib import Path
+import re
 import tkinter as tk
 from tkinter import ttk
 from tkinterweb import HtmlFrame
-from pathlib import Path
-import re
 
 from psiutils.constants import PAD
 from psiutils.buttons import ButtonFrame, Button
 from psiutils.utilities import window_resize
 
-from constants import APP_TITLE
-from config import get_config
-import text
-from utilities_bbochat import display_html
+from bbochat.constants import APP_TITLE
+from bbochat.config import get_config
+from bbochat.utilities_bbochat import display_html
+import bbochat.text as txt
 
 FRAME_TITLE = f'{APP_TITLE} - Report'
 
@@ -26,13 +26,16 @@ class ReportFrame():
         self.config = get_config()
         self.path = parent.path.get()
 
+        self.html_frame = None
+
         # tk variables
 
-        self.show()
+        self._show()
 
         self.report = self._create_report()
 
-    def show(self) -> None:
+    def _show(self) -> None:
+        # pylint: disable=no-member)
         root = self.root
         root.geometry(self.config.geometry[Path(__file__).stem])
         root.transient(self.parent.root)
@@ -40,7 +43,7 @@ class ReportFrame():
         root.bind('<Configure>',
                   lambda event, arg=None: window_resize(self, __file__))
 
-        root.bind('<Control-x>', self.dismiss)
+        root.bind('<Control-x>', self._dismiss)
 
         root.rowconfigure(0, weight=1)
         root.columnconfigure(0, weight=1)
@@ -74,8 +77,8 @@ class ReportFrame():
         frame.buttons = [
             Button(
                 frame,
-                text=text.EXIT,
-                command=self.dismiss,
+                text=txt.EXIT,
+                command=self._dismiss,
                 sticky=tk.E,
                 underline=1),
         ]
@@ -83,6 +86,7 @@ class ReportFrame():
         return frame
 
     def _create_report(self) -> str:
+        # pylint: disable=no-member)
         notes = self.parent.get_notes_content()
         output = '# Tournament report'
         output = f'{output}\n\n Date: {self.date.strftime('%d %B %Y')}'
@@ -108,8 +112,9 @@ class ReportFrame():
         return text
 
     def _save_html(self, html) -> None:
-        with open(self.path.replace('.txt', '.html'), 'w') as f_html:
+        path = self.path.replace('.txt', '.html')
+        with open(path, 'w', encoding='utf-8') as f_html:
             f_html.write(html)
 
-    def dismiss(self, *args) -> None:
+    def _dismiss(self, *args) -> None:
         self.root.destroy()

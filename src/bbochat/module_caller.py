@@ -1,6 +1,6 @@
-from forms.frm_config import ConfigFrame
-from forms.frm_edit import EditFrame
-from data import DataStore
+from bbochat.forms.frm_config import ConfigFrame
+from bbochat.forms.frm_edit import EditFrame
+from bbochat.data import DataStore
 
 
 class ModuleCaller():

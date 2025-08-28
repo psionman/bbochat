@@ -1,0 +1,16 @@
+Metadata-Version: 2.4
+Name: bbochat
+Version: 0.1.0
+Summary: Chat manager for BBO
+Requires-Python: >=3.13
+Description-Content-Type: text/markdown
+Requires-Dist: clipboard>=0.0.4
+Requires-Dist: emoji>=2.14.1
+Requires-Dist: icecream>=2.1.4
+Requires-Dist: markdown>=3.8
+Requires-Dist: psi-toml>=0.0.18
+Requires-Dist: psiconfig>=0.0.15
+Requires-Dist: psiutils>=0.1.74
+Requires-Dist: python-dateutil>=2.9.0.post0
+Requires-Dist: tkinterweb>=4.3.1
+Requires-Dist: userpaths>=0.1.3

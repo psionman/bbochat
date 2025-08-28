@@ -3,7 +3,7 @@ from pathlib import Path
 
 from psiconfig import TomlConfig
 
-from constants import CONFIG_PATH, USER_DATA_DIR, APP_NAME, DOCS_DIR
+from bbochat.constants import CONFIG_PATH, USER_DATA_DIR, APP_NAME, DOCS_DIR
 
 
 DEFAULT_CONFIG = {

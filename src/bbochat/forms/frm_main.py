@@ -1,13 +1,13 @@
 
 """MainFrame for BBO Chat."""
 
+import re
 import contextlib
 import tkinter as tk
 from tkinter import ttk, simpledialog
 from pathlib import Path
 import random
 import clipboard
-import re
 import emoji
 
 from psiutils.constants import PAD
@@ -15,17 +15,17 @@ from psiutils.buttons import ButtonFrame, IconButton
 from psiutils.utilities import window_resize
 from psiutils import messagebox
 
-import text
+from bbochat.data import DataStore, Pair, Player
+from bbochat.config import get_config
+from bbochat.constants import MODES
+from bbochat.main_menu import MainMenu
 
-from data import DataStore, Pair, Player
-from config import get_config
-from constants import MODES
+import bbochat.text as txt
 
-from main_menu import MainMenu
-from forms.frm_master import MasterFrame
-from forms.frm_partners import PartnerFrame
-from forms.frm_notes import NotesFrame
-from forms.frm_tournament import TournamentFrame
+from bbochat.forms.frm_master import MasterFrame
+from bbochat.forms.frm_partners import PartnerFrame
+from bbochat.forms.frm_notes import NotesFrame
+from bbochat.forms.frm_tournament import TournamentFrame
 
 FRAME_TITLE = 'BBO Chat'
 
@@ -35,6 +35,7 @@ DEFAULT_GEOMETRY = '1250x700'
 
 class MainFrame():
     def __init__(self, root: tk.Tk) -> None:
+        # pylint: disable=no-member)
         self.root = root
         self.config = get_config()
         self.mode = MODES['greeting']
@@ -68,8 +69,15 @@ class MainFrame():
             MODES['chat']: self.config.last_chat
         }
 
+        self.save_button = None
+        self.delete_button = None
         self.button_frame = None
-        self.show()
+        self.clipboard_entry = None
+        self.master_tab = None
+        self.tournament_tab = None
+        self.notes_tab = None
+
+        self._show()
 
         self.pair_tree = self.master_tab.pair_tree
         self.search_entry = self.master_tab.search_entry
@@ -82,6 +90,7 @@ class MainFrame():
             self._get_my_name()
 
     def _create_tk_variables(self) -> None:
+        # pylint: disable=no-member)
         self.clipboard = tk.StringVar()
 
         # Main
@@ -107,7 +116,7 @@ class MainFrame():
         self.partners_name = tk.StringVar(value='')
         self.partners_username = tk.StringVar()
 
-    def show(self):
+    def _show(self):
         root = self.root
         root.protocol("WM_DELETE_WINDOW", self._dismiss)
         root.geometry(self._geometry())
@@ -164,7 +173,8 @@ class MainFrame():
 
         # button = ttk.Button(frame, text='Copy',
         #                     command=self.copy_to_clipboard)
-        button = IconButton(frame, 'Copy', 'copy_clipboard', self.copy_to_clipboard)
+        button = IconButton(
+            frame, 'Copy', 'copy_clipboard', self.copy_to_clipboard)
         button.grid(row=0, column=7, padx=PAD)
 
         label = ttk.Label(frame, text='My name')
@@ -198,17 +208,17 @@ class MainFrame():
         entry.grid(row=2, column=4, pady=PAD)
         entry.bind('<KeyRelease>', self._update_clipboard)
 
-        # self.save_button = ttk.Button(frame, text=text.SAVE,
+        # self.save_button = ttk.Button(frame, text=txt.SAVE,
         #                               command=self._save_names)
         self.save_button = IconButton(
-            frame, text.SAVE, 'save', self._save_names)
+            frame, txt.SAVE, 'save', self._save_names)
         self.save_button.grid(row=1, column=5, padx=PAD, sticky=tk.EW)
 
-        # self.delete_button = ttk.Button(frame, text=text.DELETE,
+        # self.delete_button = ttk.Button(frame, text=txt.DELETE,
         #                                 command=self._delete_pair)
 
         self.delete_button = IconButton(
-            frame, text.DELETE, 'delete', command=self._delete_pair)
+            frame, txt.DELETE, 'delete', command=self._delete_pair)
         self.delete_button.grid(row=2, column=5, padx=PAD, pady=PAD)
 
         check_button = ttk.Checkbutton(
@@ -244,6 +254,7 @@ class MainFrame():
         return notebook
 
     def _button_frame(self, master: ttk.Frame) -> ttk.Frame:
+        # pylint: disable=no-member)
         style = ttk.Style()
         # style.theme_use('clam')
         style.configure('greeting.TButton',
@@ -305,6 +316,7 @@ class MainFrame():
         self._set_clipboard_colour()
 
     def _set_clipboard_colour(self):
+        # pylint: disable=no-member)
         colour = self.config.colours[MODES[self.mode]]
         entry_style = ttk.Style()
         entry_style.configure(
@@ -406,7 +418,7 @@ class MainFrame():
         self.update_clipboard()
 
     def _delete_pair(self, *args) -> None:
-        if not messagebox.askyesno(self, text.DELETE_TITLE, text.DELETE_PAIR):
+        if not messagebox.askyesno(self, txt.DELETE_TITLE, txt.DELETE_PAIR):
             return
 
         pair = Pair(self.username_1.get(), self.username_2.get())

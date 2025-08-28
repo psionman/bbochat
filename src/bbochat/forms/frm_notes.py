@@ -6,15 +6,15 @@ from tkinterweb import HtmlFrame
 
 from psiutils.constants import PAD, DIALOG_STATUS, MODES
 from psiutils.widgets import HAND
-from psiutils.buttons import ButtonFrame, Button
+from psiutils.buttons import ButtonFrame
 from psiutils.menus import Menu, MenuItem
 from psiutils import messagebox
 
-import text
-from utilities_bbochat import display_html
-from config import get_config
+from bbochat.utilities_bbochat import display_html
+from bbochat.config import get_config
+import bbochat.text as txt
 
-from forms.frm_notes_edit import NotesEditFrame
+from bbochat.forms.frm_notes_edit import NotesEditFrame
 
 
 class NotesFrame():
@@ -65,23 +65,9 @@ class NotesFrame():
     def _button_frame(self, master: ttk.Frame) -> tk.Frame:
         frame = ButtonFrame(master, tk.VERTICAL)
         frame.buttons = [
-            Button(
-                frame,
-                text=text.NEW,
-                command=self._new,
-                underline=0),
-            Button(
-                frame,
-                text=text.EDIT,
-                command=self._edit,
-                dimmable=True,
-                underline=0),
-            Button(
-                frame,
-                text=text.DELETE,
-                command=self._delete,
-                dimmable=True,
-                underline=0),
+            frame.icon_button('new', False, self._new),
+            frame.icon_button('edit', True, self._edit),
+            frame.icon_button('delete', True, self._delete),
         ]
         frame.enable(False)
         return frame
@@ -104,7 +90,7 @@ class NotesFrame():
     def _delete(self, *args) -> None:
         if not self.category:
             return
-        if not messagebox.askyesno(self, text.DELETE_TITLE, text.DELETE_ITEM):
+        if not messagebox.askyesno(self, txt.DELETE_TITLE, txt.DELETE_ITEM):
             return
         self.notes.pop(self.category)
         self.parent.save()
@@ -119,16 +105,16 @@ class NotesFrame():
             return
         categories = sorted(list(self.notes))
         self.category = categories[selection[0]]
-        text = self.notes[self.category]
+        notes = self.notes[self.category]
         self.context_menu.enable()
         self.button_frame.enable()
-        self._create_report(text)
+        self._create_report(notes)
 
     def _context_menu(self) -> tk.Menu:
         menu_items = [
-            MenuItem(text.NEW, self._new, dimmable=False),
-            MenuItem(text.EDIT, self._edit, dimmable=True),
-            MenuItem(text.DELETE, self._delete, dimmable=True),
+            MenuItem(txt.NEW, self._new, dimmable=False),
+            MenuItem(txt.EDIT, self._edit, dimmable=True),
+            MenuItem(txt.DELETE, self._delete, dimmable=True),
         ]
         context_menu = Menu(self.root, menu_items)
         context_menu.enable(False)
@@ -137,5 +123,6 @@ class NotesFrame():
     def _show_context_menu(self, event: tk.Event) -> None:
         self.context_menu.tk_popup(event.x_root, event.y_root)
 
-    def _create_report(self, text) -> str:
-        display_html(self.html_frame, text, self.config.css)
+    def _create_report(self, report: str) -> str:
+        # pylint: disable=no-member)
+        display_html(self.html_frame, report, self.config.css)

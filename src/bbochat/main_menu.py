@@ -5,13 +5,13 @@ import webbrowser
 from psiutils.menus import Menu, MenuItem
 from psiutils import messagebox
 
-from constants import AUTHOR, APP_TITLE, HELP_URI
+from bbochat.constants import AUTHOR, APP_TITLE, HELP_URI
 from _version import __version__
 import text
-from config import config
-from data import DataStore
+from bbochat.config import config
+from bbochat.data import DataStore
 
-from forms.frm_config import ConfigFrame
+from bbochat.forms.frm_config import ConfigFrame
 
 SPACES = ' '*20
 
@@ -37,7 +37,7 @@ class MainMenu():
         return [
             MenuItem(f'My name{text.ELLIPSIS}', self._get_my_name),
             MenuItem(f'{text.CONFIG}{text.ELLIPSIS}', self._show_config_frame),
-            MenuItem(text.EXIT, self.dismiss),
+            MenuItem(text.EXIT, self._dismiss),
         ]
 
     def _get_my_name(self) -> None:
@@ -79,5 +79,5 @@ class MainMenu():
                  f'Author: {AUTHOR} {SPACES}')
         messagebox.showinfo(self, title=f'About {APP_TITLE}', message=about)
 
-    def dismiss(self, *args):
+    def _dismiss(self, *args):
         self.root.destroy()
