@@ -174,7 +174,7 @@ class MainFrame():
         # button = ttk.Button(frame, text='Copy',
         #                     command=self.copy_to_clipboard)
         button = IconButton(
-            frame, 'Copy', 'copy_clipboard', self.copy_to_clipboard)
+            frame, 'Copy', 'copy_clipboard', False, self.copy_to_clipboard)
         button.grid(row=0, column=7, padx=PAD)
 
         label = ttk.Label(frame, text='My name')
@@ -211,14 +211,14 @@ class MainFrame():
         # self.save_button = ttk.Button(frame, text=txt.SAVE,
         #                               command=self._save_names)
         self.save_button = IconButton(
-            frame, txt.SAVE, 'save', self._save_names)
+            frame, txt.SAVE, 'save', True, self._save_names)
         self.save_button.grid(row=1, column=5, padx=PAD, sticky=tk.EW)
 
         # self.delete_button = ttk.Button(frame, text=txt.DELETE,
         #                                 command=self._delete_pair)
 
         self.delete_button = IconButton(
-            frame, txt.DELETE, 'delete', command=self._delete_pair)
+            frame, txt.DELETE, 'delete', True, command=self._delete_pair)
         self.delete_button.grid(row=2, column=5, padx=PAD, pady=PAD)
 
         check_button = ttk.Checkbutton(

@@ -15,7 +15,7 @@ from psiutils import messagebox
 
 from bbochat.config import get_config
 from bbochat.constants import META_CODES
-import text as txt
+import bbochat.text as txt
 
 from bbochat.forms.frm_text_dialog import TextDialogFrame
 
@@ -61,6 +61,7 @@ class EditFrame():
         self._populate_text_items()
 
     def _show(self) -> None:
+        # pylint: disable=no-member)
         root = self.root
         root.geometry(self.config.geometry[Path(__file__).stem])
         root.transient(self.parent.root)

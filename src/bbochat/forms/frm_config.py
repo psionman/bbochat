@@ -161,7 +161,7 @@ class ConfigFrame():
         self.html_frame.grid(row=row, column=1, columnspan=3, sticky=tk.EW)
         self.html_frame.grid_propagate(0)
 
-        button = IconButton(frame, txt.EDIT, 'edit', self._css_edit)
+        button = IconButton(frame, txt.EDIT, 'edit', False, self._css_edit)
         button.grid(row=row, column=4, sticky=tk.N, padx=PAD)
 
         row += 1

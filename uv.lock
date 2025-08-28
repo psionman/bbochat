@@ -42,7 +42,7 @@ requires-dist = [
     { name = "markdown", specifier = ">=3.8" },
     { name = "psi-toml", specifier = ">=0.0.18" },
     { name = "psiconfig", specifier = ">=0.0.15" },
-    { name = "psiutils", specifier = ">=0.1.75" },
+    { name = "psiutils", specifier = ">=0.2.0" },
     { name = "python-dateutil", specifier = ">=2.9.0.post0" },
     { name = "structlog", specifier = ">=25.4.0" },
     { name = "tkinterweb", specifier = ">=4.3.1" },
@@ -223,7 +223,7 @@ wheels = [
 
 [[package]]
 name = "psiutils"
-version = "0.1.75"
+version = "0.2.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "iniconfig" },
@@ -239,9 +239,9 @@ dependencies = [
     { name = "tomli" },
     { name = "tomli-w" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/da/6d/29e0f61ccf081f2643a8269723a4d653c0625affc6c7d83f114a83206b5b/psiutils-0.1.75.tar.gz", hash = "sha256:ed6a92bf7d4eb467195b299e6fda9adc6b2c3f907e353a74deb6e111de42c8f5", size = 62029, upload-time = "2025-08-28T09:57:41.179Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/77/e6/3c72fe698d7aaef1ad18a5e29cd290bcdc462c74f2e4c971bba6bcd76374/psiutils-0.2.0.tar.gz", hash = "sha256:774d5f3dcfa6e0fe446a444dfc56ae80cef68e71e40f1350ddc9d57797324706", size = 61956, upload-time = "2025-08-28T14:12:39.939Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/94/5b/72fe4d58e7d93c8a9b6a2785ac8cd5c82d82a4295e67c0a465e9a68af425/psiutils-0.1.75-py3-none-any.whl", hash = "sha256:ba0fe37bbd54aeb36f7c4af1c13ec5c84caf2271ea544692ceb8879b96106c96", size = 73706, upload-time = "2025-08-28T09:57:40.106Z" },
+    { url = "https://files.pythonhosted.org/packages/04/e9/955aec2581eec023c22230bba32bf08c093cf3f305a81756bb8e7081cd25/psiutils-0.2.0-py3-none-any.whl", hash = "sha256:b25cbe0b75121013a94b1b8f3e96056663f034a0dc1dc210262c393991d7f12e", size = 73626, upload-time = "2025-08-28T14:12:38.813Z" },
 ]
 
 [[package]]
