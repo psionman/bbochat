@@ -20,7 +20,8 @@ DOCS_DIR = userpaths.get_my_documents()
 
 # GUI
 APP_TITLE = 'BBO Chat'
-ICON_FILE = resolve_path('images/icon.png', __file__)
+# ICON_FILE = resolve_path('images/icon.png', __file__)
+ICON_FILE = Path(Path(__file__).parent, 'images', 'icon.png')
 
 # Dates
 YYYYMMDD = '%Y%m%d'
