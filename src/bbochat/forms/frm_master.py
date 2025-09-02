@@ -14,6 +14,7 @@ from bbochat.forms.frm_chat import ChatFrame
 
 class MasterFrame():
     def __init__(self, parent, master):
+        # pylint: disable=no-member)
         self.parent = parent
         self.root = parent.root
         # used in text_selection
@@ -47,14 +48,14 @@ class MasterFrame():
 
         mode = 'greeting'
         data_set = self.data_store.data_sets[mode]
-        data_manager = DataManager(self.data_store, data_set)
+        data_manager = DataManager(self.data_store, data=data_set)
         greetings = TextSelectionFrame(
             self, frame, MODES[mode], data_manager)
         frame.add(greetings.main_frame, width=FRAME_WIDTH)
 
         mode = 'valediction'
         data_set = self.data_store.data_sets[mode]
-        data_manager = DataManager(self.data_store, data_set)
+        data_manager = DataManager(self.data_store, data=data_set)
         valedictions = TextSelectionFrame(
             self, frame, MODES[mode], data_manager)
         frame.add(valedictions.main_frame, width=FRAME_WIDTH)

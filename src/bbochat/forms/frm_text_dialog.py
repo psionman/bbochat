@@ -11,7 +11,7 @@ from psiutils.widgets import Tooltip
 
 from bbochat.constants import APP_TITLE
 from bbochat.config import get_config
-import text as txt
+import bbochat.text as txt
 
 
 class TextDialogFrame():

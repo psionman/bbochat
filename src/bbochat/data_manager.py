@@ -5,6 +5,10 @@ from bbochat.constants import MODES, META_CODES
 
 
 class DataManager():
+    """
+        The data manager holds data for the specific mode (e.g. 'chat')
+        The data store hold data for the whole application.
+    """
     def __init__(
             self,
             data_store: dict,
@@ -120,8 +124,18 @@ class DataManager():
         text_list.insert(index, new_value)
 
     def save(self, frame, *args) -> None:
+        """
+        Saves data to the data store based on the frame mode.
+
+        Args:
+            frame: The frame object containing mode information.
+            *args: Additional arguments.
+
+        Returns:
+            None
+        """
         if not self.master:
-            self.data_store.data_sets[MODES[frame.mode]] = self.data
+            self.data_store.data_sets[frame.mode] = self.data
 
         self.data_store.save()
         if self.slave:

@@ -26,6 +26,8 @@ class EditFrame():
     def __init__(self, parent) -> None:
         self.root = tk.Toplevel(parent.root)
         self.parent = parent
+        self.data_store = parent.data_store
+
         self.mode = parent.mode
 
         self.save_button = None
@@ -267,6 +269,8 @@ class EditFrame():
                 meta_item = self.meta_dict[value]
                 self.meta_dict[value] = (meta_item[0], meta_item[1], index)
 
+        self.data_store.data_sets[self.mode] = self.text_list
+        self.data_store.save()
         self.status = DIALOG_STATUS['updated']
         self._dismiss()
 

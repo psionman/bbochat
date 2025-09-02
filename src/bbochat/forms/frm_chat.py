@@ -27,13 +27,15 @@ class ChatFrame():
         frame.columnconfigure(0, weight=1)
 
         mode = 'chat'
-        data_manager = DataManager(self.data_store, None, True, False)
+        data_manager = DataManager(
+            self.data_store, data=None, master=True, slave=False)
         chat_slave = TextSelectionFrame(
             self, frame, MODES[mode], data_manager, True, False)
 
         mode = 'chat'
         data_set = self.data_store.data_sets[mode]
-        data_manager = DataManager(self.data_store, data_set, False, True)
+        data_manager = DataManager(
+            self.data_store, data=data_set, master=False, slave=True)
         chat_master = TextSelectionFrame(
             self, frame, MODES[mode], data_manager, False, True, chat_slave)
         chat_slave.master_frame = chat_master

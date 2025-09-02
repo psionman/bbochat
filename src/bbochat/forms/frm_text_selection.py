@@ -34,6 +34,7 @@ class TextSelectionFrame():
         self.show_title = show_title
         self.slave_frame = slave
         self.master_frame = None
+        self.data_store = parent.data_store
 
         self.data = data_manager
         self.mode = MODES[mode]
@@ -56,7 +57,7 @@ class TextSelectionFrame():
         self.main_frame = self._main_frame(master)
         self.context_menu = self._context_menu()
 
-        self._populate_text_items()
+        self.populate_text_items()
 
     def _main_frame(self, master: ttk.Frame) -> ttk.Frame:
         frame = ttk.Frame(master)
@@ -72,9 +73,9 @@ class TextSelectionFrame():
             selectmode=tk.BROWSE,
             cursor=HAND,
         )
-        self.listbox .grid(row=1, column=0, sticky=tk.NSEW)
-        self.listbox .bind('<<ListboxSelect>>', self._item_selected)
-        self.listbox .bind('<Button-3>', self._show_context_menu)
+        self.listbox.grid(row=1, column=0, sticky=tk.NSEW)
+        self.listbox.bind('<<ListboxSelect>>', self._item_selected)
+        self.listbox.bind('<Button-3>', self._show_context_menu)
 
         if self.show_use_frame:
             use_frame = self._use_frame(frame)
@@ -139,17 +140,16 @@ class TextSelectionFrame():
         self._use_item()
         self.selected_text = dlg.text
 
-        self._populate_text_items(dlg.text)
+        self.populate_text_items(dlg.text)
 
     def _edit_item(self, *args) -> None:
         dlg = TextDialogFrame(self, 'Edit', self.selected_text)
         self.root.wait_window(dlg.root)
         if dlg.status != DIALOG_STATUS['updated']:
             return
-
         self.data.amend(self, self.selected_text, dlg.text)
 
-        self._populate_text_items(self.data.text_list)
+        self.populate_text_items(self.data.text_list)
 
         self.selected_text = dlg.text
         self.text_var.set(dlg.text)
@@ -163,11 +163,11 @@ class TextSelectionFrame():
 
         if self.slave_frame:
             # This is a master: it has a slave frame
-            self.slave_frame._populate_text_items()
+            self.slave_frame.populate_text_items()
 
         self.text_var.set('')
         self._use_item()
-        self._populate_text_items()
+        self.populate_text_items()
 
     def _edit_all(self, *args) -> None:
         dlg = EditFrame(self)
@@ -176,7 +176,7 @@ class TextSelectionFrame():
             return
         self.data.edit_all(self, dlg.text_list, dlg.meta_dict)
 
-        self._populate_text_items(dlg.selected_text)
+        self.populate_text_items(dlg.selected_text)
         self.selected_text = dlg.selected_text
         self.text_var.set(dlg.selected_text)
         self._use_item()
@@ -196,11 +196,7 @@ class TextSelectionFrame():
         self.config.update(self.config_key, self.text_var.get())
         self.config.save()
 
-    def _populate_text_items(self, selected_item: str = '') -> None:
-        if self.master_frame:
-            # self.data.display_list = self._build_display_list()
-            ...
-
+    def populate_text_items(self, selected_item: str = '') -> None:
         self.listbox.delete(0, tk.END)
         for index, item in enumerate(self.data.display_list):
             self.listbox.insert('end', item)

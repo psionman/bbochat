@@ -1,0 +1,7 @@
+{"changes": {"build_for_windows": [false, true]}, "event": "Project changed", "timestamp": "2025-09-01T10:51:39.555408Z", "level": "info", "logger": "package.forms.frm_project_edit"}
+{"changes": {"build_for_windows": [false, true]}, "event": "Project changed", "timestamp": "2025-09-01T10:52:15.943949Z", "level": "info", "logger": "package.forms.frm_project_edit"}
+{"changes": {"build_for_windows": [false, true]}, "event": "Project changed", "timestamp": "2025-09-01T10:55:37.445053Z", "level": "info", "logger": "package.forms.frm_project_edit"}
+{"changes": {"build_for_windows": [false, true]}, "event": "Project changed", "timestamp": "2025-09-01T10:56:34.894820Z", "level": "info", "logger": "package.forms.frm_project_edit"}
+{"name": "windows_converter", "event": "New project", "timestamp": "2025-09-01T12:30:36.521064Z", "level": "info", "logger": "package.forms.frm_project_edit"}
+{"changes": {"project_name": ["", "windows_converter"], "project_dir": ["/home/jeff/projects", "/home/jeff/projects/utilities/windows-converter/src/windows_converter"]}, "event": "Project changed", "timestamp": "2025-09-01T12:30:36.522991Z", "level": "info", "logger": "package.forms.frm_project_edit"}
+{"changes": {"script": ["", "/home/jeff/.scripts/windows-converter"]}, "event": "Project changed", "timestamp": "2025-09-01T16:27:06.576830Z", "level": "info", "logger": "package.forms.frm_project_edit"}
