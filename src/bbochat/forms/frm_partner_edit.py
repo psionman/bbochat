@@ -12,7 +12,6 @@ from psiutils.utilities import window_resize
 from bbochat.data import Partner
 from bbochat.constants import ICON_FILE
 from bbochat.config import get_config
-import text
 
 FRAME_TITLE = 'New partner'
 

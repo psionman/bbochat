@@ -19,14 +19,14 @@ from bbochat.data import DataStore, Pair, Player
 from bbochat.config import get_config
 from bbochat.constants import MODES
 from bbochat.main_menu import MainMenu
-
-import bbochat.text as txt
+from bbochat.text import Text
 
 from bbochat.forms.frm_master import MasterFrame
 from bbochat.forms.frm_partners import PartnerFrame
 from bbochat.forms.frm_notes import NotesFrame
 from bbochat.forms.frm_tournament import TournamentFrame
 
+txt = Text()
 FRAME_TITLE = 'BBO Chat'
 
 # Handles cases when size gets corrupted, e.g. after stop on error

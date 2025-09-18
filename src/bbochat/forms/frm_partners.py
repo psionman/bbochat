@@ -11,9 +11,11 @@ from psiutils import messagebox
 
 from bbochat.data import Partner
 from bbochat.config import get_config
-import bbochat.text as txt
+from bbochat.text import Text
 
 from bbochat.forms.frm_partner_edit import PartnerEditFrame
+
+txt = Text()
 
 
 class PartnerFrame():

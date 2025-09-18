@@ -6,13 +6,14 @@ from psiutils.menus import Menu, MenuItem
 from psiutils import messagebox
 
 from bbochat.constants import AUTHOR, APP_TITLE, HELP_URI
-from _version import __version__
-import text
+from bbochat._version import __version__
+from bbochat.text import Text
 from bbochat.config import config
 from bbochat.data import DataStore
 
 from bbochat.forms.frm_config import ConfigFrame
 
+txt = Text()
 SPACES = ' '*20
 
 
@@ -34,10 +35,11 @@ class MainMenu():
         menubar.add_cascade(menu=help_menu, label='Help')
 
     def _file_menu_items(self) -> list:
+        # pylint: disable=no-member)
         return [
-            MenuItem(f'My name{text.ELLIPSIS}', self._get_my_name),
-            MenuItem(f'{text.CONFIG}{text.ELLIPSIS}', self._show_config_frame),
-            MenuItem(text.EXIT, self._dismiss),
+            MenuItem(f'My name{txt.ELLIPSIS}', self._get_my_name),
+            MenuItem(f'{txt.CONFIG}{txt.ELLIPSIS}', self._show_config_frame),
+            MenuItem(txt.EXIT, self._dismiss),
         ]
 
     def _get_my_name(self) -> None:
@@ -59,11 +61,12 @@ class MainMenu():
         self.root.wait_window(dlg.root)
 
     def _help_menu_items(self) -> list:
+        # pylint: disable=no-member)
         return [
-            MenuItem(f'On line help{text.ELLIPSIS}', self._show_help),
-            MenuItem(f'Data directory location{text.ELLIPSIS}',
+            MenuItem(f'On line help{txt.ELLIPSIS}', self._show_help),
+            MenuItem(f'Data directory location{txt.ELLIPSIS}',
                      self._show_data_directory),
-            MenuItem(f'About{text.ELLIPSIS}', self._show_about),
+            MenuItem(f'About{txt.ELLIPSIS}', self._show_about),
         ]
 
     def _show_help(self):

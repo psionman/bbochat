@@ -14,9 +14,11 @@ from psiutils import messagebox
 from bbochat.config import get_config
 from bbochat.utilities_bbochat import display_html
 from bbochat.constants import HTML_TEST
-import bbochat.text as txt
+from bbochat.text import Text
 
 from bbochat.forms.frm_config_css import ConfigCssFrame
+
+txt = Text()
 
 
 class ConfigFrame():

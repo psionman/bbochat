@@ -12,9 +12,11 @@ from psiutils import messagebox
 
 from bbochat.utilities_bbochat import display_html
 from bbochat.config import get_config
-import bbochat.text as txt
+from bbochat.text import Text
 
 from bbochat.forms.frm_notes_edit import NotesEditFrame
+
+txt = Text()
 
 
 class NotesFrame():

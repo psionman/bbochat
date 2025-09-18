@@ -16,13 +16,14 @@ from psiutils.buttons import ButtonFrame, IconButton
 from psiutils import messagebox
 
 from bbochat.config import get_config
-import text
+from bbochat.text import Text
 from bbochat.constants import (
     TXT_FILE_TYPES, DOCS_DIR, APP_NAME, YYYYMMDD, FRAME_WIDTH)
 from bbochat.data import Partner
 
 from bbochat.forms.frm_report import ReportFrame
 
+txt = Text()
 
 class TournamentFrame():
     def __init__(self, parent, master):
@@ -45,7 +46,7 @@ class TournamentFrame():
 
         self.path = tk.StringVar()
         self.set_path()
-        self.tooltip_text = tk.StringVar(value=text.REPORT_HELP)
+        self.tooltip_text = tk.StringVar(value=txt.REPORT_HELP)
 
         self.notes_frame = self._get_notes_frame(master)
 
@@ -84,22 +85,23 @@ class TournamentFrame():
         return frame
 
     def _button_frame(self, master: ttk.Frame) -> ttk.Frame:
+        # pylint: disable=no-member)
         frame = ButtonFrame(master, tk.HORIZONTAL)
         self.report_button = IconButton(
-            frame, text.REPORT, 'report', self._report, True)
+            frame, txt.REPORT, 'report', self._report, True)
         help_button = IconButton(
-            frame, text.HELP, 'windows')
+            frame, txt.HELP, 'windows')
 
         help_button = ttk.Button(
                 frame,
-                text=text.HELP,)
+                text=txt.HELP,)
         help_button.tooltip = Tooltip(
             help_button,
             textvariable=self.tooltip_text,
             wrap_length=3500,
             vertical_offset=0)
         open_todays = IconButton(
-            frame, f'{text.OPEN} today\'s', 'open', self._open_todays_file)
+            frame, f'{txt.OPEN} today\'s', 'open', self._open_todays_file)
         frame.buttons = [
             frame.icon_button('open', self._open_file),
             open_todays,
@@ -181,7 +183,7 @@ class TournamentFrame():
         # if f_notes is None:
         #     return
 
-        with open(self.path.get(), 'w') as f_notes:
+        with open(self.path.get(), 'w', encoding='utf-8') as f_notes:
             json.dump(notes, f_notes)
 
         self._value_changed()
@@ -216,7 +218,7 @@ class TournamentFrame():
 
     def _get_date_from_path(self) -> datetime:
         if match := re.search(r'[0-9]' * 8, str(self.path.get())):
-            self.date = parse(match.group())
+            date = parse(match.group())
 
     def _get_notes_and_display(self) -> None:
         if not self.path.get().is_file():

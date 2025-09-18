@@ -1,48 +1,68 @@
-OK = 'OK'
-HELP = 'Help'
-EXIT = 'Exit'
-QUIT = 'Quit'
-CANCEL = 'Cancel'
-CLOSE = 'Close'
-COPY = 'Copy'
-EVENT = 'Event'
-SAVE = 'Save'
-SAVE_PDF = 'Save as PDF'
-NEW = 'New'
-EDIT = 'Edit'
-EDIT_ALL = 'Edit all'
-EDIT_ITEM = 'Edit item'
-OPEN = 'Open'
-DELETE = 'Delete'
-ACCEPT = 'Accept'
-REPORT = 'Report'
-RESTORE = 'Restore defaults'
-DELETE_RECORD = 'Are you sure you wish to delete this record?'
-DELETE_ITEM = 'Are you sure you wish to delete this item?'
-DELETE_THESE_ITEMS = 'Are you sure you want to delete these item(s)?'
-DELETE_PAIR = 'Are you sure you wish to delete this pair?'
-DELETE_TITLE = 'Delete item'
+"""
+Text module that merges psiutils.text.strings with project-level strings.
 
-SELECT = 'Select'
+Usage:
+    from text_module import Text
+
+    txt = Text()
+    print(txt.SELECT)   # Access as attribute
+    print(txt.DELETE_PROMPT)
+"""
+
+from dataclasses import dataclass, field
+from psiutils.text import Text as PsiText
+
 CONFIG = 'Settings'
-ELLIPSIS = ' ...'
-NO_SUCH_FILE = 'no such file or directory'
-USE = 'Use'
+strings = {
+    'ACCEPT': 'Accept',
+    'CHEVRON_UP': '\u25B4',
+    'CHEVRON_DOWN': '\u25BE',
+    'CONFIG': CONFIG,
+    'EDIT_ALL': 'Edit all',
+    'EDIT_ITEM': 'Edit item',
+    'DELETE_RECORD': 'Are you sure you wish to delete this record?',
+    'DELETE_ITEM': 'Are you sure you wish to delete this item?',
+    'DELETE_PAIR': 'Are you sure you wish to delete this pair?',
+    'DELETE_TITLE': 'Delete item',
+    'MOVE_UP': 'Move up',
+    'MOVE_DOWN': 'Move down',
+    'REPORT_HELP': """
+    'To format board number in the report, enter board number as 'b1'. etc.; \n
+    'to display suit symbols in the report, enter suits as '!s', '!h' etc.
+    '""",
+    'RESTORE': 'Restore defaults',
+    'SELECT': 'Select',
+    'TOOLTIP': f"""
+    'To insert your partner's and your names, use '<names>';\n
+    'to insert your opponents' names, use '<opps>';\n
+    'to insert your system, use '<system>'.\n
+    '(To remove this hint goto {CONFIG}).
+    '""",
+}
 
-MOVE_UP = 'Move up'
-MOVE_DOWN = 'Move down'
 
-CHEVRON_UP = '\u25B4'
-CHEVRON_DOWN = '\u25BE'
+@dataclass
+class Text:
+    """Combines package-level (psiutils) and project-level strings.
 
-TOOLTIP = f"""
-To insert your partner's and your names, use '<names>';\n
-to insert your opponents' names, use '<opps>';\n
-to insert your system, use '<system>'.\n
-(To remove this hint goto {CONFIG}).
-"""
+    Attributes from `psiutils.text.strings` are loaded first, then overridden
+    or extended by the local `strings` dictionary.
+    """
 
-REPORT_HELP = """
-To format board number in the report, enter board number as 'b1'. etc.; \n
-to display suit symbols in the report, enter suits as '!s', '!h' etc.
-"""
+    display: bool = field(default=False, repr=False)
+
+    def __post_init__(self) -> None:
+        """Populate the dataclass instance with string attributes."""
+        # Load psiutils strings
+        psi_text = PsiText()
+        psi_strings = psi_text.strings
+        for key, string in psi_strings.items():
+            setattr(self, key, string)
+
+        # Override or add project-level strings
+        for key, string in strings.items():
+            setattr(self, key, string)
+
+        # Optionally display contents of `text`
+        if self.display:
+            psi_text.display(strings)

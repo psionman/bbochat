@@ -15,9 +15,11 @@ from psiutils import messagebox
 
 from bbochat.config import get_config
 from bbochat.constants import META_CODES
-import bbochat.text as txt
+from bbochat.text import Text
 
 from bbochat.forms.frm_text_dialog import TextDialogFrame
+
+txt = Text()
 
 FRAME_TITLE = 'Edit'
 

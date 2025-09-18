@@ -12,10 +12,12 @@ from psiutils import messagebox
 from bbochat.constants import MODE_TEXT, MODES
 from bbochat.config import get_config
 from bbochat.data_manager import DataManager
-import bbochat.text as txt
+from bbochat.text import Text
 
 from bbochat.forms.frm_edit import EditFrame
 from bbochat.forms.frm_text_dialog import TextDialogFrame
+
+txt = Text()
 
 
 class TextSelectionFrame():

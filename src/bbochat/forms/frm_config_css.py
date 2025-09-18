@@ -13,8 +13,9 @@ from psiutils.widgets import clickable_widget
 
 from bbochat.constants import APP_TITLE, HTML_TEST
 from bbochat.utilities_bbochat import display_html
-import bbochat.text as txt
+from bbochat.text import Text
 
+txt = Text()
 FRAME_TITLE = f'{APP_TITLE} - css  {txt.CONFIG}'
 
 ELEMENTS = {
