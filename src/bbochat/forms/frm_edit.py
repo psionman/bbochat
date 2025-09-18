@@ -119,13 +119,13 @@ class EditFrame():
     def _button_frame(self, master: ttk.Frame) -> tk.Frame:
         frame = ButtonFrame(master, tk.VERTICAL)
         self.save_button = IconButton(
-            frame, txt.SAVE, 'save', True, self._save)
+            frame, txt.SAVE, 'save', self._save, True)
         frame.buttons = [
-            frame.icon_button('new', False, self._new_item),
-            frame.icon_button('edit', True, self._edit_item),
-            frame.icon_button('delete', True, self._delete_item),
+            frame.icon_button('new', self._new_item),
+            frame.icon_button('edit', self._edit_item, True),
+            frame.icon_button('delete', self._delete_item, True),
             self.save_button,
-            frame.icon_button('exit', False, self._dismiss),
+            frame.icon_button('exit', self._dismiss),
         ]
         return frame
 

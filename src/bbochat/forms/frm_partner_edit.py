@@ -5,7 +5,7 @@ from tkinter import ttk
 from pathlib import Path
 
 from psiutils.constants import PAD, PADR, PADB, DIALOG_STATUS, MODES
-from psiutils.buttons import ButtonFrame, Button
+from psiutils.buttons import ButtonFrame
 from psiutils.widgets import PsiText, clickable_widget
 from psiutils.utilities import window_resize
 
@@ -126,22 +126,10 @@ class PartnerEditFrame():
 
     def _button_frame(self, master: ttk.Frame) -> tk.Frame:
         frame = ButtonFrame(master, tk.HORIZONTAL)
-        save_button = Button(
-                frame,
-                text=text.SAVE,
-                command=self._save,
-                underline=0,
-                dimmable=True)
-        buttons = [
-            save_button,
-            Button(
-                frame,
-                text=text.EXIT,
-                command=self._dismiss,
-                sticky=tk.E,
-                underline=1),
+        frame.buttons = [
+            frame.icon_button('save', self._save, True),
+            frame.icon_button('exit', self._dismiss),
         ]
-        frame.buttons = buttons
         frame.enable(False)
         return frame
 

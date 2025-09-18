@@ -3,8 +3,6 @@ from pathlib import Path
 from appdirs import user_config_dir, user_data_dir
 import userpaths
 
-from psiutils.known_paths import resolve_path
-
 # General
 AUTHOR = 'Jeff Watkins'
 APP_NAME = 'bbochat'
@@ -20,7 +18,6 @@ DOCS_DIR = userpaths.get_my_documents()
 
 # GUI
 APP_TITLE = 'BBO Chat'
-# ICON_FILE = resolve_path('images/icon.png', __file__)
 ICON_FILE = Path(Path(__file__).parent, 'images', 'icon.png')
 
 # Dates

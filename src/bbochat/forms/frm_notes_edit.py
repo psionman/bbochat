@@ -2,16 +2,13 @@
 import tkinter as tk
 from tkinter import ttk
 from pathlib import Path
-import emoji
 
 from psiutils.constants import PAD, DIALOG_STATUS, MODES
-from psiutils.buttons import ButtonFrame, Button
+from psiutils.buttons import ButtonFrame
 from psiutils.utilities import window_resize
-from psiutils import messagebox
 
 from bbochat.constants import APP_TITLE
 from bbochat.config import get_config
-import text
 
 
 class NotesEditFrame():
@@ -20,6 +17,7 @@ class NotesEditFrame():
         self.parent = parent
         self.mode = mode
         self.notes = parent.notes
+        self.notes_text = ''
 
         self.config = get_config()
         self.title = f'{APP_TITLE} - {MODES[mode].capitalize()} notes'
@@ -82,17 +80,8 @@ class NotesEditFrame():
     def _button_frame(self, master: ttk.Frame) -> ttk.Frame:
         frame = ButtonFrame(master, tk.HORIZONTAL)
         frame.buttons = [
-            Button(
-                frame,
-                text=text.SAVE,
-                command=self._save,
-                underline=0,
-                dimmable=True),
-            Button(
-                frame,
-                text=text.CANCEL,
-                command=self._dismiss,
-                sticky=tk.E,),
+            frame.icon_button('save', self._save, True),
+            frame.icon_button('exit', self._dismiss),
         ]
         frame.enable(False)
         return frame

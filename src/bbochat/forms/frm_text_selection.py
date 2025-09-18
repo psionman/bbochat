@@ -104,11 +104,11 @@ class TextSelectionFrame():
 
         button_frame = ButtonFrame(frame, tk.HORIZONTAL)
         use_button = IconButton(
-            button_frame, txt.USE, 'done', False, self._use_item)
+            button_frame, txt.USE, 'done', self._use_item)
         use_button.widget.configure(style=f'{self.mode}.TButton')
         button_frame.buttons = [
             use_button,
-            IconButton(button_frame, txt.EDIT, 'edit', False, self._edit_all),
+            IconButton(button_frame, txt.EDIT, 'edit', self._edit_all),
         ]
         button_frame.grid(row=2, column=0, pady=PAD)
 

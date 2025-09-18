@@ -65,9 +65,9 @@ class NotesFrame():
     def _button_frame(self, master: ttk.Frame) -> tk.Frame:
         frame = ButtonFrame(master, tk.VERTICAL)
         frame.buttons = [
-            frame.icon_button('new', False, self._new),
-            frame.icon_button('edit', True, self._edit),
-            frame.icon_button('delete', True, self._delete),
+            frame.icon_button('new', self._new),
+            frame.icon_button('edit', self._edit, True),
+            frame.icon_button('delete', self._delete, True),
         ]
         frame.enable(False)
         return frame

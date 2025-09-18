@@ -161,7 +161,7 @@ class ConfigFrame():
         self.html_frame.grid(row=row, column=1, columnspan=3, sticky=tk.EW)
         self.html_frame.grid_propagate(0)
 
-        button = IconButton(frame, txt.EDIT, 'edit', False, self._css_edit)
+        button = IconButton(frame, txt.EDIT, 'edit', self._css_edit)
         button.grid(row=row, column=4, sticky=tk.N, padx=PAD)
 
         row += 1
@@ -196,9 +196,9 @@ class ConfigFrame():
     def _button_frame(self, master: ttk.Frame) -> tk.Frame:
         frame = ButtonFrame(master, tk.HORIZONTAL)
         frame.buttons = [
-            frame.icon_button('save', True, self._save_config),
-            frame.icon_button('revert', True, self._restore_defaults),
-            frame.icon_button('exit', False, self._dismiss),
+            frame.icon_button('save', self._save_config, True),
+            frame.icon_button('revert', self._restore_defaults, True),
+            frame.icon_button('exit', self._dismiss),
         ]
         frame.enable(False)
         return frame

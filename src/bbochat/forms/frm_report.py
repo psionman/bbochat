@@ -6,13 +6,12 @@ from tkinter import ttk
 from tkinterweb import HtmlFrame
 
 from psiutils.constants import PAD
-from psiutils.buttons import ButtonFrame, Button
+from psiutils.buttons import ButtonFrame
 from psiutils.utilities import window_resize
 
 from bbochat.constants import APP_TITLE
 from bbochat.config import get_config
 from bbochat.utilities_bbochat import display_html
-import bbochat.text as txt
 
 FRAME_TITLE = f'{APP_TITLE} - Report'
 
@@ -75,12 +74,7 @@ class ReportFrame():
     def _button_frame(self, master: ttk.Frame) -> tk.Frame:
         frame = ButtonFrame(master, tk.HORIZONTAL)
         frame.buttons = [
-            Button(
-                frame,
-                text=txt.EXIT,
-                command=self._dismiss,
-                sticky=tk.E,
-                underline=1),
+            frame.icon_button('exit', self._dismiss),
         ]
         frame.enable(False)
         return frame

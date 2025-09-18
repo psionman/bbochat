@@ -5,7 +5,7 @@ from pathlib import Path
 import emoji
 
 from psiutils.constants import PAD, DIALOG_STATUS
-from psiutils.buttons import ButtonFrame, Button
+from psiutils.buttons import ButtonFrame
 from psiutils.utilities import window_resize
 from psiutils.widgets import Tooltip
 
@@ -85,17 +85,8 @@ class TextDialogFrame():
     def _button_frame(self, master: ttk.Frame) -> ttk.Frame:
         frame = ButtonFrame(master, tk.HORIZONTAL)
         frame.buttons = [
-            Button(
-                frame,
-                text=txt.OK,
-                command=self._process,
-                underline=0,
-                dimmable=True),
-            Button(
-                frame,
-                text=txt.CANCEL,
-                command=self._dismiss,
-                sticky=tk.E,),
+            frame.icon_button('done', self._process, True),
+            frame.icon_button('exit', self._dismiss),
         ]
         frame.enable(False)
         return frame

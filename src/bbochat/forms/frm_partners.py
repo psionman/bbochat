@@ -5,7 +5,7 @@ from tkinter import ttk
 
 from psiutils.constants import PAD, PADT, DIALOG_STATUS, MODES
 from psiutils.widgets import HAND, PsiText
-from psiutils.buttons import ButtonFrame, Button
+from psiutils.buttons import ButtonFrame
 from psiutils.menus import Menu, MenuItem
 from psiutils import messagebox
 
@@ -109,23 +109,9 @@ class PartnerFrame():
     def _button_frame(self, master: ttk.Frame) -> tk.Frame:
         frame = ButtonFrame(master, tk.VERTICAL)
         frame.buttons = [
-            Button(
-                frame,
-                text=txt.NEW,
-                command=self._new,
-                underline=0),
-            Button(
-                frame,
-                text=txt.EDIT,
-                command=self._edit,
-                dimmable=True,
-                underline=0),
-            Button(
-                frame,
-                text=txt.DELETE,
-                command=self._delete,
-                dimmable=True,
-                underline=0),
+            frame.icon_button('new', self._new),
+            frame.icon_button('edit', self._new, True),
+            frame.icon_button('delete', self._delete, True),
         ]
         frame.enable(False)
         return frame
