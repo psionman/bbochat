@@ -6,7 +6,7 @@ from pathlib import Path
 
 from psiutils.constants import PAD, PADR, PADB, DIALOG_STATUS, MODES
 from psiutils.buttons import ButtonFrame
-from psiutils.widgets import PsiText, clickable_widget
+from psiutils.widgets import clickable_widget
 from psiutils.utilities import window_resize
 
 from bbochat.data import Partner
@@ -28,6 +28,8 @@ class PartnerEditFrame():
         self.status = DIALOG_STATUS['null']
         self.config = get_config()
 
+        self.notes_text = None
+
         if not partner:
             partner = Partner()
             if self.greetings:
@@ -39,20 +41,21 @@ class PartnerEditFrame():
         self.name = tk.StringVar(value=self.partner.name)
         self.system = tk.StringVar(value=self.partner.system)
         self.greeting = tk.StringVar(value=self.partner.greeting)
-        self.notes = tk.StringVar(value=self.partner.notes)
 
         self.username.trace_add('write', self._value_changed)
         self.name.trace_add('write', self._value_changed)
         self.system.trace_add('write', self._value_changed)
         self.greeting.trace_add('write', self._value_changed)
-        self.notes.trace_add('write', self._value_changed)
 
-        self.show()
-        self.notes_text.delete('0.0', tk.END)
+        self._show()
+
+        self.partner.notes = self.partner.notes.strip('\n')
         self.notes_text.insert('0.0', self.partner.notes)
+        self.partner.notes = f'{self.partner.notes}\n'
         self._value_changed()
 
-    def show(self) -> None:
+    def _show(self) -> None:
+        # pylint: disable=no-member)
         root = self.root
         root.geometry(self.config.geometry[Path(__file__).stem])
         root.title(f'{MODES[self.mode].capitalize()} partner')
@@ -117,9 +120,10 @@ class PartnerEditFrame():
         label = ttk.Label(frame, text='Notes')
         label.grid(row=4, column=0, sticky=tk.W)
 
-        self.notes_text = PsiText(frame, height=18)
+        self.notes_text = tk.Text(frame, height=18)
         self.notes_text.grid(row=5, column=0, columnspan=2,
                              sticky=tk.NSEW, pady=PAD)
+        self.notes_text.bind('<<Modified>>', self._value_changed)
 
         return frame
 
@@ -136,14 +140,14 @@ class PartnerEditFrame():
         self.button_frame.disable()
         if not self.username.get():
             return
-
         if (self.mode == MODES['new']
-                or self.username != self.partner.username
-                or self.name != self.partner.name
-                or self.system != self.partner.system
-                or self.greeting != self.partner.greeting
-                or self.notes != self.partner.notes):
+                or self.username.get() != self.partner.username
+                or self.name.get() != self.partner.name
+                or self.system.get() != self.partner.system
+                or self.greeting.get() != self.partner.greeting
+                or self.notes_text.get(0.0, tk.END) != self.partner.notes):
             self.button_frame.enable()
+        self.notes_text.edit_modified(False)
 
     def _save(self, *args) -> None:
         self.partner = Partner()

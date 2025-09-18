@@ -71,7 +71,8 @@ class PartnerFrame():
         )
         self.listbox.grid(row=1, column=0, rowspan=3,
                           sticky=tk.NSEW, padx=PAD, pady=PAD)
-        if self.config.last_partner and self.config.last_partner in self.partners_names:
+        if (self.config.last_partner
+                and self.config.last_partner in self.partners_names):
             index = self.partners_names.index(self.config.last_partner)
             self.listbox.select_set(index)
         self.listbox.bind('<<ListboxSelect>>', self._partner_selected)
@@ -112,7 +113,7 @@ class PartnerFrame():
         frame = ButtonFrame(master, tk.VERTICAL)
         frame.buttons = [
             frame.icon_button('new', self._new),
-            frame.icon_button('edit', self._new, True),
+            frame.icon_button('edit', self._edit, True),
             frame.icon_button('delete', self._delete, True),
         ]
         frame.enable(False)
