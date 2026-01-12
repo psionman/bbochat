@@ -49,8 +49,7 @@ class MasterFrame():
         mode = 'greeting'
         data_set = self.data_store.data_sets[mode]
         data_manager = DataManager(self.data_store, data=data_set)
-        greetings = TextSelectionFrame(
-            self, frame, MODES[mode], data_manager)
+        greetings = TextSelectionFrame(self, frame, MODES[mode], data_manager)
         frame.add(greetings.main_frame, width=FRAME_WIDTH)
 
         mode = 'valediction'

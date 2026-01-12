@@ -83,17 +83,17 @@ class ReportFrame():
         # pylint: disable=no-member)
         notes = self.parent.get_notes_content()
         output = '# Tournament report'
-        output = f'{output}\n\n Date: {self.date.strftime('%d %B %Y')}'
+        output = f'{output}\n\n Date: {self.date.strftime("%d %B %Y")}'
         output = (f'{output}\n\n Partner: '
                   f'{self.partner.name} ({self.partner.username})')
 
         if 'board_notes' in notes and notes['board_notes']:
             output = f'{output}\n\n <h2>Board notes</h2>'
-            output = f'{output}\n\n{self ._parse_md(notes['board_notes'])}'
+            output = f'{output}\n\n{self ._parse_md(notes["board_notes"])}'
 
         if 'general_notes' in notes and notes['general_notes']:
             output = f'{output}\n\n <h2>General notes</h2>'
-            output = f'{output}\n\n{self ._parse_md(notes['general_notes'])}'
+            output = f'{output}\n\n{self ._parse_md(notes["general_notes"])}'
 
         html = display_html(self.html_frame, output, self.config.css)
         self._save_html(html)

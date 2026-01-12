@@ -3,7 +3,7 @@
 import tkinter as tk
 from tkinter import ttk
 
-from bbochat.constants import MODES, FRAME_WIDTH, MODES
+from bbochat.constants import MODES, FRAME_WIDTH
 from bbochat.config import get_config
 from bbochat.data_manager import DataManager
 
