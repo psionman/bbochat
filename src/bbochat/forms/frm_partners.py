@@ -44,8 +44,8 @@ class PartnerFrame():
         self.partners_frame.grid(row=0, column=0, sticky=tk.EW)
         self._update_partner_values()
 
-        self.system.trace('w', self._partner_changed)
-        self.partners_name.trace('w', self._partner_changed)
+        self.system.trace_add('write', self._partner_changed)
+        self.partners_name.trace_add('write', self._partner_changed)
         self.notes_text.bind('<<TextModified>>', self._partner_changed)
 
         self.context_menu = self._context_menu()

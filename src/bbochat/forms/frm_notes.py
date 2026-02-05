@@ -54,8 +54,17 @@ class NotesFrame():
         self.listbox.bind('<<ListboxSelect>>', self._category_selected)
         self.listbox .bind('<Button-3>', self._show_context_menu)
 
+        self.html_frame = tk.Text(frame, height=20)
+        # self.html_frame = HtmlFrame(
+        #     frame, horizontal_scrollbar='auto',
+        #     messages_enabled=False,
+        #     )
+        self.html_frame.grid(row=0, column=1, rowspan=2, sticky=tk.NSEW)
+
         self.html_frame = HtmlFrame(
-            frame, horizontal_scrollbar='auto', messages_enabled=False)
+            frame, horizontal_scrollbar='auto',
+            messages_enabled=False,
+            )
         self.html_frame.grid(row=0, column=1, rowspan=2, sticky=tk.NSEW)
 
         self.button_frame = self._button_frame(frame)

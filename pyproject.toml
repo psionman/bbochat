@@ -4,7 +4,7 @@ version = "0.1.0"
 description = "Chat manager for BBO"
 authors = [{name = "Jeff", "email" = "<jeffwatkins2000@gmail.com>"}]
 readme = "README.md"
-requires-python = ">=3.10, <3.13"
+requires-python = ">=3.10"
 
 dependencies = [
     "appdirs>=1.4.4",
@@ -18,7 +18,6 @@ dependencies = [
     "pygobject>=3.54.2",
     "python-dateutil>=2.9.0.post0",
     "structlog>=25.4.0",
-    "tkinterweb>=4.3.1",
     "userpaths>=0.1.3",
 ]
 

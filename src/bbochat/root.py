@@ -10,7 +10,7 @@ from psiutils.widgets import get_styles
 from psiutils.utilities import display_icon
 
 from bbochat.constants import ICON_FILE, USER_DATA_DIR
-from module_caller import ModuleCaller
+from bbochat.module_caller import ModuleCaller
 
 from bbochat.forms.frm_main import MainFrame
 
@@ -24,10 +24,6 @@ class Root():
         display_icon(root, ICON_FILE)
         root.protocol("WM_DELETE_WINDOW", root.destroy)
 
-        root.tk.call('source', Path(USER_DATA_DIR, 'themes/azure/azure.tcl'))
-        # root.tk.call('set_theme', 'dark')
-        # ttk.Style().theme_use('clam')
-
         get_styles()
 
         dlg = None
@@ -36,6 +32,5 @@ class Root():
             dlg = ModuleCaller(root, module)
         if not dlg or dlg.invalid:
             MainFrame(root)
-            ...
 
         root.mainloop()
