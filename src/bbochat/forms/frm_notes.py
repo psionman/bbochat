@@ -4,7 +4,7 @@ import tkinter as tk
 from tkinter import ttk
 from tkinterweb import HtmlFrame
 
-from psiutils.constants import PAD, DIALOG_STATUS, MODES
+from psiutils.constants import PAD, Status, Mode
 from psiutils.widgets import HAND
 from psiutils.buttons import ButtonFrame
 from psiutils.menus import Menu, MenuItem
@@ -37,8 +37,25 @@ class NotesFrame():
 
     def _get_notes_frame(self, master) -> ttk.Frame:
         frame = ttk.Frame(master)
-        frame.rowconfigure(1, weight=1)
+        frame.rowconfigure(0, weight=1)
         frame.columnconfigure(1, weight=1)
+
+        selection_frame = self._selection_frame(frame)
+        selection_frame.grid(row=0, column=0, sticky=tk.NS)
+
+        notes_frame = self._notes_frame(frame)
+        notes_frame.grid(
+            row=0, column=1, rowspan=2, sticky=tk.NSEW,padx=PAD, pady=PAD)
+
+        self.button_frame = self._button_frame(frame)
+        self.button_frame.grid(row=0, column=2, rowspan=2,
+                               sticky=tk.N, padx=PAD, pady=PAD)
+
+        return frame
+
+    def _selection_frame(self, master: tk.Frame) -> tk.Frame:
+        frame = tk.Frame(master)
+        frame.rowconfigure(1, weight=1)
 
         label = ttk.Label(frame, text='Notes')
         label.grid(row=0, column=0)
@@ -54,22 +71,18 @@ class NotesFrame():
         self.listbox.bind('<<ListboxSelect>>', self._category_selected)
         self.listbox .bind('<Button-3>', self._show_context_menu)
 
-        self.html_frame = tk.Text(frame, height=20)
-        # self.html_frame = HtmlFrame(
-        #     frame, horizontal_scrollbar='auto',
-        #     messages_enabled=False,
-        #     )
-        self.html_frame.grid(row=0, column=1, rowspan=2, sticky=tk.NSEW)
+        return frame
 
-        self.html_frame = HtmlFrame(
+    def _notes_frame(self, master: tk.Frame) -> tk.Frame:
+        frame = tk.Frame(master, relief=tk.SUNKEN)
+        frame.rowconfigure(1, weight=1)
+        frame.columnconfigure(0, weight=1)
+
+        self.notes_text = HtmlFrame(
             frame, horizontal_scrollbar='auto',
             messages_enabled=False,
             )
-        self.html_frame.grid(row=0, column=1, rowspan=2, sticky=tk.NSEW)
-
-        self.button_frame = self._button_frame(frame)
-        self.button_frame.grid(row=0, column=2, rowspan=2,
-                               sticky=tk.N, padx=PAD, pady=PAD)
+        self.notes_text.grid(row=0, column=0, sticky=tk.NSEW)
 
         return frame
 
@@ -84,17 +97,17 @@ class NotesFrame():
         return frame
 
     def _new(self, *args) -> None:
-        dlg = NotesEditFrame(self, MODES['new'])
+        dlg = NotesEditFrame(self, Mode.NEW)
         self.root.wait_window(dlg.root)
-        if dlg.status != DIALOG_STATUS['updated']:
+        if dlg.status != Status.UPDATED:
             return
         self._create_report(dlg.text)
         self.categories.set(sorted(list(self.notes)))
 
     def _edit(self, *args) -> None:
-        dlg = NotesEditFrame(self, MODES['edit'])
+        dlg = NotesEditFrame(self, Mode.EDIT)
         self.root.wait_window(dlg.root)
-        if dlg.status != DIALOG_STATUS['updated']:
+        if dlg.status != Status.UPDATED:
             return
         self._create_report(dlg.text)
 
@@ -136,4 +149,4 @@ class NotesFrame():
 
     def _create_report(self, report: str) -> str:
         # pylint: disable=no-member)
-        display_html(self.html_frame, report, self.config.css)
+        display_html(self.notes_text, report, self.config.css)

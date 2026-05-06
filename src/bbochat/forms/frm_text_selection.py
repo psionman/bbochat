@@ -3,13 +3,13 @@
 import tkinter as tk
 from tkinter import ttk
 
-from psiutils.constants import PAD, DIALOG_STATUS
+from psiutils.constants import PAD, Status
 from psiutils.widgets import HAND
 from psiutils.buttons import ButtonFrame, IconButton
 from psiutils.menus import Menu, MenuItem
 from psiutils import messagebox
 
-from bbochat.constants import MODE_TEXT, MODES
+from bbochat.constants import MODE_TEXT, ChatMode
 from bbochat.config import get_config
 from bbochat.data_manager import DataManager
 from bbochat.text import Text
@@ -24,7 +24,7 @@ class TextSelectionFrame():
     def __init__(self,
                  parent: ttk.Frame,
                  master: ttk.Frame,
-                 mode: int,
+                 mode: ChatMode,
                  data_manager: DataManager,
                  show_use_frame: bool = True,
                  show_title: bool = True,
@@ -34,22 +34,22 @@ class TextSelectionFrame():
         self.root = self.parent.root
         self.show_use_frame = show_use_frame
         self.show_title = show_title
-        self.slave_frame = slave
+        self.has_slave_frame = slave
         self.master_frame = None
         self.data_store = parent.data_store
 
         self.data = data_manager
-        self.mode = MODES[mode]
-        self.mode_text = MODE_TEXT[mode]
+        self.mode = mode
+        self.mode_text = MODE_TEXT[mode.value]
 
-        self.config_key = f'last_{self.mode}'
+        self.config_key = f'last_{self.mode.name.lower()}'
         self.config = get_config()
 
         last_value = self.config.config[self.config_key]
         self.text_var = tk.StringVar(value=last_value)
 
         # TODO sort this
-        self.config.colours['chat-detail'] = self.config.colours['chat']
+        self.config.colours['chat-detail'] = self.config.colours[ChatMode.CHAT.name]
 
         # self.selected_text contains the text selected from the listbox
         self.selected_text = ''
@@ -95,7 +95,7 @@ class TextSelectionFrame():
 
         entry = ttk.Entry(frame, textvariable=self.text_var)
         entry.grid(row=1, column=0, sticky=tk.EW)
-        colour = self.config.colours[self.mode]
+        colour = self.config.colours[self.mode.name]
         entry_style = ttk.Style()
         entry_style.configure(
             f'{self.mode}.TEntry',
@@ -126,9 +126,9 @@ class TextSelectionFrame():
         self.text_var.set(self.selected_text)
         self._use_item()
         self.context_menu.enable()
-        if self.slave_frame:
+        if self.has_slave_frame:
             # This is a master: it has a slave frame
-            self.data.update_slave_data(self.slave_frame, self.selected_text)
+            self.data.update_slave_data(self.has_slave_frame, self.selected_text)
 
     def _new_item(self, *args) -> None:
         dlg = TextDialogFrame(self, 'New')
@@ -147,7 +147,7 @@ class TextSelectionFrame():
     def _edit_item(self, *args) -> None:
         dlg = TextDialogFrame(self, 'Edit', self.selected_text)
         self.root.wait_window(dlg.root)
-        if dlg.status != DIALOG_STATUS['updated']:
+        if dlg.status != Status.UPDATED:
             return
         self.data.amend(self, self.selected_text, dlg.text)
 
@@ -163,9 +163,9 @@ class TextSelectionFrame():
 
         self.data.delete(self)
 
-        if self.slave_frame:
+        if self.has_slave_frame:
             # This is a master: it has a slave frame
-            self.slave_frame.populate_text_items()
+            self.has_slave_frame.populate_text_items()
 
         self.text_var.set('')
         self._use_item()
@@ -174,7 +174,7 @@ class TextSelectionFrame():
     def _edit_all(self, *args) -> None:
         dlg = EditFrame(self)
         self.root.wait_window(dlg.root)
-        if dlg.status != DIALOG_STATUS['updated']:
+        if dlg.status != Status.UPDATED:
             return
         self.data.edit_all(self, dlg.text_list, dlg.meta_dict)
 
@@ -193,7 +193,7 @@ class TextSelectionFrame():
         if self.text_var.get() and self.text_var.get()[0] == '#':
             self.text_var.set('')
         self.parent.parent.update_clipboard(
-            self.text_var.get(), MODES[self.mode])
+            self.text_var.get(), self.mode)
         self.config = get_config()
         self.config.update(self.config_key, self.text_var.get())
         self.config.save()

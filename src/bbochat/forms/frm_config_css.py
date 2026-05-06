@@ -6,7 +6,7 @@ from tkinter import ttk
 from tkinter.colorchooser import askcolor
 from tkinterweb import HtmlFrame
 
-from psiutils.constants import PAD, Pad, DIALOG_STATUS
+from psiutils.constants import PAD, Pad, Status
 from psiutils.buttons import ButtonFrame
 from psiutils.utilities import window_resize
 from psiutils.widgets import clickable_widget
@@ -35,7 +35,7 @@ class ConfigCssFrame():
         self.parent = parent
         self.config = parent.config
         self.css = deepcopy(parent.css)
-        self.status = DIALOG_STATUS['null']
+        self.status = Status.NULL
 
         self.colour_entry = None
         self.property_frame = None
@@ -210,7 +210,7 @@ class ConfigCssFrame():
         self.display_html()
 
     def _ok(self, *args) -> None:
-        self.status = DIALOG_STATUS['ok']
+        self.status = Status.OK
         # self.config.update('css', self.css)
         self._dismiss()
 

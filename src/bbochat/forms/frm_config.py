@@ -7,7 +7,7 @@ from tkinterweb import HtmlFrame
 
 from psiutils.buttons import ButtonFrame, IconButton
 from psiutils.widgets import separator_frame
-from psiutils.constants import PAD, PADT, Pad, DIALOG_STATUS
+from psiutils.constants import PAD, PADT, Pad, Status
 from psiutils.utilities import window_resize
 from psiutils import messagebox
 
@@ -283,7 +283,7 @@ class ConfigFrame():
     def _css_edit(self) -> None:
         dlg = ConfigCssFrame(self)
         self.root.wait_window(dlg.root)
-        if dlg.status != DIALOG_STATUS['ok']:
+        if dlg.status != Status.OK:
             return
 
         self.css_element = dlg.element.get()

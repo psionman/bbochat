@@ -3,7 +3,7 @@
 import tkinter as tk
 from tkinter import ttk
 
-from bbochat.constants import MODES, FRAME_WIDTH
+from bbochat.constants import FRAME_WIDTH, ChatMode
 from bbochat.config import get_config
 
 from bbochat.forms.frm_opponents import OpponentsFrame
@@ -46,20 +46,20 @@ class MasterFrame():
         self.search_entry = opponents_frame.search_entry
         frame.add(self.players_frame, width=FRAME_WIDTH)
 
-        mode = 'greeting'
-        data_set = self.data_store.data_sets[mode]
+        mode = ChatMode.GREETING
+        data_set = self.data_store.data_sets[mode.name.lower()]
         data_manager = DataManager(self.data_store, data=data_set)
-        greetings = TextSelectionFrame(self, frame, MODES[mode], data_manager)
+        greetings = TextSelectionFrame(self, frame, mode, data_manager)
         frame.add(greetings.main_frame, width=FRAME_WIDTH)
 
-        mode = 'valediction'
-        data_set = self.data_store.data_sets[mode]
+        mode = ChatMode.VALEDICTION
+        data_set = self.data_store.data_sets[mode.name.lower()]
         data_manager = DataManager(self.data_store, data=data_set)
         valedictions = TextSelectionFrame(
-            self, frame, MODES[mode], data_manager)
+            self, frame, mode, data_manager)
         frame.add(valedictions.main_frame, width=FRAME_WIDTH)
 
-        chat_frame = ChatFrame(self, frame, MODES['chat'])
+        chat_frame = ChatFrame(self, frame, ChatMode.CHAT)
         self.chat_panel = chat_frame.chat_frame
         frame.add(self.chat_panel, width=FRAME_WIDTH)
 

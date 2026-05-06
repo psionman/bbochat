@@ -6,7 +6,7 @@ from pathlib import Path
 import uuid
 import copy
 
-from psiutils.constants import PAD, DIALOG_STATUS
+from psiutils.constants import PAD, Status
 from psiutils.widgets import HAND
 from psiutils.buttons import ButtonFrame, IconButton
 from psiutils.menus import Menu, MenuItem
@@ -41,7 +41,7 @@ class EditFrame():
         self.master_selected_text = parent.selected_text
 
         self.config = get_config()
-        self.status = DIALOG_STATUS['null']
+        self.status = Status.NULL
 
         # Original text in data store - used to check change
         self.original_data = [item for item in parent.data.text_list if item]
@@ -266,14 +266,20 @@ class EditFrame():
             self.save_button.enable()
 
     def _save(self, *args) -> None:
+        print(f"{self.meta_dict=}")
         if self.meta_dict:
             for index, value in enumerate(self.text_list):
                 meta_item = self.meta_dict[value]
                 self.meta_dict[value] = (meta_item[0], meta_item[1], index)
 
-        self.data_store.data_sets[self.mode] = self.text_list
+        xxx = self.data_store.data_sets[self.mode.name.lower()]
+        print(f"{self.mode.name.lower()=}")
+        print(f"{type(xxx)=}")
+        self.data_store.data_sets[self.mode.name.lower()] = self.text_list
+        yyy = self.data_store.data_sets[self.mode.name.lower()]
+        print(f"{type(yyy)=}")
         self.data_store.save()
-        self.status = DIALOG_STATUS['updated']
+        self.status = Status.UPDATED
         self._dismiss()
 
     def _dismiss(self, *args) -> None:

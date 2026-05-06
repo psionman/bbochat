@@ -1,31 +1,36 @@
 """Notes tab for BBO Chat notebook"""
 
-
 import contextlib
-import tkinter as tk
-from tkinter import ttk, filedialog
-from datetime import datetime
-from pathlib import Path
 import json
 import re
-from dateutil.parser import parse   # type: ignore
+import tkinter as tk
+from datetime import datetime
+from pathlib import Path
+from tkinter import filedialog, ttk
 
+from dateutil.parser import parse  # type: ignore
+from psiutils import messagebox
+from psiutils.buttons import ButtonFrame, IconButton
 from psiutils.constants import PAD
 from psiutils.widgets import PsiText, Tooltip
-from psiutils.buttons import ButtonFrame, IconButton
-from psiutils import messagebox
 
 from bbochat.config import get_config
-from bbochat.text import Text
 from bbochat.constants import (
-    TXT_FILE_TYPES, DOCS_DIR, APP_NAME, YYYYMMDD, FRAME_WIDTH)
+    APP_NAME,
+    FRAME_WIDTH,
+    ICON_DIR,
+    TXT_FILE_TYPES,
+    YYYYMMDD,
+    DATA_DIR,
+)
 from bbochat.data import Partner
-
 from bbochat.forms.frm_report import ReportFrame
+from bbochat.text import Text
 
 txt = Text()
 
-class TournamentFrame():
+
+class TournamentFrame:
     def __init__(self, parent, master):
         # pylint: disable=no-member)
         self.parent = parent
@@ -38,11 +43,11 @@ class TournamentFrame():
         self.general_notes = None
 
         # Tk variables
-        path = Path(DOCS_DIR, APP_NAME)
+        path = Path(DATA_DIR)
         if self.partner:
-            path = Path(DOCS_DIR, APP_NAME, self.partner.username)
+            path = Path(DATA_DIR, self.partner.username)
         date = datetime.now().strftime(YYYYMMDD)
-        path = Path(path, f'{date}.txt')
+        path = Path(path, f"{date}.txt")
 
         self.path = tk.StringVar()
         self.set_path()
@@ -57,11 +62,11 @@ class TournamentFrame():
         self.change_partner(self.partner)
 
     def set_path(self) -> None:
-        path = Path(DOCS_DIR, APP_NAME)
+        path = Path(DATA_DIR)
         if self.partner:
-            path = Path(DOCS_DIR, APP_NAME, self.partner.username)
+            path = Path(DATA_DIR, self.partner.username)
         date = datetime.now().strftime(YYYYMMDD)
-        path = Path(path, f'{date}.txt')
+        path = Path(path, f"{date}.txt")
         self.path.set(path)
         self._get_date_from_path()
 
@@ -71,10 +76,11 @@ class TournamentFrame():
         frame.columnconfigure(1, weight=1)
 
         self.notes_panel = self._notes_panel(frame)
-        self.notes_panel.grid(row=0, column=0, columnspan=4,
-                              sticky=tk.NSEW, padx=PAD, pady=PAD)
+        self.notes_panel.grid(
+            row=0, column=0, columnspan=4, sticky=tk.NSEW, padx=PAD, pady=PAD
+        )
 
-        label = ttk.Label(frame, text='Path')
+        label = ttk.Label(frame, text="Path")
         label.grid(row=1, column=0, padx=PAD)
 
         entry = ttk.Entry(frame, textvariable=self.path)
@@ -88,26 +94,29 @@ class TournamentFrame():
         # pylint: disable=no-member)
         frame = ButtonFrame(master, tk.HORIZONTAL)
         self.report_button = IconButton(
-            frame, txt.REPORT, 'report', self._report, True)
-        help_button = IconButton(
-            frame, txt.HELP, 'windows')
+            frame, txt.REPORT, "report", self._report, True
+        )
+        help_button = IconButton(frame, txt.HELP, "help", icon_path=ICON_DIR)
 
         help_button = ttk.Button(
-                frame,
-                text=txt.HELP,)
+            frame,
+            text=txt.HELP,
+        )
         help_button.tooltip = Tooltip(
             help_button,
             textvariable=self.tooltip_text,
             wrap_length=3500,
-            vertical_offset=0)
+            vertical_offset=0,
+        )
         open_todays = IconButton(
-            frame, f'{txt.OPEN} today\'s', 'open', self._open_todays_file)
+            frame, f"{txt.OPEN} today's", "open", self._open_todays_file
+        )
         frame.buttons = [
-            frame.icon_button('open', self._open_file),
+            frame.icon_button("open", self._open_file),
             open_todays,
-            frame.icon_button('save', self._save, True),
+            frame.icon_button("save", self._save, True),
             # help_button,
-            ]
+        ]
 
         # TODO sort out tooltip on IconButton
         help_button.grid(row=0, column=9, padx=PAD)
@@ -116,7 +125,10 @@ class TournamentFrame():
         return frame
 
     def _notes_panel(self, master: ttk.Frame) -> ttk.PanedWindow:
-        frame = tk.PanedWindow(master, orient=tk.HORIZONTAL,)
+        frame = tk.PanedWindow(
+            master,
+            orient=tk.HORIZONTAL,
+        )
         frame.rowconfigure(0, weight=1)
         frame.columnconfigure(0, weight=1)
 
@@ -136,13 +148,12 @@ class TournamentFrame():
         frame.rowconfigure(1, weight=1)
         frame.columnconfigure(0, weight=1)
 
-        label = ttk.Label(frame, text='Board notes')
+        label = ttk.Label(frame, text="Board notes")
         label.grid(row=0, column=0)
 
         self.board_notes = PsiText(frame, height=18)
-        self.board_notes.grid(row=1, column=0,
-                              sticky=tk.NSEW)
-        self.board_notes.bind('<KeyRelease>', self._value_changed)
+        self.board_notes.grid(row=1, column=0, sticky=tk.NSEW)
+        self.board_notes.bind("<KeyRelease>", self._value_changed)
 
         return frame
 
@@ -151,13 +162,12 @@ class TournamentFrame():
         frame.rowconfigure(1, weight=1)
         frame.columnconfigure(0, weight=1)
 
-        label = ttk.Label(frame, text='General notes')
+        label = ttk.Label(frame, text="General notes")
         label.grid(row=0, column=0)
 
         self.general_notes = PsiText(frame, height=18)
-        self.general_notes.grid(row=1, column=0,
-                                sticky=tk.NSEW)
-        self.general_notes.bind('<KeyRelease>', self._value_changed)
+        self.general_notes.grid(row=1, column=0, sticky=tk.NSEW)
+        self.general_notes.bind("<KeyRelease>", self._value_changed)
         return frame
 
     def change_partner(self, partner: Partner) -> None:
@@ -167,11 +177,11 @@ class TournamentFrame():
         self._value_changed()
 
     def _save(self, *args) -> None:
-        board_notes = self. board_notes.get('1.0', tk.END)
-        general_notes = self.general_notes.get('1.0', tk.END)
+        board_notes = self.board_notes.get("1.0", tk.END)
+        general_notes = self.general_notes.get("1.0", tk.END)
         notes = {
-            'board_notes': board_notes.strip('\n'),
-            'general_notes': general_notes.strip('\n'),
+            "board_notes": board_notes.strip("\n"),
+            "general_notes": general_notes.strip("\n"),
         }
 
         # path = Path(self.path.get())
@@ -183,15 +193,15 @@ class TournamentFrame():
         # if f_notes is None:
         #     return
 
-        with open(self.path.get(), 'w', encoding='utf-8') as f_notes:
+        with open(self.path.get(), "w", encoding="utf-8") as f_notes:
             json.dump(notes, f_notes)
 
         self._value_changed()
 
     def _open_file(self, *args) -> None:
         path = Path(self.path.get()).parent
-        while not path.is_dir():
-            path = Path(self.path.get()).parent.parent
+        if not path.exists():
+            path.mkdir(parents=True, exist_ok=True)
 
         if path := filedialog.askopenfilename(
             initialdir=path,
@@ -199,11 +209,12 @@ class TournamentFrame():
             parent=self.root,
             filetypes=TXT_FILE_TYPES,
         ):
-            if Path(path).suffix != '.txt':
+            if Path(path).suffix != ".txt":
                 messagebox.showerror(
                     self,
-                    'Open file',
-                    'Notes file must be a ".txt" file.',)
+                    "Open file",
+                    'Notes file must be a ".txt" file.',
+                )
                 return
             self.path.set(path)
             self._notes_contents()
@@ -217,7 +228,7 @@ class TournamentFrame():
         self.button_frame.enable()
 
     def _get_date_from_path(self) -> datetime:
-        if match := re.search(r'[0-9]' * 8, str(self.path.get())):
+        if match := re.search(r"[0-9]" * 8, str(self.path.get())):
             date = parse(match.group())
 
     def _get_notes_and_display(self) -> None:
@@ -225,18 +236,18 @@ class TournamentFrame():
             return
 
     def _notes_contents(self) -> str:
-        self.general_notes.delete('0.0', tk.END)
-        self.board_notes.delete('0.0', tk.END)
+        self.general_notes.delete("0.0", tk.END)
+        self.board_notes.delete("0.0", tk.END)
 
         notes = self.get_notes_content()
-        if 'board_notes' in notes:
-            self.board_notes.insert('1.0', notes['board_notes'])
-        if 'general_notes' in notes:
-            self.general_notes.insert('1.0', notes['general_notes'])
+        if "board_notes" in notes:
+            self.board_notes.insert("1.0", notes["board_notes"])
+        if "general_notes" in notes:
+            self.general_notes.insert("1.0", notes["general_notes"])
 
     def get_notes_content(self) -> dict[str]:
         with contextlib.suppress(FileNotFoundError):
-            with open(self.path.get(), 'r') as f_notes:
+            with open(self.path.get(), "r") as f_notes:
                 return json.load(f_notes)
         return {}
 
@@ -245,11 +256,11 @@ class TournamentFrame():
         self.root.wait_window(dlg.root)
 
     def _value_changed(self, *args):  # *args essential here to make it work
-        board_notes = self. board_notes.get('1.0', tk.END)
-        general_notes = self.general_notes.get('1.0', tk.END)
+        board_notes = self.board_notes.get("1.0", tk.END)
+        general_notes = self.general_notes.get("1.0", tk.END)
         self.button_frame.disable()
-        if f'{board_notes}{general_notes}'.replace('\n', ''):
+        if f"{board_notes}{general_notes}".replace("\n", ""):
             self.button_frame.enable()
         self.report_button.disable()
-        if f'{board_notes}{general_notes}':
+        if f"{board_notes}{general_notes}":
             self.report_button.enable()

@@ -21,6 +21,15 @@ wheels = [
 ]
 
 [[package]]
+name = "babel"
+version = "2.18.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/7d/b2/51899539b6ceeeb420d40ed3cd4b7a40519404f9baf3d4ac99dc413a834b/babel-2.18.0.tar.gz", hash = "sha256:b80b99a14bd085fcacfa15c9165f651fbb3406e66cc603abf11c5750937c992d", size = 9959554, upload-time = "2026-02-01T12:30:56.078Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/77/f5/21d2de20e8b8b0408f0681956ca2c69f1320a3848ac50e6e7f39c6159675/babel-2.18.0-py3-none-any.whl", hash = "sha256:e2b422b277c2b9a9630c1d7903c2a00d0830c409c59ac8cae9081c92f1aeba35", size = 10196845, upload-time = "2026-02-01T12:30:53.445Z" },
+]
+
+[[package]]
 name = "bbochat"
 version = "0.1.0"
 source = { editable = "." }
@@ -28,6 +37,7 @@ dependencies = [
     { name = "appdirs" },
     { name = "clipboard" },
     { name = "emoji" },
+    { name = "enums" },
     { name = "icecream" },
     { name = "markdown" },
     { name = "psi-toml" },
@@ -39,29 +49,22 @@ dependencies = [
     { name = "userpaths" },
 ]
 
-[package.dev-dependencies]
-dev = [
-    { name = "pytest" },
-]
-
 [package.metadata]
 requires-dist = [
     { name = "appdirs", specifier = ">=1.4.4" },
     { name = "clipboard", specifier = ">=0.0.4" },
     { name = "emoji", specifier = ">=2.14.1" },
+    { name = "enums", specifier = ">=0.0.2" },
     { name = "icecream", specifier = ">=2.1.4" },
     { name = "markdown", specifier = ">=3.8" },
     { name = "psi-toml", specifier = ">=0.0.18" },
     { name = "psiconfig", specifier = ">=0.0.15" },
-    { name = "psiutils", specifier = ">=0.2.10" },
+    { name = "psiutils", specifier = ">=0.2.33" },
     { name = "pygobject", specifier = ">=3.54.2" },
     { name = "python-dateutil", specifier = ">=2.9.0.post0" },
     { name = "structlog", specifier = ">=25.4.0" },
     { name = "userpaths", specifier = ">=0.1.3" },
 ]
-
-[package.metadata.requires-dev]
-dev = [{ name = "pytest" }]
 
 [[package]]
 name = "clipboard"
@@ -88,6 +91,15 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/cb/7d/01cddcbb6f5cc0ba72e00ddf9b1fa206c802d557fd0a20b18e130edf1336/emoji-2.14.1.tar.gz", hash = "sha256:f8c50043d79a2c1410ebfae833ae1868d5941a67a6cd4d18377e2eb0bd79346b", size = 597182, upload-time = "2025-01-16T06:31:24.983Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/91/db/a0335710caaa6d0aebdaa65ad4df789c15d89b7babd9a30277838a7d9aac/emoji-2.14.1-py3-none-any.whl", hash = "sha256:35a8a486c1460addb1499e3bf7929d3889b2e2841a57401903699fef595e942b", size = 590617, upload-time = "2025-01-16T06:31:23.526Z" },
+]
+
+[[package]]
+name = "enums"
+version = "0.0.2"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/0a/f6/65678b7c4676e0cb8aa33e9717ec6f27f6f1cf583ed5a1a41352dcee6bd6/enums-0.0.2.zip", hash = "sha256:ac3be6c9c7a8f30a495a7bec8c80543df3523f954f8f059f8a3d43e32bbcd504", size = 7432, upload-time = "2015-08-08T20:38:23.248Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/d2/24/fc893a515739c39e089e84723e4dd9419ab653bea2d3ec77fac96f77297d/enums-0.0.2-py2.py3-none-any.whl", hash = "sha256:447960d14879efbfb49aeb8798be1b5eb71350bd7be61b8b6171214665516444", size = 4719, upload-time = "2015-08-08T20:38:26.815Z" },
 ]
 
 [[package]]
@@ -297,9 +309,10 @@ wheels = [
 
 [[package]]
 name = "psiutils"
-version = "0.2.12"
+version = "0.2.33"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
+    { name = "appdirs" },
     { name = "iniconfig" },
     { name = "markdown" },
     { name = "packaging" },
@@ -307,15 +320,19 @@ dependencies = [
     { name = "pluggy" },
     { name = "psi-toml" },
     { name = "psiconfig" },
+    { name = "pycairo" },
     { name = "pygments" },
+    { name = "pytest" },
+    { name = "structlog" },
+    { name = "tkcalendar" },
     { name = "tkinterweb" },
     { name = "tkinterweb-tkhtml" },
     { name = "tomli" },
     { name = "tomli-w" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/4c/fa/aad0eeb55e115b77e1620e957a7952dfe567f29e5ad3efea9ad348c79ee8/psiutils-0.2.12.tar.gz", hash = "sha256:c2366e39b9d5ec65730e01b8d6e43932e5bdf6ebe0f5d10619a95ceb561a42a2", size = 64690, upload-time = "2025-09-22T11:34:25.026Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/3f/ea/831205dc50f34d900ad4ae23537d4baa156cda2701f151eb22fdb45d6f0b/psiutils-0.2.33.tar.gz", hash = "sha256:bd1962d400528ba28592c016c87a9649da2e30d7e1284688102e68ecd05a2cff", size = 75169, upload-time = "2026-03-02T15:29:07.644Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/d0/35/eaebdde2fec427a200dc183ba5c0782cb06bd0ddba6ece91b9e112ebdde9/psiutils-0.2.12-py3-none-any.whl", hash = "sha256:f6d46116d12ccb77b3f565042a47f3c410d14be8a52b5cee34b225c76e57ac58", size = 77022, upload-time = "2025-09-22T11:34:23.604Z" },
+    { url = "https://files.pythonhosted.org/packages/65/45/356cf6ef2bab2a3bfbdb20735959105c5d99602f2b16454832c9219d598a/psiutils-0.2.33-py3-none-any.whl", hash = "sha256:b13ef62516d3ca04b9ffba51390cef355800e92b936892010e3b3aab1b36a191", size = 89459, upload-time = "2026-03-02T15:29:06.109Z" },
 ]
 
 [[package]]
@@ -366,7 +383,7 @@ sdist = { url = "https://files.pythonhosted.org/packages/30/23/2f0a3efc4d6a32f3b
 
 [[package]]
 name = "pytest"
-version = "8.4.1"
+version = "9.0.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "colorama", marker = "sys_platform == 'win32'" },
@@ -377,9 +394,9 @@ dependencies = [
     { name = "pygments" },
     { name = "tomli", marker = "python_full_version < '3.11'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/08/ba/45911d754e8eba3d5a841a5ce61a65a685ff1798421ac054f85aa8747dfb/pytest-8.4.1.tar.gz", hash = "sha256:7c67fd69174877359ed9371ec3af8a3d2b04741818c51e5e99cc1742251fa93c", size = 1517714, upload-time = "2025-06-18T05:48:06.109Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/d1/db/7ef3487e0fb0049ddb5ce41d3a49c235bf9ad299b6a25d5780a89f19230f/pytest-9.0.2.tar.gz", hash = "sha256:75186651a92bd89611d1d9fc20f0b4345fd827c41ccd5c299a868a05d70edf11", size = 1568901, upload-time = "2025-12-06T21:30:51.014Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/29/16/c8a903f4c4dffe7a12843191437d7cd8e32751d5de349d45d3fe69544e87/pytest-8.4.1-py3-none-any.whl", hash = "sha256:539c70ba6fcead8e78eebbf1115e8b589e7565830d7d006a8723f19ac8a0afb7", size = 365474, upload-time = "2025-06-18T05:48:03.955Z" },
+    { url = "https://files.pythonhosted.org/packages/3b/ab/b3226f0bd7cdcf710fbede2b3548584366da3b19b5021e74f5bde2a8fa3f/pytest-9.0.2-py3-none-any.whl", hash = "sha256:711ffd45bf766d5264d487b917733b453d917afd2b0ad65223959f59089f875b", size = 374801, upload-time = "2025-12-06T21:30:49.154Z" },
 ]
 
 [[package]]
@@ -413,6 +430,18 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/79/b9/6e672db4fec07349e7a8a8172c1a6ae235c58679ca29c3f86a61b5e59ff3/structlog-25.4.0.tar.gz", hash = "sha256:186cd1b0a8ae762e29417095664adf1d6a31702160a46dacb7796ea82f7409e4", size = 1369138, upload-time = "2025-06-02T08:21:12.971Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/a0/4a/97ee6973e3a73c74c8120d59829c3861ea52210667ec3e7a16045c62b64d/structlog-25.4.0-py3-none-any.whl", hash = "sha256:fe809ff5c27e557d14e613f45ca441aabda051d119ee5a0102aaba6ce40eed2c", size = 68720, upload-time = "2025-06-02T08:21:11.43Z" },
+]
+
+[[package]]
+name = "tkcalendar"
+version = "1.6.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "babel" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/65/3d/3406cf7963661ed890082bff17ed4c5e26b5a564306639303d4fbb2a047f/tkcalendar-1.6.1.tar.gz", hash = "sha256:5edf958c0a59429e90309e9b805b2e229192bbcab952460247204d7030eea5cf", size = 32916, upload-time = "2019-12-28T11:20:54.019Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/e9/d4/9528ea6ecb5d4394f425df651957da6f6a715b41c5b12d43d41888c14394/tkcalendar-1.6.1-py3-none-any.whl", hash = "sha256:9d3a80816a7b32d64fab696fa3d2a007fb23c87953267d5e343a38ff4cd7c15c", size = 40912, upload-time = "2019-12-28T11:20:48.564Z" },
 ]
 
 [[package]]

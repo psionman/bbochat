@@ -3,7 +3,7 @@
 import tkinter as tk
 from tkinter import ttk
 
-from psiutils.constants import PAD, PADT, DIALOG_STATUS, MODES
+from psiutils.constants import PAD, PADT, Status, Mode
 from psiutils.widgets import HAND, PsiText
 from psiutils.buttons import ButtonFrame
 from psiutils.menus import Menu, MenuItem
@@ -55,10 +55,26 @@ class PartnerFrame():
             self.context_menu.enable()
 
     def _get_partners_frame(self, master) -> ttk.Frame:
-        # pylint: disable=no-member)
         frame = ttk.Frame(master)
-        frame.rowconfigure(3, weight=1)
-        frame.columnconfigure(3, weight=1)
+        frame.rowconfigure(0, weight=1)
+        frame.columnconfigure(1, weight=1)
+
+        partners_list = self._partners_list(frame)
+        partners_list.grid(row=0, column=0, sticky=tk.NS, padx=PAD, pady=PAD)
+
+        partners_details = self._partners_details(frame)
+        partners_details.grid(row=0, column=1, sticky=tk.NSEW)
+
+        self.button_frame = self._button_frame(frame)
+        self.button_frame.grid(row=0, column=2, rowspan=4,
+                               sticky=tk.N, padx=PAD, pady=PAD)
+
+
+        return frame
+
+    def _partners_list(self, master: tk.Frame) -> tk.Frame:
+        frame = ttk.Frame(master)
+        frame.rowconfigure(1, weight=1)
 
         label = ttk.Label(frame, text='Partners')
         label.grid(row=0, column=0)
@@ -69,8 +85,8 @@ class PartnerFrame():
             selectmode=tk.BROWSE,
             cursor=HAND,
         )
-        self.listbox.grid(row=1, column=0, rowspan=3,
-                          sticky=tk.NSEW, padx=PAD, pady=PAD)
+        self.listbox.grid(row=1, column=0,
+                          sticky=tk.NSEW)
         if (self.config.last_partner
                 and self.config.last_partner in self.partners_names):
             index = self.partners_names.index(self.config.last_partner)
@@ -78,36 +94,43 @@ class PartnerFrame():
         self.listbox.bind('<<ListboxSelect>>', self._partner_selected)
         self.listbox .bind('<Button-3>', self._show_context_menu)
 
+        return frame
+
+    def _partners_details(self, master: tk.Frame) -> tk.Frame:
+        frame = ttk.Frame(master)
+        frame.columnconfigure(1, weight=1)
+
+        row = 0
         label = ttk.Label(frame, text='Name')
-        label.grid(row=0, column=1, sticky=tk.E, padx=PAD)
+        label.grid(row=row, column=0, sticky=tk.E, padx=PAD)
 
         entry = ttk.Entry(
             frame, width=30, textvariable=self.partners_name, state='readonly')
-        entry.grid(row=0, column=2, sticky=tk.EW, pady=PADT)
+        entry.grid(row=row, column=1, sticky=tk.EW, pady=PADT)
 
+        row += 1
         label = ttk.Label(frame, text='System')
-        label.grid(row=1, column=1, sticky=tk.E, padx=PAD)
+        label.grid(row=row, column=0, sticky=tk.E, padx=PAD)
 
         entry = ttk.Entry(
             frame, width=80, textvariable=self.system, state='readonly')
-        entry.grid(row=1, column=2, sticky=tk.EW, pady=PADT)
+        entry.grid(row=row, column=1, sticky=tk.EW, pady=PADT)
 
+        row += 1
         label = ttk.Label(frame, text='Greeting')
-        label.grid(row=2, column=1, sticky=tk.E, padx=PAD)
+        label.grid(row=row, column=0, sticky=tk.E, padx=PAD)
 
         entry = ttk.Entry(
             frame, width=80, textvariable=self.greeting, state='readonly')
-        entry.grid(row=2, column=2, sticky=tk.EW, pady=PADT)
+        entry.grid(row=row, column=1, sticky=tk.EW, pady=PADT)
 
-        self.notes_text = PsiText(frame, height=18)
-        self.notes_text.grid(row=3, column=1, columnspan=4,
+        row += 1
+        frame.rowconfigure(row, weight=1)
+        self.notes_text = PsiText(frame)
+        self.notes_text.grid(row=row, column=0, columnspan=2,
                              sticky=tk.NSEW, padx=PAD, pady=PAD)
-
-        self.button_frame = self._button_frame(frame)
-        self.button_frame.grid(row=0, column=5, rowspan=4,
-                               sticky=tk.N, padx=PAD, pady=PAD)
-
         return frame
+
 
     def _button_frame(self, master: ttk.Frame) -> tk.Frame:
         frame = ButtonFrame(master, tk.VERTICAL)
@@ -166,9 +189,9 @@ class PartnerFrame():
         self.context_menu.enable()
 
     def _new(self, *args) -> None:
-        dlg = PartnerEditFrame(self, MODES['new'])
+        dlg = PartnerEditFrame(self, Mode.NEW)
         self.root.wait_window(dlg.root)
-        if dlg.status != DIALOG_STATUS['ok']:
+        if dlg.status != Status.OK:
             return
         self.partner = dlg.partner
         self.partners[self.partner.username] = self.partner
@@ -184,9 +207,9 @@ class PartnerFrame():
         self._update_partner_values()
 
     def _edit(self, *args) -> None:
-        dlg = PartnerEditFrame(self, MODES['edit'], partner=self.partner)
+        dlg = PartnerEditFrame(self, Mode.EDIT, partner=self.partner)
         self.root.wait_window(dlg.root)
-        if dlg.status != DIALOG_STATUS['ok']:
+        if dlg.status != Status.OK:
             return
         self.partner = dlg.partner
         self._update_partner_values()

@@ -3,7 +3,7 @@ import tkinter as tk
 from tkinter import ttk
 from pathlib import Path
 
-from psiutils.constants import PAD, DIALOG_STATUS, MODES
+from psiutils.constants import PAD, Status, Mode
 from psiutils.buttons import ButtonFrame
 from psiutils.utilities import window_resize
 
@@ -20,10 +20,10 @@ class NotesEditFrame():
         self.notes_text = ''
 
         self.config = get_config()
-        self.title = f'{APP_TITLE} - {MODES[mode].capitalize()} notes'
-        self.status = DIALOG_STATUS['undefined']
+        self.title = f'{APP_TITLE} - {Mode[mode].name.capitalize()} notes'
+        self.status = Status.UNDEFINED
 
-        category = '' if mode == MODES['new'] else parent.category
+        category = '' if mode == Mode.NEW else parent.category
         self.text = ''
         if category and category in parent.notes:
             self.text = parent.notes[category]
@@ -63,7 +63,7 @@ class NotesEditFrame():
         label = ttk.Label(frame, text='Category')
         label.grid(row=0, column=0, sticky=tk.E)
 
-        state = 'readonly' if self.mode == MODES['edit'] else ''
+        state = 'readonly' if self.mode == Mode['edit'] else ''
         entry = ttk.Entry(frame, textvariable=self.category_text, state=state)
         entry.grid(row=0, column=1, sticky=tk.W, padx=PAD)
         entry.focus_set()
@@ -98,7 +98,7 @@ class NotesEditFrame():
         self.notes[self.category_text.get()] = self.text
         self.parent.parent.save()
 
-        self.status = DIALOG_STATUS['updated']
+        self.status = Status.UPDATED
         self.root.destroy()
 
     def _dismiss(self, *args) -> None:

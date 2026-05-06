@@ -3,7 +3,8 @@ from pathlib import Path
 
 from psiconfig import TomlConfig as BaseTomlConfig
 
-from bbochat.constants import CONFIG_PATH, USER_DATA_DIR, APP_NAME, DOCS_DIR
+from bbochat.constants import (
+    CONFIG_PATH, USER_DATA_DIR, APP_NAME, DOCS_DIR, ChatMode)
 
 
 class TomlConfig(BaseTomlConfig):
@@ -37,9 +38,12 @@ DEFAULT_CONFIG = {
         'frm_notes_edit': '880x550',
     },
     'colours': {
-        'greeting': 'limegreen',
-        'valediction': 'salmon',
-        'chat': 'aqua',
+        # 'greeting': 'limegreen',
+        # 'valediction': 'salmon',
+        # 'chat': 'aqua',
+        ChatMode.GREETING.name: 'limegreen',
+        f'{ChatMode.VALEDICTION}': 'salmon',
+        f'{ChatMode.CHAT}': 'aqua',
     },
     'vertical_sashes': [(250, 1), (465, 1), (720, 1)],
     'horizontal_sashes': [(1, 165)],

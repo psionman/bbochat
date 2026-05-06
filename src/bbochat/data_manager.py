@@ -1,7 +1,7 @@
 """Handle data management for BBO Chat."""
 import uuid
 
-from bbochat.constants import MODES, META_CODES
+from bbochat.constants import META_CODES
 
 
 class DataManager():
@@ -13,12 +13,12 @@ class DataManager():
             self,
             data_store: dict,
             data: list | dict = None,
-            master=None,
+            has_master: bool = False,
             slave=None
             ):
 
         self.data_store = data_store
-        self.master = master
+        self.has_master = has_master
         self.slave = slave
 
         # slave => the data set is a dict of text items,
@@ -45,7 +45,7 @@ class DataManager():
 
         if self.slave:
             self.data[text] = []
-        elif self.master:
+        elif self.has_master:
             data = frame.master_frame.data.data
             data[frame.master_frame.selected_text].append(text)
         else:
@@ -61,7 +61,7 @@ class DataManager():
         if self.slave:
             self.data[new_value] = self.data[old_value]
             self.data.pop(old_value)
-        elif self.master:
+        elif self.has_master:
             data = frame.master_frame.data.data
             self._update_text_list(
                 data[frame.master_frame.selected_text], old_value, new_value)
@@ -77,7 +77,7 @@ class DataManager():
         if self.slave:
             self.data.pop(frame.selected_text)
             self._delete_slave_data(frame.slave_frame)
-        elif self.master:
+        elif self.has_master:
             data = frame.master_frame.data.data
             data[frame.master_frame.selected_text].remove(frame.selected_text)
         else:
@@ -91,7 +91,7 @@ class DataManager():
         if self.slave:
             # This is a master frame: it has a slave frame
             self._rebuild_dict(meta_dict)
-        elif self.master:
+        elif self.has_master:
             data = frame.master_frame.data.data
             data[frame.master_frame.selected_text] = self.text_list
         else:
@@ -134,8 +134,11 @@ class DataManager():
         Returns:
             None
         """
-        if not self.master:
-            self.data_store.data_sets[frame.mode] = self.data
+        print(f"{self.has_master=}")
+        print(f"{self.slave=}")
+        print(f"{type(self.data)=}")
+        if not self.has_master:
+            self.data_store.data_sets[frame.mode.name] = self.data
 
         self.data_store.save()
         if self.slave:
@@ -177,6 +180,8 @@ class DataManager():
     #             print(key, meta_dict[key])
 
     def _meta_dict(self) -> dict:
+        # if not isinstance(self.data, dict):
+        #     return {}
         if not self.slave:
             return {}
 

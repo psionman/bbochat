@@ -4,7 +4,7 @@ from tkinter import ttk
 from pathlib import Path
 import emoji
 
-from psiutils.constants import PAD, DIALOG_STATUS
+from psiutils.constants import PAD, Status
 from psiutils.buttons import ButtonFrame
 from psiutils.utilities import window_resize
 from psiutils.widgets import Tooltip
@@ -32,7 +32,7 @@ class TextDialogFrame():
 
         self.entry = None
 
-        self.status = DIALOG_STATUS['null']
+        self.status = Status.NULL
 
         # tk variables
         self.text_value = tk.StringVar(value=default)
@@ -134,7 +134,7 @@ class TextDialogFrame():
         self.text_ = self.text_value.get()
         if self.hidden_item .get():
             self.text_ = f'# {self.text_}'
-        self.status = DIALOG_STATUS['updated']
+        self.status = Status.UPDATED
         self._dismiss()
 
     @property

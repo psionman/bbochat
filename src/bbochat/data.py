@@ -2,12 +2,15 @@
 
 import json
 
-from bbochat.constants import DATA_FILE
+from bbochat import logger
+from bbochat.constants import DATA_FILE, DONT_SAVE
 
 OK = 0
 FILE_NOT_FOUND = 1
 INVALID_JSON = 2
 
+if DONT_SAVE:
+    logger.warn(f"DONT_SAVE={DONT_SAVE}")
 
 class Partner():
     def __init__(self) -> None:
@@ -210,6 +213,9 @@ class DataStore():
 
     @staticmethod
     def _write_data_file(json_data: str):
+        if DONT_SAVE:
+            logger,Warning(f"DONT_SAVE={DONT_SAVE}")
+            return None
         try:
             with open(DATA_FILE, 'w') as f_data:
                 return f_data.write(json_data)

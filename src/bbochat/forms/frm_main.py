@@ -17,7 +17,7 @@ from psiutils import messagebox
 
 from bbochat.data import DataStore, Pair, Player
 from bbochat.config import get_config
-from bbochat.constants import MODES
+from bbochat.constants import ChatMode
 from bbochat.main_menu import MainMenu
 from bbochat.text import Text
 
@@ -38,7 +38,7 @@ class MainFrame():
         # pylint: disable=no-member)
         self.root = root
         self.config = get_config()
-        self.mode = MODES['greeting']
+        self.mode = ChatMode.GREETING
 
         self.data_store = DataStore()
         ds = self.data_store
@@ -64,9 +64,9 @@ class MainFrame():
         self.username_2.trace_add('write', self._pair_username_change)
 
         self.last_mode_text = {
-            MODES['greeting']: self.config.last_greeting,
-            MODES['valediction']: self.config.last_valediction,
-            MODES['chat']: self.config.last_chat
+            ChatMode.GREETING: self.config.last_greeting,
+            ChatMode.VALEDICTION: self.config.last_valediction,
+            ChatMode.CHAT: self.config.last_chat
         }
 
         self.save_button = None
@@ -258,15 +258,15 @@ class MainFrame():
         style = ttk.Style()
         # style.theme_use('clam')
         style.configure('greeting.TButton',
-                        background=self.config.colours['greeting'])
+                        background=self.config.colours['GREETING'])
         style.configure('valediction.TButton',
-                        background=self.config.colours['valediction'])
-        style.configure('chat.TButton', background=self.config.colours['chat'])
+                        background=self.config.colours['VALEDICTION'])
+        style.configure('chat.TButton', background=self.config.colours['CHAT'])
         style.configure('greeting.TFrame',
-                        background=self.config.colours['greeting'])
+                        background=self.config.colours['GREETING'])
         style.configure('valediction.TFrame',
-                        background=self.config.colours['valediction'])
-        style.configure('chat.TFrame', background=self.config.colours['chat'])
+                        background=self.config.colours['VALEDICTION'])
+        style.configure('chat.TFrame', background=self.config.colours['CHAT'])
 
         frame = ButtonFrame(master, tk.HORIZONTAL)
         frame.buttons = [
@@ -276,15 +276,15 @@ class MainFrame():
         return frame
 
     def _greeting(self, *args) -> None:
-        self.mode = MODES['greeting']
+        self.mode = ChatMode.GREETING
         self.update_clipboard()
 
     def _valediction(self, *args) -> None:
-        self.mode = MODES['valediction']
+        self.mode = ChatMode.VALEDICTION
         self.update_clipboard()
 
     def _chat(self, *args) -> None:
-        self.mode = MODES['chat']
+        self.mode = ChatMode.CHAT
         self.update_clipboard()
 
     def _get_my_name(self) -> None:
@@ -317,7 +317,7 @@ class MainFrame():
 
     def _set_clipboard_colour(self):
         # pylint: disable=no-member)
-        colour = self.config.colours[MODES[self.mode]]
+        colour = self.config.colours[self.mode.name]
         entry_style = ttk.Style()
         entry_style.configure(
             'clipboard_entry.TEntry',
@@ -330,7 +330,7 @@ class MainFrame():
         self.update_clipboard()
 
     def pair_tree_clicked(self) -> None:
-        self.mode = MODES['greeting']
+        self.mode = ChatMode.GREETING
         self.update_clipboard()
 
     def update_clipboard(
@@ -342,7 +342,7 @@ class MainFrame():
 
         if not message:
             if mode is None:
-                message = self.last_mode_text[MODES['greeting']]
+                message = self.last_mode_text[ChatMode.GREETING]
             else:
                 message = self.last_mode_text[mode]
 

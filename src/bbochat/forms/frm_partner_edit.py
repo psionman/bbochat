@@ -4,7 +4,7 @@ import tkinter as tk
 from tkinter import ttk
 from pathlib import Path
 
-from psiutils.constants import PAD, PADR, PADB, DIALOG_STATUS, MODES
+from psiutils.constants import PAD, PADR, PADB, Status, Mode
 from psiutils.buttons import ButtonFrame
 from psiutils.widgets import clickable_widget
 from psiutils.utilities import window_resize
@@ -25,7 +25,7 @@ class PartnerEditFrame():
         self.data_store.read()
         self.partners = parent.partners
         self.greetings = self.data_store.greetings
-        self.status = DIALOG_STATUS['null']
+        self.status = Status.NULL
         self.config = get_config()
 
         self.notes_text = None
@@ -58,7 +58,7 @@ class PartnerEditFrame():
         # pylint: disable=no-member)
         root = self.root
         root.geometry(self.config.geometry[Path(__file__).stem])
-        root.title(f'{MODES[self.mode].capitalize()} partner')
+        root.title(f'{self.mode.name.capitalize()} partner')
         root.iconphoto(False, tk.PhotoImage(file=ICON_FILE))
         root.wait_visibility()
         root.grab_set()
@@ -67,13 +67,16 @@ class PartnerEditFrame():
         root.bind('<Configure>',
                   lambda e: window_resize(self, __file__))
 
+        row = 0
         root.rowconfigure(0, weight=1)
         root.columnconfigure(0, weight=1)
 
         main_frame = self._main_frame(root)
-        main_frame.grid(row=0, column=0, sticky=tk.NSEW, padx=PAD, pady=PAD)
+        main_frame.grid(row=row, column=0, sticky=tk.NSEW, padx=PAD, pady=PAD)
+
+        row += 1
         self.button_frame = self._button_frame(root)
-        self.button_frame.grid(row=8, column=0, columnspan=9,
+        self.button_frame.grid(row=row, column=0,
                                sticky=tk.EW, padx=PAD, pady=PAD)
 
         sizegrip = ttk.Sizegrip(root)
@@ -83,7 +86,7 @@ class PartnerEditFrame():
         frame = ttk.Frame(master)
         frame.rowconfigure(5, weight=1)
         frame.columnconfigure(1, weight=1)
-        state = 'readonly' if self.mode == MODES['edit'] else 'normal'
+        state = 'readonly' if self.mode == Mode.EDIT else 'normal'
 
         label = ttk.Label(frame, text='Username')
         label.grid(row=0, column=0, sticky=tk.E, padx=PADR)
@@ -140,7 +143,7 @@ class PartnerEditFrame():
         self.button_frame.disable()
         if not self.username.get():
             return
-        if (self.mode == MODES['new']
+        if (self.mode == Mode.NEW
                 or self.username.get() != self.partner.username
                 or self.name.get() != self.partner.name
                 or self.system.get() != self.partner.system
@@ -158,7 +161,7 @@ class PartnerEditFrame():
         self.partner.notes = self.notes_text.get(0.0, tk.END)
         self.partners[self.partner.username] = self.partner
         self.parent.parent.save()
-        self.status = DIALOG_STATUS['ok']
+        self.status = Status.OK
         self._dismiss()
 
     def _dismiss(self, *args) -> None:

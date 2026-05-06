@@ -10,19 +10,21 @@ dependencies = [
     "appdirs>=1.4.4",
     "clipboard>=0.0.4",
     "emoji>=2.14.1",
+    "enums>=0.0.2",
     "icecream>=2.1.4",
     "markdown>=3.8",
     "psi-toml>=0.0.18",
     "psiconfig>=0.0.15",
-    "psiutils>=0.2.10",
+    "psiutils>=0.2.33",
     "pygobject>=3.54.2",
     "python-dateutil>=2.9.0.post0",
     "structlog>=25.4.0",
     "userpaths>=0.1.3",
 ]
 
-[dependency-groups]
-dev = ['pytest']
+[tool.ruff]
+line-length = 79
+target-version = "py311"
 
 [build-system]
 requires = ['uv-build']
