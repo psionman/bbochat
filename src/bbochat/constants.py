@@ -31,7 +31,7 @@ YYYYMMDD = "%Y%m%d"
 
 # Data
 DATA_FILE = Path(USER_DATA_DIR, "data.json")
-DONT_SAVE = True
+DONT_SAVE = False
 
 TXT_FILE_TYPES = (("text files", "*.txt"), ("All files", "*.*"))
 

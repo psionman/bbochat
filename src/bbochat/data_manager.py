@@ -1,21 +1,23 @@
 """Handle data management for BBO Chat."""
+
 import uuid
 
 from bbochat.constants import META_CODES
 
 
-class DataManager():
+class DataManager:
     """
-        The data manager holds data for the specific mode (e.g. 'chat')
-        The data store hold data for the whole application.
+    The data manager holds data for the specific mode (e.g. 'chat')
+    The data store hold data for the whole application (see data.py).
     """
+
     def __init__(
-            self,
-            data_store: dict,
-            data: list | dict = None,
-            has_master: bool = False,
-            slave=None
-            ):
+        self,
+        data_store: dict,
+        data: list | dict = None,
+        has_master: bool = False,
+        slave=None,
+    ):
 
         self.data_store = data_store
         self.has_master = has_master
@@ -54,8 +56,7 @@ class DataManager():
         self.save(frame)
 
     def amend(self, frame, old_value: str, new_value: str) -> None:
-        self._update_text_list(
-            self.text_list, old_value, new_value)
+        self._update_text_list(self.text_list, old_value, new_value)
         self.display_list = self._build_display_list()
 
         if self.slave:
@@ -64,7 +65,8 @@ class DataManager():
         elif self.has_master:
             data = frame.master_frame.data.data
             self._update_text_list(
-                data[frame.master_frame.selected_text], old_value, new_value)
+                data[frame.master_frame.selected_text], old_value, new_value
+            )
         else:
             self.data = self.text_list
 
@@ -103,7 +105,8 @@ class DataManager():
         slave.data.text_data = data
         slave.data.text_list = list(data)
         slave.data.display_list = self._build_display_list(
-            slave.data.text_list)
+            slave.data.text_list
+        )
 
         slave.populate_text_items()
 
@@ -115,10 +118,8 @@ class DataManager():
         slave.populate_text_items()
 
     def _update_text_list(
-            self,
-            text_list: list[str],
-            old_value: str,
-            new_value: str) -> None:
+        self, text_list: list[str], old_value: str, new_value: str
+    ) -> None:
         index = text_list.index(old_value)
         text_list.remove(old_value)
         text_list.insert(index, new_value)
@@ -134,9 +135,7 @@ class DataManager():
         Returns:
             None
         """
-        print(f"{self.has_master=}")
-        print(f"{self.slave=}")
-        print(f"{type(self.data)=}")
+        
         if not self.has_master:
             self.data_store.data_sets[frame.mode.name] = self.data
 
@@ -149,7 +148,7 @@ class DataManager():
         new_data = {}
         keys_to_sort = []
         for item in new_meta_dict.values():
-            if item[0] == META_CODES['uuid']:
+            if item[0] == META_CODES["uuid"]:
                 data_key = item[1]
                 keys_to_sort.append(data_key)
 
@@ -159,14 +158,16 @@ class DataManager():
                     new_data[data_key] = self.data[data_key]
 
         for uuid_key, item in old_meta_dict.items():
-            if item[0] == META_CODES['uuid'] and uuid_key in old_meta_dict:
+            if item[0] == META_CODES["uuid"] and uuid_key in old_meta_dict:
                 old_text_key = old_meta_dict[uuid_key][1]
                 new_data[data_key] = self.data[old_text_key]
 
         # Ensure the items a re sorted according to the order in frm_edit
         sort_dict = {new_meta_dict[key][2]: key for key in keys_to_sort}
-        self.data = {sort_dict[index]: new_data[sort_dict[index]]
-                     for index in range(len(sort_dict))}
+        self.data = {
+            sort_dict[index]: new_data[sort_dict[index]]
+            for index in range(len(sort_dict))
+        }
 
         self.text_list = list(self.data)
         self.display_list = self._build_display_list()
@@ -188,12 +189,15 @@ class DataManager():
         meta_dict = {}
         for key in self.data.keys():
             uid = str(uuid.uuid4())
-            meta_dict[uid] = (META_CODES['uuid'], key)
-            meta_dict[key] = (META_CODES['text'], uid)
+            meta_dict[uid] = (META_CODES["uuid"], key)
+            meta_dict[key] = (META_CODES["text"], uid)
         return meta_dict
 
     def _build_display_list(self, text_list: list[str] = None) -> list[str]:
         if not text_list:
             text_list = self.text_list
-        return [u'{unicodes_value}'.format(unicodes_value=item)
-                for item in text_list if item and item[0] != '#']
+        return [
+            "{unicodes_value}".format(unicodes_value=item)
+            for item in text_list
+            if item and item[0] != "#"
+        ]

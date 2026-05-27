@@ -3,33 +3,34 @@
 import tkinter as tk
 from tkinter import ttk
 
-from psiutils.constants import PAD, Status
-from psiutils.widgets import HAND
-from psiutils.buttons import ButtonFrame, IconButton
-from psiutils.menus import Menu, MenuItem
 from psiutils import messagebox
+from psiutils.buttons import ButtonFrame, IconButton
+from psiutils.constants import PAD, Status
+from psiutils.menus import Menu, MenuItem
+from psiutils.widgets import HAND
 
-from bbochat.constants import MODE_TEXT, ChatMode
 from bbochat.config import get_config
+from bbochat.constants import MODE_TEXT, ChatMode
 from bbochat.data_manager import DataManager
-from bbochat.text import Text
-
 from bbochat.forms.frm_edit import EditFrame
 from bbochat.forms.frm_text_dialog import TextDialogFrame
+from bbochat.text import Text
 
 txt = Text()
 
 
-class TextSelectionFrame():
-    def __init__(self,
-                 parent: ttk.Frame,
-                 master: ttk.Frame,
-                 mode: ChatMode,
-                 data_manager: DataManager,
-                 show_use_frame: bool = True,
-                 show_title: bool = True,
-                 slave=None) -> None:
-        # pylint: disable=no-member)
+class TextSelectionFrame:
+    def __init__(
+        self,
+        parent: ttk.Frame,
+        master: ttk.Frame,
+        mode: ChatMode,
+        data_manager: DataManager,
+        show_use_frame: bool = True,
+        show_title: bool = True,
+        slave=None,
+    ) -> None:
+
         self.parent = parent
         self.root = self.parent.root
         self.show_use_frame = show_use_frame
@@ -42,17 +43,19 @@ class TextSelectionFrame():
         self.mode = mode
         self.mode_text = MODE_TEXT[mode.value]
 
-        self.config_key = f'last_{self.mode.name.lower()}'
+        self.config_key = f"last_{self.mode.name.lower()}"
         self.config = get_config()
 
         last_value = self.config.config[self.config_key]
         self.text_var = tk.StringVar(value=last_value)
 
         # TODO sort this
-        self.config.colours['chat-detail'] = self.config.colours[ChatMode.CHAT.name]
+        self.config.colours["chat-detail"] = self.config.colours[
+            ChatMode.CHAT.name
+        ]
 
         # self.selected_text contains the text selected from the listbox
-        self.selected_text = ''
+        self.selected_text = ""
         # self.selected_index is the index of selected text in self.text_data
         self.selected_index = -1
 
@@ -67,7 +70,7 @@ class TextSelectionFrame():
         frame.columnconfigure(0, weight=1)
 
         if self.show_title:
-            label = ttk.Label(frame, text=f'{self.mode_text.capitalize()}s')
+            label = ttk.Label(frame, text=f"{self.mode_text.capitalize()}s")
             label.grid(row=0, column=0)
 
         self.listbox = tk.Listbox(
@@ -76,8 +79,8 @@ class TextSelectionFrame():
             cursor=HAND,
         )
         self.listbox.grid(row=1, column=0, sticky=tk.NSEW)
-        self.listbox.bind('<<ListboxSelect>>', self._item_selected)
-        self.listbox.bind('<Button-3>', self._show_context_menu)
+        self.listbox.bind("<<ListboxSelect>>", self._item_selected)
+        self.listbox.bind("<Button-3>", self._show_context_menu)
 
         if self.show_use_frame:
             use_frame = self._use_frame(frame)
@@ -90,7 +93,7 @@ class TextSelectionFrame():
         frame = ttk.Frame(master)
         frame.columnconfigure(0, weight=1)
 
-        label = ttk.Label(frame, text=f'Selected {self.mode_text}')
+        label = ttk.Label(frame, text=f"Selected {self.mode_text}")
         label.grid(row=0, column=0, pady=PAD)
 
         entry = ttk.Entry(frame, textvariable=self.text_var)
@@ -98,19 +101,18 @@ class TextSelectionFrame():
         colour = self.config.colours[self.mode.name]
         entry_style = ttk.Style()
         entry_style.configure(
-            f'{self.mode}.TEntry',
+            f"{self.mode}.TEntry",
             fieldbackground=colour,
-            )
-        entry.configure(style=f'{self.mode}.TEntry')
-        entry.bind('<Key>', lambda e: 'break')
+        )
+        entry.configure(style=f"{self.mode}.TEntry")
+        entry.bind("<Key>", lambda e: "break")
 
         button_frame = ButtonFrame(frame, tk.HORIZONTAL)
-        use_button = IconButton(
-            button_frame, txt.USE, 'done', self._use_item)
-        use_button.widget.configure(style=f'{self.mode}.TButton')
+        use_button = IconButton(button_frame, txt.USE, "done", self._use_item)
+        use_button.widget.configure(style=f"{self.mode}.TButton")
         button_frame.buttons = [
             use_button,
-            IconButton(button_frame, txt.EDIT, 'edit', self._edit_all),
+            IconButton(button_frame, txt.EDIT, "edit", self._edit_all),
         ]
         button_frame.grid(row=2, column=0, pady=PAD)
 
@@ -128,10 +130,12 @@ class TextSelectionFrame():
         self.context_menu.enable()
         if self.has_slave_frame:
             # This is a master: it has a slave frame
-            self.data.update_slave_data(self.has_slave_frame, self.selected_text)
+            self.data.update_slave_data(
+                self.has_slave_frame, self.selected_text
+            )
 
     def _new_item(self, *args) -> None:
-        dlg = TextDialogFrame(self, 'New')
+        dlg = TextDialogFrame(self, "New", show_save=True)
         self.root.wait_window(dlg.root)
         if not dlg.text:
             return
@@ -145,7 +149,7 @@ class TextSelectionFrame():
         self.populate_text_items(dlg.text)
 
     def _edit_item(self, *args) -> None:
-        dlg = TextDialogFrame(self, 'Edit', self.selected_text)
+        dlg = TextDialogFrame(self, "Edit", self.selected_text, show_save=True)
         self.root.wait_window(dlg.root)
         if dlg.status != Status.UPDATED:
             return
@@ -167,7 +171,7 @@ class TextSelectionFrame():
             # This is a master: it has a slave frame
             self.has_slave_frame.populate_text_items()
 
-        self.text_var.set('')
+        self.text_var.set("")
         self._use_item()
         self.populate_text_items()
 
@@ -184,24 +188,24 @@ class TextSelectionFrame():
         self._use_item()
 
     def _update_text_list(
-            self, text_list: list[str], old_text: str, new_text: str) -> None:
+        self, text_list: list[str], old_text: str, new_text: str
+    ) -> None:
         index = text_list.index(old_text)
         text_list.remove(old_text)
         text_list.insert(index, new_text)
 
     def _use_item(self, *args) -> None:
-        if self.text_var.get() and self.text_var.get()[0] == '#':
-            self.text_var.set('')
-        self.parent.parent.update_clipboard(
-            self.text_var.get(), self.mode)
+        if self.text_var.get() and self.text_var.get()[0] == "#":
+            self.text_var.set("")
+        self.parent.parent.update_clipboard(self.text_var.get(), self.mode)
         self.config = get_config()
         self.config.update(self.config_key, self.text_var.get())
         self.config.save()
 
-    def populate_text_items(self, selected_item: str = '') -> None:
+    def populate_text_items(self, selected_item: str = "") -> None:
         self.listbox.delete(0, tk.END)
         for index, item in enumerate(self.data.display_list):
-            self.listbox.insert('end', item)
+            self.listbox.insert("end", item)
             if selected_item and item == selected_item:
                 self.listbox.selection_set(index)
 

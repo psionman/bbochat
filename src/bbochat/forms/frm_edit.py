@@ -1,5 +1,5 @@
-
 """Text Edit Frame for BBO Chat."""
+
 import tkinter as tk
 from tkinter import ttk
 from pathlib import Path
@@ -21,10 +21,10 @@ from bbochat.forms.frm_text_dialog import TextDialogFrame
 
 txt = Text()
 
-FRAME_TITLE = 'Edit'
+FRAME_TITLE = "Edit"
 
 
-class EditFrame():
+class EditFrame:
     def __init__(self, parent) -> None:
         self.root = tk.Toplevel(parent.root)
         self.parent = parent
@@ -57,7 +57,7 @@ class EditFrame():
         self.selected_item = None
 
         # self.selected_text contains the text selected from the listbox
-        self.selected_text = ''
+        self.selected_text = ""
 
         self._show()
         self.context_menu = self._context_menu()
@@ -71,10 +71,9 @@ class EditFrame():
         root.transient(self.parent.root)
         root.title(FRAME_TITLE)
 
-        root.bind('<Control-x>', self._dismiss)
-        root.bind('<Control-s>', self._save)
-        root.bind('<Configure>',
-                  lambda e: window_resize(self, __file__))
+        root.bind("<Control-x>", self._dismiss)
+        root.bind("<Control-s>", self._save)
+        root.bind("<Configure>", lambda e: window_resize(self, __file__))
 
         root.rowconfigure(0, weight=1)
         root.columnconfigure(0, weight=1)
@@ -92,15 +91,14 @@ class EditFrame():
 
         self.listbox = tk.Listbox(frame, cursor=HAND)
         self.listbox.grid(row=0, column=0, rowspan=6, sticky=tk.NSEW, padx=PAD)
-        self.listbox.bind('<<ListboxSelect>>', self._select_item)
-        self.listbox.bind('<Button-3>', self._show_context_menu)
+        self.listbox.bind("<<ListboxSelect>>", self._select_item)
+        self.listbox.bind("<Button-3>", self._show_context_menu)
 
         scroll_buttons = self._scroll_buttons(frame)
         scroll_buttons.grid(row=0, column=1, sticky=tk.NS)
 
         self.button_frame = self._button_frame(frame)
-        self.button_frame.grid(row=0, column=2,
-                               sticky=tk.NS, padx=PAD)
+        self.button_frame.grid(row=0, column=2, sticky=tk.NS, padx=PAD)
 
         return frame
 
@@ -109,25 +107,28 @@ class EditFrame():
         frame.rowconfigure(0, weight=1)
         frame.rowconfigure(1, weight=1)
 
-        button = ttk.Button(frame, text=txt.CHEVRON_UP,
-                            command=self._move_up, width=1)
+        button = ttk.Button(
+            frame, text=txt.CHEVRON_UP, command=self._move_up, width=1
+        )
         button.grid(row=0, column=0, sticky=tk.NS)
 
-        button = ttk.Button(frame, text=txt.CHEVRON_DOWN,
-                            command=self._move_down, width=1)
+        button = ttk.Button(
+            frame, text=txt.CHEVRON_DOWN, command=self._move_down, width=1
+        )
         button.grid(row=1, column=0, sticky=tk.NS)
         return frame
 
     def _button_frame(self, master: ttk.Frame) -> tk.Frame:
         frame = ButtonFrame(master, tk.VERTICAL)
         self.save_button = IconButton(
-            frame, txt.SAVE, 'save', self._save, True)
+            frame, txt.SAVE, "save", self._save, True
+        )
         frame.buttons = [
-            frame.icon_button('new', self._new_item),
-            frame.icon_button('edit', self._edit_item, True),
-            frame.icon_button('delete', self._delete_item, True),
+            frame.icon_button("new", self._new_item),
+            frame.icon_button("edit", self._edit_item, True),
+            frame.icon_button("delete", self._delete_item, True),
             self.save_button,
-            frame.icon_button('exit', self._dismiss),
+            frame.icon_button("exit", self._dismiss),
         ]
         return frame
 
@@ -161,29 +162,29 @@ class EditFrame():
     def _populate_text_items(self) -> None:
         self.listbox.delete(0, tk.END)
         for index, item in enumerate(self.text_list):
-            self.listbox.insert('end', item)
+            self.listbox.insert("end", item)
             if self.master_selected_text and item == self.master_selected_text:
                 self.listbox.selection_set(index)
                 self.selected_text = self.master_selected_text
                 self.selected_item = index
 
         if self.master_selected_text:
-            self.master_selected_text = ''
+            self.master_selected_text = ""
             self._enable_menu()
         self._enable_buttons()
 
     def _new_item(self, *args) -> None:
-        dlg = TextDialogFrame(self, 'New')
+        dlg = TextDialogFrame(self, "New")
         self.root.wait_window(dlg.root)
         if dlg.text:
             self.text_list.append(dlg.text)
             uid = str(uuid.uuid4())
-            self.meta_dict[uid] = (META_CODES['uuid'], dlg.text)
-            self.meta_dict[dlg.text] = (META_CODES['text'], uid)
+            self.meta_dict[uid] = (META_CODES["uuid"], dlg.text)
+            self.meta_dict[dlg.text] = (META_CODES["text"], uid)
             self._populate_text_items()
 
     def _edit_item(self, *args) -> None:
-        dlg = TextDialogFrame(self, 'Edit', self.selected_text)
+        dlg = TextDialogFrame(self, "Edit", self.selected_text)
         self.root.wait_window(dlg.root)
         if dlg.text == self.selected_text:
             return
@@ -206,10 +207,10 @@ class EditFrame():
         meta_uuid_key = meta_text_item[1]
 
         # Rebuild the uuid item with the new text
-        self.meta_dict[meta_uuid_key] = (META_CODES['uuid'], text)
+        self.meta_dict[meta_uuid_key] = (META_CODES["uuid"], text)
 
         # Create a text item with the new text
-        self.meta_dict[text] = (META_CODES['text'], meta_uuid_key)
+        self.meta_dict[text] = (META_CODES["text"], meta_uuid_key)
         # ic(len(self.meta_dict))
 
         # Remove the text item relating to the old value
@@ -225,7 +226,7 @@ class EditFrame():
             self.meta_dict.pop(meta_text_item[1])
 
         self.text_list.remove(self.selected_text)
-        self.selected_text = ''
+        self.selected_text = ""
         self._populate_text_items()
 
     def _move_up(self, *args) -> None:
@@ -234,11 +235,12 @@ class EditFrame():
         if self.selected_item == 0:
             return
         index = self.selected_item
-        (self.text_list[index-1], self.text_list[index]) = (
-            self.text_list[index], self.text_list[index-1]
+        (self.text_list[index - 1], self.text_list[index]) = (
+            self.text_list[index],
+            self.text_list[index - 1],
         )
         self._populate_text_items()
-        self.listbox.select_set(index-1)
+        self.listbox.select_set(index - 1)
         self.selected_item -= 1
         self._enable_buttons()
 
@@ -248,11 +250,12 @@ class EditFrame():
         if self.selected_item == len(self.text_list) - 1:
             return
         index = self.selected_item
-        (self.text_list[index+1], self.text_list[index]) = (
-            self.text_list[index], self.text_list[index+1]
+        (self.text_list[index + 1], self.text_list[index]) = (
+            self.text_list[index],
+            self.text_list[index + 1],
         )
         self._populate_text_items()
-        self.listbox.select_set(index+1)
+        self.listbox.select_set(index + 1)
         self.selected_item += 1
         self._enable_buttons()
 
@@ -272,12 +275,7 @@ class EditFrame():
                 meta_item = self.meta_dict[value]
                 self.meta_dict[value] = (meta_item[0], meta_item[1], index)
 
-        xxx = self.data_store.data_sets[self.mode.name.lower()]
-        print(f"{self.mode.name.lower()=}")
-        print(f"{type(xxx)=}")
         self.data_store.data_sets[self.mode.name.lower()] = self.text_list
-        yyy = self.data_store.data_sets[self.mode.name.lower()]
-        print(f"{type(yyy)=}")
         self.data_store.save()
         self.status = Status.UPDATED
         self._dismiss()

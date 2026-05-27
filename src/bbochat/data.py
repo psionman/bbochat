@@ -12,16 +12,17 @@ INVALID_JSON = 2
 if DONT_SAVE:
     logger.warn(f"DONT_SAVE={DONT_SAVE}")
 
-class Partner():
+
+class Partner:
     def __init__(self) -> None:
-        self.username: str = ''
-        self.name: str = ''
-        self.system: str = ''
-        self.greeting: str = ''
-        self.notes: str = ''
+        self.username: str = ""
+        self.name: str = ""
+        self.system: str = ""
+        self.greeting: str = ""
+        self.notes: str = ""
 
     def __repr__(self):
-        return f'Partner: {self.username} {self.name}'
+        return f"Partner: {self.username} {self.name}"
 
     def serialize(self) -> dict:
         return [self.name, self.system, self.greeting, self.notes]
@@ -46,13 +47,13 @@ class Partner():
         self.notes = item[3]
 
 
-class Player():
-    def __init__(self, name: str = '', username: str = '') -> None:
+class Player:
+    def __init__(self, name: str = "", username: str = "") -> None:
         self.name: str = name
         self.username: str = username
 
     def __repr__(self):
-        return f'Player: {self.username} {self.name}'
+        return f"Player: {self.username} {self.name}"
 
     def serialize(self) -> dict:
         return {self.username: self.name}
@@ -62,15 +63,15 @@ class Player():
         self.username = username
 
 
-class Pair():
-    def __init__(self, username_1: str = '', username_2: str = '') -> None:
+class Pair:
+    def __init__(self, username_1: str = "", username_2: str = "") -> None:
         if username_1 > username_2:
             username_1, username_2 = username_2, username_1
         self.username_1: str = username_1
         self.username_2: str = username_2
 
     def __repr__(self):
-        return f'Pair: {self.username_1} {self.username_2}'
+        return f"Pair: {self.username_1} {self.username_2}"
 
     def __eq__(self, other) -> bool:
         return (
@@ -88,7 +89,7 @@ class Pair():
         self.username_2 = username_2
 
 
-class DataStore():
+class DataStore:
     def __init__(self) -> None:
         self.partners = {}
         self.players = {}
@@ -97,58 +98,58 @@ class DataStore():
         self.valedictions = []
         self.chat = []
         self.notes = {}
-        self.my_name = ''
+        self.my_name = ""
 
     def read(self):
         raw_data = self._read_data_file()
         data = {} if raw_data == FILE_NOT_FOUND else self._get_json(raw_data)
         self.data_sets = {
-            'partners': {},
-            'pairs': [],
-            'players': {},
-            'greeting': [],
-            'valediction': [],
-            'chat': {},
-            'notes': {},
-            'my_name': '',
+            "partners": {},
+            "pairs": [],
+            "players": {},
+            "greeting": [],
+            "valediction": [],
+            "chat": {},
+            "notes": {},
+            "my_name": "",
         }
         if data == INVALID_JSON:
             return INVALID_JSON
-        if 'partners' in data:
-            self.partners = self._get_partners(data['partners'])
-            self.data_sets['partners'] = self.partners
+        if "partners" in data:
+            self.partners = self._get_partners(data["partners"])
+            self.data_sets["partners"] = self.partners
 
-        if 'players' in data:
-            self.players = self._get_players(data['players'])
-            self.data_sets['players'] = self.players
+        if "players" in data:
+            self.players = self._get_players(data["players"])
+            self.data_sets["players"] = self.players
 
-        if 'pairs' in data:
-            self.pairs = self._get_pairs(data['pairs'])
-            self.data_sets['pairs'] = self.pairs
+        if "pairs" in data:
+            self.pairs = self._get_pairs(data["pairs"])
+            self.data_sets["pairs"] = self.pairs
 
-        if 'greetings' in data:
-            self.greetings = data['greetings']
-            self.data_sets['greeting'] = self.greetings
+        if "greetings" in data:
+            self.greetings = data["greetings"]
+            self.data_sets["greeting"] = self.greetings
 
-        if 'valedictions' in data:
-            self.valedictions = data['valedictions']
-            self.data_sets['valediction'] = self.valedictions
+        if "valedictions" in data:
+            self.valedictions = data["valedictions"]
+            self.data_sets["valediction"] = self.valedictions
 
-        if 'notes' in data:
-            self.notes = data['notes']
-            self.data_sets['notes'] = self.notes
+        if "notes" in data:
+            self.notes = data["notes"]
+            self.data_sets["notes"] = self.notes
 
-        if 'chat' in data:
-            self.chat = data['chat']
-            self.data_sets['chat'] = self.chat
+        if "chat" in data:
+            self.chat = data["chat"]
+            self.data_sets["chat"] = self.chat
 
-        if 'my_name' in data:
-            self.my_name = data['my_name']
-            self.data_sets['my_name'] = self.my_name
+        if "my_name" in data:
+            self.my_name = data["my_name"]
+            self.data_sets["my_name"] = self.my_name
 
     def _read_data_file(self) -> str | int | None:
         try:
-            with open(DATA_FILE, 'r') as f_data:
+            with open(DATA_FILE, "r") as f_data:
                 return f_data.read()
         except FileNotFoundError:
             return FILE_NOT_FOUND
@@ -159,7 +160,7 @@ class DataStore():
         try:
             return json.loads(data)
         except json.decoder.JSONDecodeError:
-            print(f'*** Invalid json in {DATA_FILE}***')
+            print(f"*** Invalid json in {DATA_FILE}***")
             return INVALID_JSON
 
     @staticmethod
@@ -191,18 +192,20 @@ class DataStore():
 
     def save(self):
         output = {
-            'partners': {partner.username: partner.serialize()
-                         for partner in self.partners.values()},
-            'pairs': [pair.serialize() for pair in self.pairs],
-            'players': {
+            "partners": {
+                partner.username: partner.serialize()
+                for partner in self.partners.values()
+            },
+            "pairs": [pair.serialize() for pair in self.pairs],
+            "players": {
                 player.username: player.name
                 for player in self.players.values()
             },
-            'greetings': self.data_sets['greeting'],
-            'valedictions': self.data_sets['valediction'],
-            'chat': self.data_sets['chat'],
-            'notes': self.data_sets['notes'],
-            'my_name': self.my_name,
+            "greetings": self.data_sets["greeting"],
+            "valedictions": self.data_sets["valediction"],
+            "chat": self.data_sets["chat"],
+            "notes": self.data_sets["notes"],
+            "my_name": self.my_name,
         }
         json_data = self._data_to_json(output)
         return self._write_data_file(json_data)
@@ -214,11 +217,19 @@ class DataStore():
     @staticmethod
     def _write_data_file(json_data: str):
         if DONT_SAVE:
-            logger,Warning(f"DONT_SAVE={DONT_SAVE}")
+            logger.warning(f"DONT_SAVE={DONT_SAVE}")
             return None
+
         try:
-            with open(DATA_FILE, 'w') as f_data:
-                return f_data.write(json_data)
+            with open(DATA_FILE, "w") as f_data:
+                bytes_written = f_data.write(json_data)
+                logger.info("data saved")
+                return bytes_written
+
         except FileNotFoundError:
+            logger.error(f"File not found: {DATA_FILE}")
             return FILE_NOT_FOUND
-        return None
+
+        except Exception as e:
+            logger.error(f"Failed to save data: {e}")
+            return None
