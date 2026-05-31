@@ -1,30 +1,28 @@
 """Text Edit Frame for BBO Chat."""
 
-import tkinter as tk
-from tkinter import ttk
-from pathlib import Path
-import uuid
 import copy
+import tkinter as tk
+import uuid
+from pathlib import Path
+from tkinter import ttk
 
-from psiutils.constants import PAD, Status
-from psiutils.widgets import HAND
+from psiutils import messagebox
 from psiutils.buttons import ButtonFrame, IconButton
+from psiutils.constants import PAD, Status
 from psiutils.menus import Menu, MenuItem
 from psiutils.utilities import window_resize
-from psiutils import messagebox
+from psiutils.widgets import HAND
 
 from bbochat.config import get_config
-from bbochat.constants import META_CODES
-from bbochat.text import Text
-
 from bbochat.forms.frm_text_dialog import TextDialogFrame
+from bbochat.text import Text
 
 txt = Text()
 
 FRAME_TITLE = "Edit"
 
 
-class EditFrame:
+class EditSelectFrame:
     def __init__(self, parent) -> None:
         self.root = tk.Toplevel(parent.root)
         self.parent = parent
@@ -49,9 +47,18 @@ class EditFrame:
         # Current text in frame
         self.text_list = [item for item in parent.data.text_list if item]
 
-        self.meta_dict = {}
-        if parent.data.meta_dict:
-            self.meta_dict = copy.deepcopy(parent.data.meta_dict)
+        # item_register is a dictionary mapping listbox text to unique identifiers
+        # It ensures item identity persists during edits or reordering
+        # by associating display text with UUIDs.
+        self.item_register = {}
+        self.text_register = {}
+        self.key_register = {}
+        self.uuid_register = {}
+        if parent.data.text_register:
+            self.item_register = copy.deepcopy(parent.data.item_register)
+            self.text_register = parent.data.text_register
+            self.key_register = parent.data.key_register
+            self.uuid_register = parent.data.uuid_register
 
         # self.selected_item is the index of the item selected in the listbox
         self.selected_item = None
@@ -65,14 +72,13 @@ class EditFrame:
         self._populate_text_items()
 
     def _show(self) -> None:
-        # pylint: disable=no-member)
         root = self.root
         root.geometry(self.config.geometry[Path(__file__).stem])
         root.transient(self.parent.root)
         root.title(FRAME_TITLE)
 
         root.bind("<Control-x>", self._dismiss)
-        root.bind("<Control-s>", self._save)
+        root.bind("<Control-s>", self._update_data_set)
         root.bind("<Configure>", lambda e: window_resize(self, __file__))
 
         root.rowconfigure(0, weight=1)
@@ -121,7 +127,7 @@ class EditFrame:
     def _button_frame(self, master: ttk.Frame) -> tk.Frame:
         frame = ButtonFrame(master, tk.VERTICAL)
         self.save_button = IconButton(
-            frame, txt.SAVE, "save", self._save, True
+            frame, txt.SAVE, "save", self._update_data_set, True
         )
         frame.buttons = [
             frame.icon_button("new", self._new_item),
@@ -178,19 +184,25 @@ class EditFrame:
         self.root.wait_window(dlg.root)
         if dlg.text:
             self.text_list.append(dlg.text)
-            uid = str(uuid.uuid4())
-            self.meta_dict[uid] = (META_CODES["uuid"], dlg.text)
-            self.meta_dict[dlg.text] = (META_CODES["text"], uid)
-            self._populate_text_items()
+            if self.text_register:
+                uid = str(uuid.uuid4())
+                # self.item_register[uid] = (ItemRegistryFields.UUID, dlg.text)
+                # self.item_register[dlg.text] = (ItemRegistryFields.TEXT, uid)
+
+                self.text_register[uid] = dlg.text
+                self.key_register[dlg.text] = uid
+                self.uuid_register[uid] = dlg.text
+                self._populate_text_items()
 
     def _edit_item(self, *args) -> None:
+        old_text = self.selected_text
         dlg = TextDialogFrame(self, "Edit", self.selected_text)
         self.root.wait_window(dlg.root)
         if dlg.text == self.selected_text:
             return
 
-        if self.meta_dict:
-            self._update_meta_dict(dlg.text)
+        if self.text_register:
+            self._update_item_register(old_text, dlg.text)
 
         index = self.text_list.index(self.selected_text)
         self.text_list.remove(self.selected_text)
@@ -199,31 +211,34 @@ class EditFrame:
         self._populate_text_items()
         self.listbox.select_set(index)
 
-    def _update_meta_dict(self, text: str):
-        # Get the meta_dict text item relating to the old value
-        meta_text_item = self.meta_dict[self.selected_text]
+    def _update_item_register(self, old_text: str, new_text: str):
+        # Get the item_register text item relating to the
+        # old value and replace it with the new text
 
-        # Get the related uuid item
-        meta_uuid_key = meta_text_item[1]
+        # Get the uuid_key for the text
+        uuid_key = self.key_register[old_text]
+        print(f"{uuid_key=}")
 
-        # Rebuild the uuid item with the new text
-        self.meta_dict[meta_uuid_key] = (META_CODES["uuid"], text)
+        # swap key register keys
+        self.key_register[new_text] = uuid_key
+        self.key_register.pop(old_text)
 
-        # Create a text item with the new text
-        self.meta_dict[text] = (META_CODES["text"], meta_uuid_key)
-        # ic(len(self.meta_dict))
-
-        # Remove the text item relating to the old value
-        self.meta_dict.pop(self.selected_text)
+        # update uuid register
+        self.uuid_register[uuid_key] = new_text
+        print(f"{old_text=}")
+        print(f"{new_text=}")
+        print(f"{self.uuid_register[uuid_key]=}")
+        for key, uuid_text in self.key_register.items():
+            print(f"{key=} {uuid_text=}")
 
     def _delete_item(self, *args) -> None:
         if not messagebox.askyesno(self, txt.DELETE_TITLE, txt.DELETE_ITEM):
             return
 
-        if self.meta_dict:
-            meta_text_item = self.meta_dict[self.selected_text]
-            self.meta_dict.pop(self.selected_text)
-            self.meta_dict.pop(meta_text_item[1])
+        if self.key_register:
+            item_register_member = self.item_register[self.selected_text]
+            self.item_register.pop(self.selected_text)
+            self.item_register.pop(item_register_member[1])
 
         self.text_list.remove(self.selected_text)
         self.selected_text = ""
@@ -268,15 +283,19 @@ class EditFrame:
         if self.text_list != self.original_data:
             self.save_button.enable()
 
-    def _save(self, *args) -> None:
-        print(f"{self.meta_dict=}")
-        if self.meta_dict:
-            for index, value in enumerate(self.text_list):
-                meta_item = self.meta_dict[value]
-                self.meta_dict[value] = (meta_item[0], meta_item[1], index)
+    def _update_data_set(self, *args) -> None:
+        # Problem: mode is chat, but how to you update child data?
+        mode = self.mode.name.lower()
+        print(f"{len(self.text_register)=} {mode=}")
+        if self.text_register:
+            # then the dict must be saved with the new key (if any)
+            data_set = {}
+            for key, value in self.key_register.items():
+                data_set[key] = self.text_register[value]
 
-        self.data_store.data_sets[self.mode.name.lower()] = self.text_list
-        self.data_store.save()
+            self.data_store.data_sets[mode] = data_set
+        else:
+            self.data_store.data_sets[mode] = self.text_list
         self.status = Status.UPDATED
         self._dismiss()
 

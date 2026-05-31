@@ -1,25 +1,25 @@
-from bbochat.forms.frm_config import ConfigFrame
-from bbochat.forms.frm_edit import EditFrame
 from bbochat.data import DataStore
+from bbochat.forms.frm_config import ConfigFrame
+from bbochat.forms.frm_edit_select import EditSelectFrame
 
 
-class ModuleCaller():
+class ModuleCaller:
     def __init__(self, root, module) -> None:
         modules = {
-            'config': self._config,
-            'edit': self._edit,
-            }
+            "config": self._config,
+            "edit": self._edit,
+        }
 
         self.invalid = False
-        if module == '-h':
-            for key in sorted(list(modules.keys())+['main']):
+        if module == "-h":
+            for key in sorted(list(modules.keys()) + ["main"]):
                 print(key)
             self.invalid = True
             return
 
         if module not in modules:
-            if module != 'main':
-                print(f'Invalid function name: {module}')
+            if module != "main":
+                print(f"Invalid function name: {module}")
             self.invalid = True
             return
 
@@ -36,5 +36,5 @@ class ModuleCaller():
         self.data_store = DataStore()
         ds = self.data_store
         ds.read()
-        dlg = EditFrame(self, 'greetings')
+        dlg = EditSelectFrame(self, "greetings")
         self.root.wait_window(dlg.root)

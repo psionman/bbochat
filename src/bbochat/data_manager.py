@@ -1,14 +1,16 @@
+# data_manager.py
+
 """Handle data management for BBO Chat."""
 
 import uuid
 
-from bbochat.constants import META_CODES
+from bbochat.constants import ItemRegistryFields
 
 
 class DataManager:
     """
     The data manager holds data for the specific mode (e.g. 'chat')
-    The data store hold data for the whole application (see data.py).
+    The data store holds data for the whole application (see data.py).
     """
 
     def __init__(
@@ -22,6 +24,9 @@ class DataManager:
         self.data_store = data_store
         self.has_master = has_master
         self.slave = slave
+        self.text_register = {}
+        self.key_register = {}
+        self.uuid_register = {}
 
         # slave => the data set is a dict of text items,
         # otherwise a list of text
@@ -38,8 +43,17 @@ class DataManager:
         # Used to display items in the relevant listbox.
         self.display_list = self._build_display_list()
 
-        # build a meta dict used to handle edit_all for master frames
-        self.meta_dict = self._meta_dict()
+        # build a item_register used to handle edit_all for master frames
+
+        # text_register is a dict of text items (a list) keyed on uuids
+        # key_register is a dict of uuids keyed on the keys
+        # uuid_register is a dict of keys keyed on uuids
+        (
+            # self.item_register,
+            self.text_register,
+            self.key_register,
+            self.uuid_register,
+        ) = self._build_registers()
 
     def add(self, frame, text) -> None:
         self.text_list.append(text)
@@ -53,7 +67,7 @@ class DataManager:
         else:
             self.data.append(text)
 
-        self.save(frame)
+        self.save(frame.mode.name)
 
     def amend(self, frame, old_value: str, new_value: str) -> None:
         self._update_text_list(self.text_list, old_value, new_value)
@@ -70,7 +84,7 @@ class DataManager:
         else:
             self.data = self.text_list
 
-        self.save(frame)
+        self.save(frame.mode.name)
 
     def delete(self, frame) -> None:
         self.text_list.remove(frame.selected_text)
@@ -84,21 +98,27 @@ class DataManager:
             data[frame.master_frame.selected_text].remove(frame.selected_text)
         else:
             self.data.remove(frame.selected_text)
-        self.save(frame)
+        self.save(frame.mode.name)
 
-    def edit_all(self, frame, data: list[str], meta_dict: dict) -> None:
-        self.text_list = data
+    def edit_all(
+        self, frame, text_list: list[str], item_register: dict
+    ) -> None:
+        print(f"{item_register=}")
+        self.text_list = text_list
         self.display_list = self._build_display_list()
 
         if self.slave:
             # This is a master frame: it has a slave frame
-            self._rebuild_dict(meta_dict)
+            # self._rebuild_item_register(item_register)
+            pass
         elif self.has_master:
             data = frame.master_frame.data.data
             data[frame.master_frame.selected_text] = self.text_list
         else:
+            data = ""  # ,!!!!!!!!!!!!!!!!!!
             self.data = data
-        self.save(frame)
+            print("data wierd")
+        self.save(frame.mode.name)
 
     def update_slave_data(self, slave, selected_text: str) -> None:
         data = self.data[selected_text]
@@ -124,46 +144,54 @@ class DataManager:
         text_list.remove(old_value)
         text_list.insert(index, new_value)
 
-    def save(self, frame, *args) -> None:
+    def save(self, mode: str, *args) -> None:
         """
         Saves data to the data store based on the frame mode.
 
         Args:
-            frame: The frame object containing mode information.
+            mode: The chat mode as string.
+            *args: Additional arguments.
             *args: Additional arguments.
 
         Returns:
             None
         """
-        
-        if not self.has_master:
-            self.data_store.data_sets[frame.mode.name] = self.data
+
+        print("saving data:", mode, type(self.data))
+        # if not self.has_master:
+        self.data_store.data_sets[mode] = self.data
 
         self.data_store.save()
-        if self.slave:
-            self.meta_dict = self._meta_dict()
+        # if self.slave:
+        #     self.item_register = self._build_registers()
 
-    def _rebuild_dict(self, new_meta_dict: dict) -> None:
-        old_meta_dict = self._meta_dict()
+    def _rebuild_item_register(self, new_item_register: dict) -> None:
+        old_item_register = self._build_registers()
+        # self.xxx("o", old_item_register)
+        # self.xxx("n", new_item_register)
         new_data = {}
         keys_to_sort = []
-        for item in new_meta_dict.values():
-            if item[0] == META_CODES["uuid"]:
+        for item in new_item_register.values():
+            if item[0] == ItemRegistryFields.UUID:
                 data_key = item[1]
                 keys_to_sort.append(data_key)
 
                 # New item
                 new_data[data_key] = []
-                if data_key in old_meta_dict:
+                if data_key in old_item_register:
                     new_data[data_key] = self.data[data_key]
 
-        for uuid_key, item in old_meta_dict.items():
-            if item[0] == META_CODES["uuid"] and uuid_key in old_meta_dict:
-                old_text_key = old_meta_dict[uuid_key][1]
+        for uuid_key, item in old_item_register.items():
+            if (
+                item[0] == ItemRegistryFields.UUID
+                and uuid_key in old_item_register
+            ):
+                old_text_key = old_item_register[uuid_key][1]
                 new_data[data_key] = self.data[old_text_key]
+                print(f"Copying {old_text_key} to {data_key}")
 
-        # Ensure the items a re sorted according to the order in frm_edit
-        sort_dict = {new_meta_dict[key][2]: key for key in keys_to_sort}
+        # Ensure the items a re sorted according to the order in frm_edit_select
+        sort_dict = {new_item_register[key][1]: key for key in keys_to_sort}
         self.data = {
             sort_dict[index]: new_data[sort_dict[index]]
             for index in range(len(sort_dict))
@@ -172,26 +200,42 @@ class DataManager:
         self.text_list = list(self.data)
         self.display_list = self._build_display_list()
 
-    # def _print_meta_dict(self, meta_dict) -> None:
-    #     for key in sorted(list(meta_dict)):
-    #         if meta_dict[key][0] == META_CODES['uuid']:
-    #             print(key, meta_dict[key])
-    #     for key in sorted(list(meta_dict)):
-    #         if meta_dict[key][0] == META_CODES['text']:
-    #             print(key, meta_dict[key])
+    # def xxx(self, type: str, item_register: dict) -> None:
+    #     print(type)
+    #     for key in sorted(list(item_register)):
+    #         if item_register[key][0] == ItemRegistryFields.UUID:
+    #             print(key, item_register[key])
+    # for key in sorted(list(item_register)):
+    #     if item_register[key][0] == ItemRegistryFields.TEXT:
+    #         print(key, item_register[key])
 
-    def _meta_dict(self) -> dict:
+    # def _print_item_register(self, item_register) -> None:
+    #     for key in sorted(list(item_register)):
+    #         if item_register[key][0] == META_CODES['uuid']:
+    #             print(key, item_register[key])
+    #     for key in sorted(list(item_register)):
+    #         if item_register[key][0] == META_CODES['text']:
+    #             print(key, item_register[key])
+
+    def _build_registers(self) -> dict:
         # if not isinstance(self.data, dict):
         #     return {}
         if not self.slave:
-            return {}
+            return {}, {}, {}
 
-        meta_dict = {}
-        for key in self.data.keys():
+        # item_register = {}
+        key_register = {}
+        uuid_register = {}
+        text_register = {}
+        for text in self.data.keys():
             uid = str(uuid.uuid4())
-            meta_dict[uid] = (META_CODES["uuid"], key)
-            meta_dict[key] = (META_CODES["text"], uid)
-        return meta_dict
+            # item_register[uid] = (ItemRegistryFields.UUID, text)
+            # item_register[text] = (ItemRegistryFields.TEXT, uid)
+
+            text_register[uid] = self.data[text]
+            key_register[text] = uid
+            uuid_register[uid] = text
+        return text_register, key_register, uuid_register
 
     def _build_display_list(self, text_list: list[str] = None) -> list[str]:
         if not text_list:

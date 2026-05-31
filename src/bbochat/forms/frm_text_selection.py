@@ -12,7 +12,7 @@ from psiutils.widgets import HAND
 from bbochat.config import get_config
 from bbochat.constants import MODE_TEXT, ChatMode
 from bbochat.data_manager import DataManager
-from bbochat.forms.frm_edit import EditFrame
+from bbochat.forms.frm_edit_select import EditSelectFrame
 from bbochat.forms.frm_text_dialog import TextDialogFrame
 from bbochat.text import Text
 
@@ -77,10 +77,14 @@ class TextSelectionFrame:
             frame,
             selectmode=tk.BROWSE,
             cursor=HAND,
+            exportselection=False,  # ← Important
+            activestyle="none",  # ← Removes the dotted underline
         )
         self.listbox.grid(row=1, column=0, sticky=tk.NSEW)
         self.listbox.bind("<<ListboxSelect>>", self._item_selected)
         self.listbox.bind("<Button-3>", self._show_context_menu)
+        self.listbox.bind("<FocusIn>", self._on_focus_in)
+        self.listbox.bind("<FocusOut>", self._on_focus_out)
 
         if self.show_use_frame:
             use_frame = self._use_frame(frame)
@@ -88,8 +92,15 @@ class TextSelectionFrame:
 
         return frame
 
+    def _on_focus_in(self, event=None):
+        colour = self.config.colours[self.mode.name]
+        self.listbox.config(selectbackground=colour)
+
+    def _on_focus_out(self, event=None):
+        self.listbox.config(selectbackground="#ffffff")
+        self.listbox.config(selectforeground="#000000")
+
     def _use_frame(self, master) -> ttk.Frame:
-        # pylint: disable=no-member)
         frame = ttk.Frame(master)
         frame.columnconfigure(0, weight=1)
 
@@ -176,11 +187,11 @@ class TextSelectionFrame:
         self.populate_text_items()
 
     def _edit_all(self, *args) -> None:
-        dlg = EditFrame(self)
+        dlg = EditSelectFrame(self)
         self.root.wait_window(dlg.root)
         if dlg.status != Status.UPDATED:
             return
-        self.data.edit_all(self, dlg.text_list, dlg.meta_dict)
+        self.data.edit_all(self, dlg.text_list, dlg.item_register)
 
         self.populate_text_items(dlg.selected_text)
         self.selected_text = dlg.selected_text

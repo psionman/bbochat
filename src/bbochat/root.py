@@ -1,30 +1,32 @@
-
 """
 Tkinter root for BBO Chat.
 """
+
 import sys
 import tkinter as tk
-from pathlib import Path
+from tkinter import ttk
 
-from psiutils.widgets import get_styles
 from psiutils.utilities import display_icon
+from psiutils.widgets import get_styles
 
-from bbochat.constants import ICON_FILE, USER_DATA_DIR
-from bbochat.module_caller import ModuleCaller
-
+from bbochat.constants import ICON_FILE
 from bbochat.forms.frm_main import MainFrame
+from bbochat.module_caller import ModuleCaller
+from bbochat.config import get_config
 
 
-class Root():
+class Root:
     def __init__(self) -> None:
         """Create the app's root and loop."""
+        self.config = get_config()
         self.root = tk.Tk()
         root = self.root
-        root.option_add('*tearOff', False)
+        root.option_add("*tearOff", False)
         display_icon(root, ICON_FILE)
         root.protocol("WM_DELETE_WINDOW", root.destroy)
 
         get_styles()
+        self._set_styles()
 
         dlg = None
         if len(sys.argv) > 1:
@@ -34,3 +36,23 @@ class Root():
             MainFrame(root)
 
         root.mainloop()
+
+    def _set_styles(self) -> None:
+        """Set the style of the app."""
+        style = ttk.Style()
+        # style.theme_use('clam')
+        style.configure(
+            "greeting.TButton", background=self.config.colours["GREETING"]
+        )
+        style.configure(
+            "valediction.TButton",
+            background=self.config.colours["VALEDICTION"],
+        )
+        style.configure("chat.TButton", background=self.config.colours["CHAT"])
+        style.configure(
+            "greeting.TFrame", background=self.config.colours["GREETING"]
+        )
+        style.configure(
+            "valediction.TFrame", background=self.config.colours["VALEDICTION"]
+        )
+        style.configure("chat.TFrame", background=self.config.colours["CHAT"])

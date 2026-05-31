@@ -5,7 +5,7 @@ from pathlib import Path
 from tkinter import ttk
 
 import emoji
-from psiutils.buttons import ButtonFrame, IconButton
+from psiutils.buttons import ButtonFrame
 from psiutils.constants import PAD, Status
 from psiutils.utilities import window_resize
 from psiutils.widgets import Tooltip

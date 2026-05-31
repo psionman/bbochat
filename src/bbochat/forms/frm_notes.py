@@ -19,14 +19,14 @@ from bbochat.forms.frm_notes_edit import NotesEditFrame
 txt = Text()
 
 
-class NotesFrame():
+class NotesFrame:
     def __init__(self, parent, master):
         self.parent = parent
         self.root = parent.root
         self.config = get_config()
         self.data_store = parent.data_store
         self.notes = self.data_store.notes
-        self.category = ''
+        self.category = ""
 
         # tk variables
         self.categories = tk.StringVar(value=sorted(list(self.notes)))
@@ -45,11 +45,13 @@ class NotesFrame():
 
         notes_frame = self._notes_frame(frame)
         notes_frame.grid(
-            row=0, column=1, rowspan=2, sticky=tk.NSEW,padx=PAD, pady=PAD)
+            row=0, column=1, rowspan=2, sticky=tk.NSEW, padx=PAD, pady=PAD
+        )
 
         self.button_frame = self._button_frame(frame)
-        self.button_frame.grid(row=0, column=2, rowspan=2,
-                               sticky=tk.N, padx=PAD, pady=PAD)
+        self.button_frame.grid(
+            row=0, column=2, rowspan=2, sticky=tk.N, padx=PAD, pady=PAD
+        )
 
         return frame
 
@@ -57,7 +59,7 @@ class NotesFrame():
         frame = tk.Frame(master)
         frame.rowconfigure(1, weight=1)
 
-        label = ttk.Label(frame, text='Notes')
+        label = ttk.Label(frame, text="Notes")
         label.grid(row=0, column=0)
 
         self.listbox = tk.Listbox(
@@ -66,10 +68,9 @@ class NotesFrame():
             selectmode=tk.BROWSE,
             cursor=HAND,
         )
-        self.listbox.grid(row=1, column=0,
-                          sticky=tk.NS, padx=PAD, pady=PAD)
-        self.listbox.bind('<<ListboxSelect>>', self._category_selected)
-        self.listbox .bind('<Button-3>', self._show_context_menu)
+        self.listbox.grid(row=1, column=0, sticky=tk.NS, padx=PAD, pady=PAD)
+        self.listbox.bind("<<ListboxSelect>>", self._category_selected)
+        self.listbox.bind("<Button-3>", self._show_context_menu)
 
         return frame
 
@@ -79,9 +80,10 @@ class NotesFrame():
         frame.columnconfigure(0, weight=1)
 
         self.notes_text = HtmlFrame(
-            frame, horizontal_scrollbar='auto',
+            frame,
+            horizontal_scrollbar="auto",
             messages_enabled=False,
-            )
+        )
         self.notes_text.grid(row=0, column=0, sticky=tk.NSEW)
 
         return frame
@@ -89,9 +91,9 @@ class NotesFrame():
     def _button_frame(self, master: ttk.Frame) -> tk.Frame:
         frame = ButtonFrame(master, tk.VERTICAL)
         frame.buttons = [
-            frame.icon_button('new', self._new),
-            frame.icon_button('edit', self._edit, True),
-            frame.icon_button('delete', self._delete, True),
+            frame.icon_button("new", self._new),
+            frame.icon_button("edit", self._edit, True),
+            frame.icon_button("delete", self._delete, True),
         ]
         frame.enable(False)
         return frame
@@ -118,9 +120,9 @@ class NotesFrame():
             return
         self.notes.pop(self.category)
         self.parent.save()
-        self._create_report('')
+        self._create_report("")
         self.categories.set(sorted(list(self.notes)))
-        self.category = ''
+        self.category = ""
         self.listbox.selection_clear(0, tk.END)
 
     def _category_selected(self, event: object = None) -> None:
@@ -148,5 +150,4 @@ class NotesFrame():
         self.context_menu.tk_popup(event.x_root, event.y_root)
 
     def _create_report(self, report: str) -> str:
-        # pylint: disable=no-member)
         display_html(self.notes_text, report, self.config.css)

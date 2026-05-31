@@ -16,12 +16,11 @@ from psiutils.widgets import PsiText, Tooltip
 
 from bbochat.config import get_config
 from bbochat.constants import (
-    APP_NAME,
+    DATA_DIR,
     FRAME_WIDTH,
     ICON_DIR,
     TXT_FILE_TYPES,
     YYYYMMDD,
-    DATA_DIR,
 )
 from bbochat.data import Partner
 from bbochat.forms.frm_report import ReportFrame
@@ -32,7 +31,6 @@ txt = Text()
 
 class TournamentFrame:
     def __init__(self, parent, master):
-        # pylint: disable=no-member)
         self.parent = parent
         self.root = parent.root
         self.partner = parent.partner
@@ -91,7 +89,6 @@ class TournamentFrame:
         return frame
 
     def _button_frame(self, master: ttk.Frame) -> ttk.Frame:
-        # pylint: disable=no-member)
         frame = ButtonFrame(master, tk.HORIZONTAL)
         self.report_button = IconButton(
             frame, txt.REPORT, "report", self._report, True

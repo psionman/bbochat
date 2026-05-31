@@ -1,9 +1,10 @@
 """Constants for the BBOChat app."""
 
+from enum import Enum, IntEnum
 from pathlib import Path
-from appdirs import user_config_dir, user_data_dir
+
 import userpaths
-from enum import Enum
+from appdirs import user_config_dir, user_data_dir
 
 # General
 AUTHOR = "Jeff Watkins"
@@ -63,7 +64,11 @@ GEOMETRY = {
     },
 }
 
-META_CODES = {"uuid": 0, "text": 1, 0: "uuid", 1: "text"}
+
+class ItemRegistryFields(IntEnum):
+    UUID = 0
+    TEXT = 1
+
 
 HTML_STYLE = """
     <style>

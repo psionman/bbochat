@@ -96,7 +96,7 @@ class DataStore:
         self.pairs = []
         self.greetings = []
         self.valedictions = []
-        self.chat = []
+        # self.chat = []
         self.notes = {}
         self.my_name = ""
 
@@ -115,37 +115,32 @@ class DataStore:
         }
         if data == INVALID_JSON:
             return INVALID_JSON
-        if "partners" in data:
-            self.partners = self._get_partners(data["partners"])
-            self.data_sets["partners"] = self.partners
 
-        if "players" in data:
-            self.players = self._get_players(data["players"])
-            self.data_sets["players"] = self.players
-
-        if "pairs" in data:
-            self.pairs = self._get_pairs(data["pairs"])
-            self.data_sets["pairs"] = self.pairs
-
-        if "greetings" in data:
-            self.greetings = data["greetings"]
-            self.data_sets["greeting"] = self.greetings
-
-        if "valedictions" in data:
-            self.valedictions = data["valedictions"]
-            self.data_sets["valediction"] = self.valedictions
-
-        if "notes" in data:
-            self.notes = data["notes"]
-            self.data_sets["notes"] = self.notes
-
-        if "chat" in data:
-            self.chat = data["chat"]
-            self.data_sets["chat"] = self.chat
-
-        if "my_name" in data:
-            self.my_name = data["my_name"]
-            self.data_sets["my_name"] = self.my_name
+        for key, value in data.items():
+            if key == "partners":
+                self.partners = self._get_partners(value)
+                self.data_sets["partners"] = self.partners
+            elif key == "players":
+                self.players = self._get_players(value)
+                self.data_sets["players"] = self.players
+            elif key == "pairs":
+                self.pairs = self._get_pairs(value)
+                self.data_sets["pairs"] = self.pairs
+            elif key == "greetings":
+                self.greetings = value
+                self.data_sets["greetings"] = self.greetings
+            elif key == "valedictions":
+                self.valedictions = value
+                self.data_sets["valediction"] = self.valedictions
+            elif key == "chat":
+                self.chat = value
+                self.data_sets["chat"] = value
+            elif key == "notes":
+                self.notes = value
+                self.data_sets["notes"] = self.notes
+            elif key == "my_name":
+                self.my_name = value
+                self.data_sets["my_name"] = self.my_name
 
     def _read_data_file(self) -> str | int | None:
         try:
@@ -207,8 +202,12 @@ class DataStore:
             "notes": self.data_sets["notes"],
             "my_name": self.my_name,
         }
+        # print("-" * 25)
+        # for key, value in self.data_sets["chat"].items():
+        #     print("save", key, value)
         json_data = self._data_to_json(output)
-        return self._write_data_file(json_data)
+        # TODO: remove this when ready to save
+        # return self._write_data_file(json_data)
 
     @staticmethod
     def _data_to_json(output: dict) -> str:

@@ -1,4 +1,3 @@
-
 """MainFrame for BBO Chat."""
 
 import re
@@ -24,18 +23,18 @@ from bbochat.text import Text
 from bbochat.forms.frm_master import MasterFrame
 from bbochat.forms.frm_partners import PartnerFrame
 from bbochat.forms.frm_notes import NotesFrame
+from bbochat.forms.frm_notes import NotesFrame
 from bbochat.forms.frm_tournament import TournamentFrame
 
 txt = Text()
-FRAME_TITLE = 'BBO Chat'
+FRAME_TITLE = "BBO Chat"
 
 # Handles cases when size gets corrupted, e.g. after stop on error
-DEFAULT_GEOMETRY = '1250x700'
+DEFAULT_GEOMETRY = "1250x700"
 
 
-class MainFrame():
+class MainFrame:
     def __init__(self, root: tk.Tk) -> None:
-        # pylint: disable=no-member)
         self.root = root
         self.config = get_config()
         self.mode = ChatMode.GREETING
@@ -43,7 +42,7 @@ class MainFrame():
         self.data_store = DataStore()
         ds = self.data_store
         ds.read()
-        self.partners = ds.partners
+
         self.players = ds.players
         self.pairs = ds.pairs
         self.greetings = ds.greetings
@@ -51,22 +50,26 @@ class MainFrame():
         self.chat = ds.chat
         self.my_name = ds.my_name
 
-        self.partners_names = sorted(list(self.partners.keys()))
         self.pair = []
-        self.partner = ''
-        if (self.config.last_partner
-                and self.config.last_partner in self.partners):
+
+        self.partner = ""
+        self.partners = ds.partners
+        self.partners_names = sorted(list(self.partners.keys()))
+        if (
+            self.config.last_partner
+            and self.config.last_partner in self.partners
+        ):
             self.partner = self.partners[self.config.last_partner]
 
         # tk variables
         self._create_tk_variables()
-        self.username_1.trace_add('write', self._pair_username_change)
-        self.username_2.trace_add('write', self._pair_username_change)
+        self.username_1.trace_add("write", self._pair_username_change)
+        self.username_2.trace_add("write", self._pair_username_change)
 
         self.last_mode_text = {
             ChatMode.GREETING: self.config.last_greeting,
             ChatMode.VALEDICTION: self.config.last_valediction,
-            ChatMode.CHAT: self.config.last_chat
+            ChatMode.CHAT: self.config.last_chat,
         }
 
         self.save_button = None
@@ -86,11 +89,10 @@ class MainFrame():
         self._pair_username_change()
 
         # On setup
-        if not self.data_store.data_sets['my_name']:
+        if not self.data_store.data_sets["my_name"]:
             self._get_my_name()
 
     def _create_tk_variables(self) -> None:
-        # pylint: disable=no-member)
         self.clipboard = tk.StringVar()
 
         # Main
@@ -101,7 +103,7 @@ class MainFrame():
         self.name_2 = tk.StringVar()
         self.randomize = tk.BooleanVar(value=self.config.randomize_name_order)
 
-        greeting = self.partner.greeting if self.partner else ''
+        greeting = self.partner.greeting if self.partner else ""
         self.greeting = tk.StringVar(value=greeting)
         self.greetings_list = tk.StringVar(value=self.greetings)
         self.valediction = tk.StringVar(value=self.config.last_valediction)
@@ -113,7 +115,7 @@ class MainFrame():
         self.partners_list = tk.StringVar(value=self.partners_names)
         self.selected_partner = tk.StringVar(value=self.config.last_partner)
         self.my_name_text = tk.StringVar(value=self.my_name)
-        self.partners_name = tk.StringVar(value='')
+        self.partners_name = tk.StringVar(value="")
         self.partners_username = tk.StringVar()
 
     def _show(self):
@@ -121,13 +123,12 @@ class MainFrame():
         root.protocol("WM_DELETE_WINDOW", self._dismiss)
         root.geometry(self._geometry())
         root.title(FRAME_TITLE)
-        root.bind('<Control-x>', self._dismiss)
-        root.bind('<Control-g>', self._greeting)
-        root.bind('<Control-v>', self._valediction)
-        root.bind('<Control-c>', self._chat)
-        root.bind('<Control-s>', self.save)
-        root.bind('<Configure>',
-                  lambda e: window_resize(self, __file__))
+        root.bind("<Control-x>", self._dismiss)
+        root.bind("<Control-g>", self._greeting)
+        root.bind("<Control-v>", self._valediction)
+        root.bind("<Control-c>", self._chat)
+        # root.bind("<Control-s>", self.save)
+        root.bind("<Configure>", lambda e: window_resize(self, __file__))
 
         root.rowconfigure(0, weight=1)
         root.columnconfigure(0, weight=1)
@@ -144,8 +145,9 @@ class MainFrame():
         main_frame.grid(row=0, column=0, sticky=tk.NSEW, padx=0, pady=PAD)
 
         self.button_frame = self._button_frame(frame)
-        self.button_frame.grid(row=1, column=0,
-                               sticky=tk.EW, padx=PAD, pady=PAD)
+        self.button_frame.grid(
+            row=1, column=0, sticky=tk.EW, padx=PAD, pady=PAD
+        )
 
         sizegrip = ttk.Sizegrip(frame)
         sizegrip.grid(sticky=tk.SE)
@@ -153,45 +155,90 @@ class MainFrame():
     def _geometry(self) -> str:
         try:
             geometry = self.config.geometry[Path(__file__).stem]
-            width = int(geometry.split('x')[0])
+            width = int(geometry.split("x")[0])
             return DEFAULT_GEOMETRY if width < 10 else geometry
         except tk.TclError:
             return DEFAULT_GEOMETRY
 
     def _main_frame(self, master: ttk.Frame) -> ttk.Frame:
         frame = ttk.Frame(master)
-        frame.rowconfigure(4, weight=1)  # Notebook row
-        frame.columnconfigure(6, weight=1)
+        frame.columnconfigure(0, weight=1)
 
-        label = ttk.Label(frame, text='Clipboard')
+        row = 0
+        clipboard_frame = self._clipboard_frame(frame)
+        clipboard_frame.grid(
+            row=row, column=0, columnspan=2, sticky=tk.EW, padx=PAD
+        )
+
+        row += 1
+        names_frame = self._names_frame(frame)
+        names_frame.grid(row=row, column=0, sticky=tk.NW, padx=PAD)
+
+        row += 1
+        frame.rowconfigure(row, weight=1)
+        notebooks = self._notebook_frames(frame)
+        notebooks.grid(
+            row=row, column=0, columnspan=2, sticky=tk.NSEW, padx=PAD
+        )
+        return frame
+
+    def _clipboard_frame(self, master: ttk.Frame) -> ttk.Frame:
+        frame = ttk.Frame(master)
+        frame.columnconfigure(1, weight=1)
+
+        label = ttk.Label(frame, text="Clipboard")
         label.grid(row=0, column=0, sticky=tk.E, padx=PAD)
 
         self.clipboard_entry = ttk.Entry(frame, textvariable=self.clipboard)
-        self.clipboard_entry.grid(row=0, column=1, columnspan=6,
-                                  sticky=tk.EW, padx=0, pady=PAD)
-        self.clipboard_entry.bind('<KeyRelease>', self.copy_to_clipboard)
+        self.clipboard_entry.grid(
+            row=0, column=1, columnspan=1, sticky=tk.EW, padx=0, pady=PAD
+        )
+        self.clipboard_entry.bind("<KeyRelease>", self.copy_to_clipboard)
 
-        # button = ttk.Button(frame, text='Copy',
-        #                     command=self.copy_to_clipboard)
         button = IconButton(
-            frame, 'Copy', 'copy_clipboard', self.copy_to_clipboard)
-        button.grid(row=0, column=7, padx=PAD)
+            frame, "Copy", "copy_clipboard", self.copy_to_clipboard
+        )
+        button.grid(row=0, column=2, padx=PAD)
 
-        label = ttk.Label(frame, text='My name')
+        return frame
+
+    def _names_frame(self, master: ttk.Frame) -> ttk.Frame:
+        frame = ttk.Frame(master)
+
+        identity_frame = self._identity_frame(frame)
+        identity_frame.grid(row=0, column=0, sticky=tk.NW, padx=PAD)
+
+        opponents_frame = self._opponents_frame(frame)
+        opponents_frame.grid(row=0, column=1, sticky=tk.W, padx=PAD)
+
+        return frame
+
+    def _identity_frame(self, master: ttk.Frame) -> ttk.Frame:
+        frame = ttk.Frame(master)
+
+        label = ttk.Label(frame, text="My name")
         label.grid(row=1, column=0, sticky=tk.E)
 
-        entry = ttk.Entry(frame, textvariable=self.my_name_text,
-                          state='readonly')
+        entry = ttk.Entry(
+            frame, textvariable=self.my_name_text, state="readonly"
+        )
         entry.grid(row=1, column=1, sticky=tk.W, padx=PAD)
 
-        label = ttk.Label(frame, text='Partner')
-        label.grid(row=2, column=0, sticky=tk.E)
+        label = ttk.Label(frame, text="Partner")
+        label.grid(row=2, column=0, sticky=tk.E, pady=PAD)
 
-        entry = ttk.Entry(frame, textvariable=self.partners_username,
-                          state='readonly')
-        entry.grid(row=2, column=1, sticky=tk.W, padx=PAD)
+        entry = ttk.Entry(
+            frame, textvariable=self.partners_username, state="readonly"
+        )
+        entry.grid(row=2, column=1, sticky=tk.W, padx=PAD, pady=PAD)
 
-        label = ttk.Label(frame, text='Opponents')
+        return frame
+
+    def _opponents_frame(self, master: ttk.Frame) -> ttk.Frame:
+        frame = ttk.Frame(master)
+        frame.columnconfigure(1, weight=1)
+
+        label = ttk.Label(frame, text="Opponents")
         label.grid(row=1, column=2)
 
         entry = ttk.Entry(frame, textvariable=self.username_1)
@@ -199,78 +246,53 @@ class MainFrame():
 
         entry = ttk.Entry(frame, textvariable=self.name_1)
         entry.grid(row=2, column=3, pady=PAD)
-        entry.bind('<KeyRelease>', self._update_clipboard)
+        entry.bind("<KeyRelease>", self._update_clipboard)
 
         entry = ttk.Entry(frame, textvariable=self.username_2)
         entry.grid(row=1, column=4, padx=PAD)
 
         entry = ttk.Entry(frame, textvariable=self.name_2)
         entry.grid(row=2, column=4, pady=PAD)
-        entry.bind('<KeyRelease>', self._update_clipboard)
+        entry.bind("<KeyRelease>", self._update_clipboard)
 
-        # self.save_button = ttk.Button(frame, text=txt.SAVE,
-        #                               command=self._save_names)
         self.save_button = IconButton(
-            frame, txt.SAVE, 'save', self._save_names, True)
+            frame, txt.SAVE, "save", self._save_names, True
+        )
         self.save_button.grid(row=1, column=5, padx=PAD, sticky=tk.EW)
 
-        # self.delete_button = ttk.Button(frame, text=txt.DELETE,
-        #                                 command=self._delete_pair)
-
         self.delete_button = IconButton(
-            frame, txt.DELETE, 'delete', self._delete_pair, True)
+            frame, txt.DELETE, "delete", self._delete_pair, True
+        )
         self.delete_button.grid(row=2, column=5, padx=PAD, pady=PAD)
 
         check_button = ttk.Checkbutton(
-            frame,
-            text='Randomize opp\'s names order',
-            variable=self.randomize)
+            frame, text="Randomize opp's names order", variable=self.randomize
+        )
         check_button.grid(row=1, column=6, rowspan=2, sticky=tk.W)
 
-        notebook = self._get_notebook(frame)
-        notebook.grid(row=4, column=0, columnspan=9,
-                      sticky=tk.NSEW, padx=PAD)
         return frame
 
-    def _get_notebook(self, master: ttk.Frame) -> ttk.Notebook:
-        style = ttk.Style()
-        # style.configure("TNotebook", foreground="blue")
-        style.map('master.TNotebook.Tab', background=[("selected", "yellow")])
-
-        notebook = ttk.Notebook(master, style='master.TNotebook')
+    def _notebook_frames(self, master: ttk.Frame) -> ttk.Notebook:
+        notebook = ttk.Notebook(master, style="master.TNotebook")
 
         self.master_tab = MasterFrame(self, notebook)
-        notebook.add(self.master_tab.master_frame, text='Master')
+        notebook.add(self.master_tab.master_frame, text="Master")
 
         partners_tab = PartnerFrame(self, notebook)
-        notebook.add(partners_tab.partners_frame, text='Partners')
+        notebook.add(partners_tab.partners_frame, text="Partners")
 
         self.notes_tab = NotesFrame(self, notebook)
-        notebook.add(self.notes_tab.notes_frame, text='Notes')
+        notebook.add(self.notes_tab.notes_frame, text="Notes")
 
         self.tournament_tab = TournamentFrame(self, notebook)
-        notebook.add(self.tournament_tab.notes_frame, text='Tournament')
+        notebook.add(self.tournament_tab.notes_frame, text="Tournament")
 
         return notebook
 
     def _button_frame(self, master: ttk.Frame) -> ttk.Frame:
-        # pylint: disable=no-member)
-        style = ttk.Style()
-        # style.theme_use('clam')
-        style.configure('greeting.TButton',
-                        background=self.config.colours['GREETING'])
-        style.configure('valediction.TButton',
-                        background=self.config.colours['VALEDICTION'])
-        style.configure('chat.TButton', background=self.config.colours['CHAT'])
-        style.configure('greeting.TFrame',
-                        background=self.config.colours['GREETING'])
-        style.configure('valediction.TFrame',
-                        background=self.config.colours['VALEDICTION'])
-        style.configure('chat.TFrame', background=self.config.colours['CHAT'])
-
         frame = ButtonFrame(master, tk.HORIZONTAL)
         frame.buttons = [
-            frame.icon_button('close', self._dismiss),
+            frame.icon_button("close", self._dismiss),
         ]
         frame.enable(False)
         return frame
@@ -289,8 +311,8 @@ class MainFrame():
 
     def _get_my_name(self) -> None:
         if dlg := simpledialog.askstring(
-            'Your name',
-            'Enter the name that you wish to be known by',
+            "Your name",
+            "Enter the name that you wish to be known by",
             parent=self.root,
         ):
             self.my_name = dlg
@@ -298,33 +320,18 @@ class MainFrame():
             self.data_store.my_name = dlg
             self.data_store.save()
 
-    def save(self, *args) -> None:
-        self.data_store.partners = self.partners
-        self.data_store.players = self.players
-        self.data_store.pairs = self.pairs
-        self.data_store.greetings = self.greetings
-        self.data_store.valedictions = self.valedictions
-        self.data_store.chat = self.chat
-        self.data_store.my_name = self.my_name
-        self.data_store.save()
-        self.enable_buttons(False)
-
-    # def _update_mode_colour(self) -> None:
-    #     self._set_clipboard_colour(self.mode)
-
     def _update_clipboard_colour(self):
         self._set_clipboard_colour()
 
     def _set_clipboard_colour(self):
-        # pylint: disable=no-member)
         colour = self.config.colours[self.mode.name]
         entry_style = ttk.Style()
         entry_style.configure(
-            'clipboard_entry.TEntry',
+            "clipboard_entry.TEntry",
             fieldbackground=colour,
-            )
+        )
         with contextlib.suppress(tk.TclError):
-            self.clipboard_entry.configure(style='clipboard_entry.TEntry')
+            self.clipboard_entry.configure(style="clipboard_entry.TEntry")
 
     def _update_clipboard(self, *args) -> None:
         self.update_clipboard()
@@ -334,7 +341,8 @@ class MainFrame():
         self.update_clipboard()
 
     def update_clipboard(
-            self, message: str = '', mode: int = None, *args) -> None:
+        self, message: str = "", mode: int = None, *args
+    ) -> None:
         if mode is not None:
             self.last_mode_text[mode] = message
             self.mode = mode
@@ -350,22 +358,22 @@ class MainFrame():
 
     def _create_message(self, message: str) -> None:
         if self.partner:
-            names = f'{self.partner.name} and {self.my_name}'
+            names = f"{self.partner.name} and {self.my_name}"
             system = self.partner.system
         else:
-            names = f'{self.my_name}'
-            system = ''
+            names = f"{self.my_name}"
+            system = ""
 
         opps = self._get_opps()
-        message = message.replace('<opps>', opps)
-        message = message.replace('<names>', names)
-        message = message.replace('<system>', system)
+        message = message.replace("<opps>", opps)
+        message = message.replace("<names>", names)
+        message = message.replace("<system>", system)
         self.clipboard.set(message)
         self.copy_to_clipboard()
 
     def copy_to_clipboard(self, *args) -> None:
         text = self.clipboard.get()
-        emoji_re = r':.*:'
+        emoji_re = r":.*:"
 
         found = True
         while found:
@@ -388,13 +396,13 @@ class MainFrame():
             choice = (choice + 1) % 2
             opp_2 = opps[choice]
 
-        if opp_1.lower() == 'robot':
+        if opp_1.lower() == "robot":
             opp_1, opp_2 = opp_2, opp_1
-        if opp_2.lower() == 'robot':
-            opp_2 = ''
+        if opp_2.lower() == "robot":
+            opp_2 = ""
 
         if opp_1:
-            return f'{opp_1} and {opp_2}' if opp_2 else opp_1
+            return f"{opp_1} and {opp_2}" if opp_2 else opp_1
         return opp_2
 
     def _save_names(self, *args) -> None:
@@ -410,7 +418,7 @@ class MainFrame():
             self.pairs.append(Pair(username_1, username_2))
 
         self.save()
-        self.search.set('')
+        self.search.set("")
         self.pair_tree.delete(*self.pair_tree.get_children())
         self.search.set(self.username_1.get())
         self.search_entry.focus_set()
@@ -425,14 +433,25 @@ class MainFrame():
         self.pairs.remove(pair)
         self.save()
 
-        self.name_1.set('')
-        self.name_2.set('')
-        self.username_1.set('')
-        self.username_2.set('')
+        self.name_1.set("")
+        self.name_2.set("")
+        self.username_1.set("")
+        self.username_2.set("")
         self._pair_username_change()
-        self.search.set('')
+        self.search.set("")
         self.pair_tree.delete(*self.pair_tree.get_children())
         self.search_entry.focus_set()
+
+    def save(self, *args) -> None:
+        self.data_store.players = self.players
+        self.data_store.pairs = self.pairs
+        # self.data_store.partners = self.partners
+        # self.data_store.greetings = self.greetings
+        # self.data_store.valedictions = self.valedictions
+        # self.data_store.chat = self.chat
+        # self.data_store.my_name = self.my_name
+        self.data_store.save()
+        self.enable_buttons(False)
 
     def _pair_username_change(self, *args) -> None:
         username_1 = self.username_1.get().lower()
@@ -446,11 +465,11 @@ class MainFrame():
         if username_2 in self.players:
             self.name_2.set(self.players[username_2].name)
 
-        self.save_button.widget.state(['disabled'])
-        self.delete_button.widget.state(['disabled'])
+        self.save_button.widget.state(["disabled"])
+        self.delete_button.widget.state(["disabled"])
         if username_1 or username_2:
-            self.save_button.widget.state(['!disabled'])
-            self.delete_button.widget.state(['!disabled'])
+            self.save_button.widget.state(["!disabled"])
+            self.delete_button.widget.state(["!disabled"])
 
     def enable_buttons(self, enable: bool = True) -> None:
         if not self.button_frame:
@@ -464,19 +483,22 @@ class MainFrame():
         self.button_frame.enable(True)
 
     def _save_sashes(self) -> None:
-        vertical_sashes = [self.master_tab.master_frame.sash_coord(index)
-                           for index in range(3)]
+        vertical_sashes = [
+            self.master_tab.master_frame.sash_coord(index)
+            for index in range(3)
+        ]
         horizontal_sashes = [
-            self.master_tab.chat_panel.sash_coord(index)
-            for index in range(1)]
+            self.master_tab.chat_panel.sash_coord(index) for index in range(1)
+        ]
         notes_sashes = [
             self.tournament_tab.notes_panel.sash_coord(index)
-            for index in range(1)]
+            for index in range(1)
+        ]
 
         self.config = get_config()
-        self.config.update('vertical_sashes', vertical_sashes)
-        self.config.update('horizontal_sashes', horizontal_sashes)
-        self.config.update('notes_sashes', notes_sashes)
+        self.config.update("vertical_sashes", vertical_sashes)
+        self.config.update("horizontal_sashes", horizontal_sashes)
+        self.config.update("notes_sashes", notes_sashes)
         self.config.save()
 
     def _dismiss(self, *args) -> None:
