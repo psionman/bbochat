@@ -9,10 +9,10 @@ from tkinter import ttk
 from psiutils.utilities import display_icon
 from psiutils.widgets import get_styles
 
+from bbochat.config import get_config
 from bbochat.constants import ICON_FILE
 from bbochat.forms.frm_main import MainFrame
 from bbochat.module_caller import ModuleCaller
-from bbochat.config import get_config
 
 
 class Root:
@@ -42,7 +42,7 @@ class Root:
         style = ttk.Style()
         # style.theme_use('clam')
         style.configure(
-            "greeting.TButton", background=self.config.colours["GREETING"]
+            "greeting.TButton", background=self.config.colours["GREETINGS"]
         )
         style.configure(
             "valediction.TButton",
@@ -50,7 +50,7 @@ class Root:
         )
         style.configure("chat.TButton", background=self.config.colours["CHAT"])
         style.configure(
-            "greeting.TFrame", background=self.config.colours["GREETING"]
+            "greeting.TFrame", background=self.config.colours["GREETINGS"]
         )
         style.configure(
             "valediction.TFrame", background=self.config.colours["VALEDICTION"]

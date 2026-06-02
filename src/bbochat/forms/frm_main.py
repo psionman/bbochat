@@ -1,33 +1,35 @@
 """MainFrame for BBO Chat."""
 
-import re
 import contextlib
-import tkinter as tk
-from tkinter import ttk, simpledialog
-from pathlib import Path
 import random
+import re
+import tkinter as tk
+from pathlib import Path
+from tkinter import simpledialog, ttk
+
 import clipboard
 import emoji
-
-from psiutils.constants import PAD
-from psiutils.buttons import ButtonFrame, IconButton
-from psiutils.utilities import window_resize
 from psiutils import messagebox
+from psiutils.buttons import ButtonFrame, IconButton
+from psiutils.constants import PAD
+from psiutils.utilities import window_resize
 
-from bbochat.data import DataStore, Pair, Player
 from bbochat.config import get_config
 from bbochat.constants import ChatMode
+from bbochat.data import DataStore, Pair, Player
+from bbochat.forms.frm_master import MasterFrame
+from bbochat.forms.frm_notes import NotesFrame
+from bbochat.forms.frm_partners import PartnerFrame
+from bbochat.forms.frm_tournament import TournamentFrame
 from bbochat.main_menu import MainMenu
 from bbochat.text import Text
 
-from bbochat.forms.frm_master import MasterFrame
-from bbochat.forms.frm_partners import PartnerFrame
-from bbochat.forms.frm_notes import NotesFrame
-from bbochat.forms.frm_notes import NotesFrame
-from bbochat.forms.frm_tournament import TournamentFrame
-
 txt = Text()
 FRAME_TITLE = "BBO Chat"
+
+VERTICAL_FRAME_COUNT = 3
+HORIZONTAL_FRAME_COUNT = 1
+NOTES_FRAME_COUNT = 1
 
 # Handles cases when size gets corrupted, e.g. after stop on error
 DEFAULT_GEOMETRY = "1250x700"
@@ -37,7 +39,7 @@ class MainFrame:
     def __init__(self, root: tk.Tk) -> None:
         self.root = root
         self.config = get_config()
-        self.mode = ChatMode.GREETING
+        self.mode = ChatMode.GREETINGS
 
         self.data_store = DataStore()
         ds = self.data_store
@@ -67,7 +69,7 @@ class MainFrame:
         self.username_2.trace_add("write", self._pair_username_change)
 
         self.last_mode_text = {
-            ChatMode.GREETING: self.config.last_greeting,
+            ChatMode.GREETINGS: self.config.last_greeting,
             ChatMode.VALEDICTION: self.config.last_valediction,
             ChatMode.CHAT: self.config.last_chat,
         }
@@ -298,7 +300,7 @@ class MainFrame:
         return frame
 
     def _greeting(self, *args) -> None:
-        self.mode = ChatMode.GREETING
+        self.mode = ChatMode.GREETINGS
         self.update_clipboard()
 
     def _valediction(self, *args) -> None:
@@ -337,7 +339,7 @@ class MainFrame:
         self.update_clipboard()
 
     def pair_tree_clicked(self) -> None:
-        self.mode = ChatMode.GREETING
+        self.mode = ChatMode.GREETINGS
         self.update_clipboard()
 
     def update_clipboard(
@@ -350,7 +352,7 @@ class MainFrame:
 
         if not message:
             if mode is None:
-                message = self.last_mode_text[ChatMode.GREETING]
+                message = self.last_mode_text[ChatMode.GREETINGS]
             else:
                 message = self.last_mode_text[mode]
 
@@ -485,14 +487,15 @@ class MainFrame:
     def _save_sashes(self) -> None:
         vertical_sashes = [
             self.master_tab.master_frame.sash_coord(index)
-            for index in range(3)
+            for index in range(VERTICAL_FRAME_COUNT)
         ]
         horizontal_sashes = [
-            self.master_tab.chat_panel.sash_coord(index) for index in range(1)
+            self.master_tab.chat_panel.sash_coord(index)
+            for index in range(HORIZONTAL_FRAME_COUNT)
         ]
         notes_sashes = [
             self.tournament_tab.notes_panel.sash_coord(index)
-            for index in range(1)
+            for index in range(NOTES_FRAME_COUNT)
         ]
 
         self.config = get_config()

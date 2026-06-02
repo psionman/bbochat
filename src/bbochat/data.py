@@ -196,7 +196,7 @@ class DataStore:
                 player.username: player.name
                 for player in self.players.values()
             },
-            "greetings": self.data_sets["greeting"],
+            "greetings": self.data_sets["greetings"],
             "valedictions": self.data_sets["valediction"],
             "chat": self.data_sets["chat"],
             "notes": self.data_sets["notes"],
@@ -207,7 +207,7 @@ class DataStore:
         #     print("save", key, value)
         json_data = self._data_to_json(output)
         # TODO: remove this when ready to save
-        # return self._write_data_file(json_data)
+        return self._write_data_file(json_data)
 
     @staticmethod
     def _data_to_json(output: dict) -> str:

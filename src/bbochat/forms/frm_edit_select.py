@@ -186,8 +186,6 @@ class EditSelectFrame:
             self.text_list.append(dlg.text)
             if self.text_register:
                 uid = str(uuid.uuid4())
-                # self.item_register[uid] = (ItemRegistryFields.UUID, dlg.text)
-                # self.item_register[dlg.text] = (ItemRegistryFields.TEXT, uid)
 
                 self.text_register[uid] = dlg.text
                 self.key_register[dlg.text] = uid

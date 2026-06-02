@@ -38,7 +38,7 @@ TXT_FILE_TYPES = (("text files", "*.txt"), ("All files", "*.*"))
 
 
 class ChatMode(Enum):
-    GREETING = 0
+    GREETINGS = 0
     VALEDICTION = 1
     CHAT = 2
     CHAT_DETAIL = 3
@@ -63,11 +63,6 @@ GEOMETRY = {
         "Windows": "700x300",
     },
 }
-
-
-class ItemRegistryFields(IntEnum):
-    UUID = 0
-    TEXT = 1
 
 
 HTML_STYLE = """

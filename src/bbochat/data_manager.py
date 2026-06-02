@@ -4,8 +4,6 @@
 
 import uuid
 
-from bbochat.constants import ItemRegistryFields
-
 
 class DataManager:
     """
@@ -108,8 +106,6 @@ class DataManager:
         self.display_list = self._build_display_list()
 
         if self.slave:
-            # This is a master frame: it has a slave frame
-            # self._rebuild_item_register(item_register)
             pass
         elif self.has_master:
             data = frame.master_frame.data.data
@@ -162,60 +158,6 @@ class DataManager:
         self.data_store.data_sets[mode] = self.data
 
         self.data_store.save()
-        # if self.slave:
-        #     self.item_register = self._build_registers()
-
-    def _rebuild_item_register(self, new_item_register: dict) -> None:
-        old_item_register = self._build_registers()
-        # self.xxx("o", old_item_register)
-        # self.xxx("n", new_item_register)
-        new_data = {}
-        keys_to_sort = []
-        for item in new_item_register.values():
-            if item[0] == ItemRegistryFields.UUID:
-                data_key = item[1]
-                keys_to_sort.append(data_key)
-
-                # New item
-                new_data[data_key] = []
-                if data_key in old_item_register:
-                    new_data[data_key] = self.data[data_key]
-
-        for uuid_key, item in old_item_register.items():
-            if (
-                item[0] == ItemRegistryFields.UUID
-                and uuid_key in old_item_register
-            ):
-                old_text_key = old_item_register[uuid_key][1]
-                new_data[data_key] = self.data[old_text_key]
-                print(f"Copying {old_text_key} to {data_key}")
-
-        # Ensure the items a re sorted according to the order in frm_edit_select
-        sort_dict = {new_item_register[key][1]: key for key in keys_to_sort}
-        self.data = {
-            sort_dict[index]: new_data[sort_dict[index]]
-            for index in range(len(sort_dict))
-        }
-
-        self.text_list = list(self.data)
-        self.display_list = self._build_display_list()
-
-    # def xxx(self, type: str, item_register: dict) -> None:
-    #     print(type)
-    #     for key in sorted(list(item_register)):
-    #         if item_register[key][0] == ItemRegistryFields.UUID:
-    #             print(key, item_register[key])
-    # for key in sorted(list(item_register)):
-    #     if item_register[key][0] == ItemRegistryFields.TEXT:
-    #         print(key, item_register[key])
-
-    # def _print_item_register(self, item_register) -> None:
-    #     for key in sorted(list(item_register)):
-    #         if item_register[key][0] == META_CODES['uuid']:
-    #             print(key, item_register[key])
-    #     for key in sorted(list(item_register)):
-    #         if item_register[key][0] == META_CODES['text']:
-    #             print(key, item_register[key])
 
     def _build_registers(self) -> dict:
         # if not isinstance(self.data, dict):
@@ -229,8 +171,6 @@ class DataManager:
         text_register = {}
         for text in self.data.keys():
             uid = str(uuid.uuid4())
-            # item_register[uid] = (ItemRegistryFields.UUID, text)
-            # item_register[text] = (ItemRegistryFields.TEXT, uid)
 
             text_register[uid] = self.data[text]
             key_register[text] = uid
