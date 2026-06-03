@@ -1,17 +1,17 @@
 """PartnerEditFrame for BBO Chat."""
 
 import tkinter as tk
-from tkinter import ttk
 from pathlib import Path
+from tkinter import ttk
 
-from psiutils.constants import PAD, PADR, PADB, Status, Mode
 from psiutils.buttons import ButtonFrame
-from psiutils.widgets import clickable_widget
+from psiutils.constants import PAD, PADB, PADR, Mode, Status
 from psiutils.utilities import window_resize
+from psiutils.widgets import clickable_widget
 
-from bbochat.data import Partner
-from bbochat.constants import ICON_FILE
 from bbochat.config import get_config
+from bbochat.constants import ICON_FILE
+from bbochat.data_server import Partner
 
 FRAME_TITLE = "New partner"
 
@@ -21,10 +21,10 @@ class PartnerEditFrame:
         self.root = tk.Toplevel(parent.root)
         self.parent = parent
         self.mode = mode
-        self.data_store = parent.data_store
-        self.data_store.read()
+        self.data_server = parent.data_server
+        self.data_server.read()
         self.partners = parent.partners
-        self.greetings = self.data_store.greetings
+        self.greetings = self.data_server.greetings
         self.status = Status.NULL
         self.config = get_config()
 

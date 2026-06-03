@@ -2,19 +2,18 @@
 
 import tkinter as tk
 from tkinter import ttk
+
+from psiutils import messagebox
+from psiutils.buttons import ButtonFrame
+from psiutils.constants import PAD, Mode, Status
+from psiutils.menus import Menu, MenuItem
+from psiutils.widgets import HAND
 from tkinterweb import HtmlFrame
 
-from psiutils.constants import PAD, Status, Mode
-from psiutils.widgets import HAND
-from psiutils.buttons import ButtonFrame
-from psiutils.menus import Menu, MenuItem
-from psiutils import messagebox
-
-from bbochat.utilities_bbochat import display_html
 from bbochat.config import get_config
-from bbochat.text import Text
-
 from bbochat.forms.frm_notes_edit import NotesEditFrame
+from bbochat.text import Text
+from bbochat.utilities_bbochat import display_html
 
 txt = Text()
 
@@ -24,8 +23,8 @@ class NotesFrame:
         self.parent = parent
         self.root = parent.root
         self.config = get_config()
-        self.data_store = parent.data_store
-        self.notes = self.data_store.notes
+        self.data_server = parent.data_server
+        self.notes = self.data_server.notes
         self.category = ""
 
         # tk variables

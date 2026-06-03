@@ -11,9 +11,9 @@ from psiutils.widgets import HAND
 
 from bbochat.config import get_config
 from bbochat.constants import MODE_TEXT, ChatMode
-from bbochat.data_manager import DataManager
 from bbochat.forms.frm_edit_select import EditSelectFrame
 from bbochat.forms.frm_text_dialog import TextDialogFrame
+from bbochat.mode_data import ModeData
 from bbochat.text import Text
 
 txt = Text()
@@ -25,7 +25,7 @@ class TextSelectionFrame:
         parent: ttk.Frame,
         master: ttk.Frame,
         mode: ChatMode,
-        data_manager: DataManager,
+        mode_data: ModeData,
         show_use_frame: bool = True,
         show_title: bool = True,
         slave=None,
@@ -37,9 +37,9 @@ class TextSelectionFrame:
         self.show_title = show_title
         self.has_slave_frame = slave
         self.master_frame = None
-        self.data_store = parent.data_store
+        self.data_server = parent.data_server
 
-        self.data = data_manager
+        self.data = mode_data
         self.mode = mode
         self.mode_text = MODE_TEXT[mode.value]
 
@@ -166,7 +166,7 @@ class TextSelectionFrame:
             return
         self.data.amend(self, self.selected_text, dlg.text)
 
-        self.populate_text_items(self.data.text_list)
+        self.populate_text_items(self.data.display_list_raw)
 
         self.selected_text = dlg.text
         self.text_var.set(dlg.text)
@@ -191,7 +191,7 @@ class TextSelectionFrame:
         self.root.wait_window(dlg.root)
         if dlg.status != Status.UPDATED:
             return
-        self.data.edit_all(self, dlg.text_list, dlg.item_register)
+        self.data.edit_all(self, dlg.display_list_raw)
 
         self.populate_text_items(dlg.selected_text)
         self.selected_text = dlg.selected_text
@@ -199,11 +199,11 @@ class TextSelectionFrame:
         self._use_item()
 
     def _update_text_list(
-        self, text_list: list[str], old_text: str, new_text: str
+        self, display_list_raw: list[str], old_text: str, new_text: str
     ) -> None:
-        index = text_list.index(old_text)
-        text_list.remove(old_text)
-        text_list.insert(index, new_text)
+        index = display_list_raw.index(old_text)
+        display_list_raw.remove(old_text)
+        display_list_raw.insert(index, new_text)
 
     def _use_item(self, *args) -> None:
         if self.text_var.get() and self.text_var.get()[0] == "#":

@@ -16,7 +16,7 @@ from psiutils.utilities import window_resize
 
 from bbochat.config import get_config
 from bbochat.constants import ChatMode
-from bbochat.data import DataStore, Pair, Player
+from bbochat.data_server import DataServer, Pair, Player
 from bbochat.forms.frm_master import MasterFrame
 from bbochat.forms.frm_notes import NotesFrame
 from bbochat.forms.frm_partners import PartnerFrame
@@ -41,8 +41,8 @@ class MainFrame:
         self.config = get_config()
         self.mode = ChatMode.GREETINGS
 
-        self.data_store = DataStore()
-        ds = self.data_store
+        self.data_server = DataServer()
+        ds = self.data_server
         ds.read()
 
         self.players = ds.players
@@ -91,7 +91,7 @@ class MainFrame:
         self._pair_username_change()
 
         # On setup
-        if not self.data_store.data_sets["my_name"]:
+        if not self.data_server.data_sets["my_name"]:
             self._get_my_name()
 
     def _create_tk_variables(self) -> None:
@@ -319,8 +319,8 @@ class MainFrame:
         ):
             self.my_name = dlg
             self.my_name_text.set(dlg)
-            self.data_store.my_name = dlg
-            self.data_store.save()
+            self.data_server.my_name = dlg
+            self.data_server.save()
 
     def _update_clipboard_colour(self):
         self._set_clipboard_colour()
@@ -445,14 +445,14 @@ class MainFrame:
         self.search_entry.focus_set()
 
     def save(self, *args) -> None:
-        self.data_store.players = self.players
-        self.data_store.pairs = self.pairs
-        # self.data_store.partners = self.partners
-        # self.data_store.greetings = self.greetings
-        # self.data_store.valedictions = self.valedictions
-        # self.data_store.chat = self.chat
-        # self.data_store.my_name = self.my_name
-        self.data_store.save()
+        self.data_server.players = self.players
+        self.data_server.pairs = self.pairs
+        # self.data_server.partners = self.partners
+        # self.data_server.greetings = self.greetings
+        # self.data_server.valedictions = self.valedictions
+        # self.data_server.chat = self.chat
+        # self.data_server.my_name = self.my_name
+        self.data_server.save()
         self.enable_buttons(False)
 
     def _pair_username_change(self, *args) -> None:

@@ -5,10 +5,10 @@ from tkinter import ttk
 
 from bbochat.config import get_config
 from bbochat.constants import FRAME_WIDTH, ChatMode
-from bbochat.data_manager import DataManager
 from bbochat.forms.frm_chat import ChatFrame
 from bbochat.forms.frm_opponents import OpponentsFrame
 from bbochat.forms.frm_text_selection import TextSelectionFrame
+from bbochat.mode_data import ModeData
 
 
 class MasterFrame:
@@ -18,9 +18,9 @@ class MasterFrame:
         # used in text_selection
         self.update_clipboard = parent.update_clipboard
         self.config = get_config()
-        self.data_store = parent.data_store
+        self.data_server = parent.data_server
 
-        self.chat = parent.data_store.data_sets["chat"]
+        self.chat = parent.data_server.data_sets["chat"]
         self.chat_list = parent.chat_list
         self.chat_line = parent.chat_line
 
@@ -45,15 +45,15 @@ class MasterFrame:
         frame.add(self.players_frame, width=FRAME_WIDTH)
 
         mode = ChatMode.GREETINGS
-        data_set = self.data_store.data_sets[mode.name.lower()]
-        data_manager = DataManager(self.data_store, data=data_set)
-        greetings = TextSelectionFrame(self, frame, mode, data_manager)
+        data_set = self.data_server.data_sets[mode.name.lower()]
+        mode_data = ModeData(self.data_server, source_data=data_set)
+        greetings = TextSelectionFrame(self, frame, mode, mode_data)
         frame.add(greetings.main_frame, width=FRAME_WIDTH)
 
         mode = ChatMode.VALEDICTION
-        data_set = self.data_store.data_sets[mode.name.lower()]
-        data_manager = DataManager(self.data_store, data=data_set)
-        valedictions = TextSelectionFrame(self, frame, mode, data_manager)
+        data_set = self.data_server.data_sets[mode.name.lower()]
+        mode_data = ModeData(self.data_server, source_data=data_set)
+        valedictions = TextSelectionFrame(self, frame, mode, mode_data)
         frame.add(valedictions.main_frame, width=FRAME_WIDTH)
 
         chat_frame = ChatFrame(self, frame, ChatMode.CHAT)

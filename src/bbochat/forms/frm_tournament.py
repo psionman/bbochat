@@ -22,7 +22,7 @@ from bbochat.constants import (
     TXT_FILE_TYPES,
     YYYYMMDD,
 )
-from bbochat.data import Partner
+from bbochat.data_server import Partner
 from bbochat.forms.frm_report import ReportFrame
 from bbochat.text import Text
 
@@ -244,7 +244,7 @@ class TournamentFrame:
 
     def get_notes_content(self) -> dict[str]:
         with contextlib.suppress(FileNotFoundError):
-            with open(self.path.get(), "r") as f_notes:
+            with open(self.path.get()) as f_notes:
                 return json.load(f_notes)
         return {}
 

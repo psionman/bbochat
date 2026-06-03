@@ -3,26 +3,28 @@
 import tkinter as tk
 from tkinter import ttk
 
-from bbochat.constants import FRAME_WIDTH, ChatMode
 from bbochat.config import get_config
-from bbochat.data_manager import DataManager
-
+from bbochat.constants import FRAME_WIDTH, ChatMode
 from bbochat.forms.frm_text_selection import TextSelectionFrame
+from bbochat.mode_data import ModeData
 
 
-class ChatFrame():
+class ChatFrame:
     def __init__(self, parent, master: ttk.Frame, mode: int) -> None:
         self.parent = parent
         self.root = parent.root
         self.config = get_config()
-        self.data_store = parent.data_store
-        self.config_key = f'last_{mode}'
+        self.data_server = parent.data_server
+        self.config_key = f"last_{mode}"
 
         self.chat_line = parent.chat_line
         self.chat_frame = self._main_frame(master)
 
     def _main_frame(self, master: ttk.Frame) -> ttk.PanedWindow:
-        frame = tk.PanedWindow(master, orient=tk.VERTICAL,)
+        frame = tk.PanedWindow(
+            master,
+            orient=tk.VERTICAL,
+        )
         frame.rowconfigure(0, weight=1)
         frame.columnconfigure(0, weight=1)
 
@@ -37,41 +39,40 @@ class ChatFrame():
         return frame
 
     def _get_chat_slave(
-            self, master: ttk.Frame, mode: str) -> TextSelectionFrame:
-        data_manager = DataManager(
-            self.data_store,
-            data=None,
-            has_master=True,
-            slave=False)
+        self, master: ttk.Frame, mode: str
+    ) -> TextSelectionFrame:
+        mode_data = ModeData(
+            self.data_server, source_data=None, has_master=True, slave=False
+        )
 
         return TextSelectionFrame(
             self,
             master,
             mode,
-            data_manager,
+            mode_data,
             show_use_frame=True,
             show_title=False,
-            slave=None)
+            slave=None,
+        )
 
     def _get_chat_master(
-            self,
-            master: ttk.Frame,
-            mode: ChatMode,
-            chat_slave: TextSelectionFrame
-            ) -> TextSelectionFrame:
+        self, master: ttk.Frame, mode: ChatMode, chat_slave: TextSelectionFrame
+    ) -> TextSelectionFrame:
 
-        data_set = self.data_store.data_sets[mode.name.lower()]
-        data_manager = DataManager(
-            self.data_store,
-            data=data_set,
+        data_set = self.data_server.data_sets[mode.name.lower()]
+        mode_data = ModeData(
+            self.data_server,
+            source_data=data_set,
             has_master=False,
-            slave=True)
+            slave=True,
+        )
 
         return TextSelectionFrame(
             self,
             master,
             mode,
-            data_manager,
+            mode_data,
             show_use_frame=False,
             show_title=True,
-            slave=chat_slave)
+            slave=chat_slave,
+        )

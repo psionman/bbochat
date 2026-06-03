@@ -1,11 +1,11 @@
 """Text Edit Frame for BBO Chat."""
 
-import copy
 import tkinter as tk
 import uuid
 from pathlib import Path
 from tkinter import ttk
 
+from bidict import bidict
 from psiutils import messagebox
 from psiutils.buttons import ButtonFrame, IconButton
 from psiutils.constants import PAD, Status
@@ -26,7 +26,7 @@ class EditSelectFrame:
     def __init__(self, parent) -> None:
         self.root = tk.Toplevel(parent.root)
         self.parent = parent
-        self.data_store = parent.data_store
+        self.data_server = parent.data_server
 
         self.mode = parent.mode
 
@@ -42,23 +42,23 @@ class EditSelectFrame:
         self.status = Status.NULL
 
         # Original text in data store - used to check change
-        self.original_data = [item for item in parent.data.text_list if item]
+        self.original_data = [
+            item for item in parent.data.display_list_raw if item
+        ]
 
         # Current text in frame
-        self.text_list = [item for item in parent.data.text_list if item]
+        self.display_list_raw = [
+            item for item in parent.data.display_list_raw if item
+        ]
 
-        # item_register is a dictionary mapping listbox text to unique identifiers
-        # It ensures item identity persists during edits or reordering
-        # by associating display text with UUIDs.
-        self.item_register = {}
+        # text_register is a dict of text items (a list) keyed on uuids
+        # key_register is a  bidict of uuids and the keys (text) to the text items list
         self.text_register = {}
-        self.key_register = {}
-        self.uuid_register = {}
+        self.key_register = bidict()
+
         if parent.data.text_register:
-            self.item_register = copy.deepcopy(parent.data.item_register)
             self.text_register = parent.data.text_register
             self.key_register = parent.data.key_register
-            self.uuid_register = parent.data.uuid_register
 
         # self.selected_item is the index of the item selected in the listbox
         self.selected_item = None
@@ -155,7 +155,7 @@ class EditSelectFrame:
         if len(event.widget.curselection()) == 0:
             return
         self.selected_item = event.widget.curselection()[0]
-        self.selected_text = self.text_list[self.selected_item]
+        self.selected_text = self.display_list_raw[self.selected_item]
         self._enable_menu()
 
     def _enable_menu(self, *args) -> None:
@@ -167,7 +167,7 @@ class EditSelectFrame:
 
     def _populate_text_items(self) -> None:
         self.listbox.delete(0, tk.END)
-        for index, item in enumerate(self.text_list):
+        for index, item in enumerate(self.display_list_raw):
             self.listbox.insert("end", item)
             if self.master_selected_text and item == self.master_selected_text:
                 self.listbox.selection_set(index)
@@ -183,14 +183,20 @@ class EditSelectFrame:
         dlg = TextDialogFrame(self, "New")
         self.root.wait_window(dlg.root)
         if dlg.text:
-            self.text_list.append(dlg.text)
             if self.text_register:
                 uid = str(uuid.uuid4())
 
                 self.text_register[uid] = dlg.text
                 self.key_register[dlg.text] = uid
-                self.uuid_register[uid] = dlg.text
                 self._populate_text_items()
+
+            self._add_item_to_list(len(self.display_list_raw), dlg.text)
+
+        # print("-" * 50)
+        # for key, value in self.key_register.items():
+        #     print(f"{key}: {value}")
+        # for key, value in self.key_register.inverse.items():
+        #     print(f"{key}: {value}")
 
     def _edit_item(self, *args) -> None:
         old_text = self.selected_text
@@ -202,43 +208,32 @@ class EditSelectFrame:
         if self.text_register:
             self._update_item_register(old_text, dlg.text)
 
-        index = self.text_list.index(self.selected_text)
-        self.text_list.remove(self.selected_text)
-        self.text_list.insert(index, dlg.text)
-        self.selected_text = dlg.text
+        index = self.display_list_raw.index(self.selected_text)
+        self.display_list_raw.remove(self.selected_text)
+        self._add_item_to_list(index, dlg.text)
+
+    def _add_item_to_list(self, index: int, text: str) -> None:
+        self.display_list_raw.insert(index, text)
+        self.selected_text = text
         self._populate_text_items()
         self.listbox.select_set(index)
 
     def _update_item_register(self, old_text: str, new_text: str):
-        # Get the item_register text item relating to the
-        # old value and replace it with the new text
-
         # Get the uuid_key for the text
         uuid_key = self.key_register[old_text]
-        print(f"{uuid_key=}")
 
         # swap key register keys
-        self.key_register[new_text] = uuid_key
         self.key_register.pop(old_text)
-
-        # update uuid register
-        self.uuid_register[uuid_key] = new_text
-        print(f"{old_text=}")
-        print(f"{new_text=}")
-        print(f"{self.uuid_register[uuid_key]=}")
-        for key, uuid_text in self.key_register.items():
-            print(f"{key=} {uuid_text=}")
+        self.key_register[new_text] = uuid_key
 
     def _delete_item(self, *args) -> None:
         if not messagebox.askyesno(self, txt.DELETE_TITLE, txt.DELETE_ITEM):
             return
 
         if self.key_register:
-            item_register_member = self.item_register[self.selected_text]
-            self.item_register.pop(self.selected_text)
-            self.item_register.pop(item_register_member[1])
+            pass  # ????
 
-        self.text_list.remove(self.selected_text)
+        self.display_list_raw.remove(self.selected_text)
         self.selected_text = ""
         self._populate_text_items()
 
@@ -248,9 +243,9 @@ class EditSelectFrame:
         if self.selected_item == 0:
             return
         index = self.selected_item
-        (self.text_list[index - 1], self.text_list[index]) = (
-            self.text_list[index],
-            self.text_list[index - 1],
+        (self.display_list_raw[index - 1], self.display_list_raw[index]) = (
+            self.display_list_raw[index],
+            self.display_list_raw[index - 1],
         )
         self._populate_text_items()
         self.listbox.select_set(index - 1)
@@ -260,12 +255,12 @@ class EditSelectFrame:
     def _move_down(self, *args) -> None:
         if self.selected_item is None:
             return
-        if self.selected_item == len(self.text_list) - 1:
+        if self.selected_item == len(self.display_list_raw) - 1:
             return
         index = self.selected_item
-        (self.text_list[index + 1], self.text_list[index]) = (
-            self.text_list[index],
-            self.text_list[index + 1],
+        (self.display_list_raw[index + 1], self.display_list_raw[index]) = (
+            self.display_list_raw[index],
+            self.display_list_raw[index + 1],
         )
         self._populate_text_items()
         self.listbox.select_set(index + 1)
@@ -278,22 +273,21 @@ class EditSelectFrame:
             self.button_frame.enable()
 
         self.save_button.disable()
-        if self.text_list != self.original_data:
+        if self.display_list_raw != self.original_data:
             self.save_button.enable()
 
     def _update_data_set(self, *args) -> None:
         # Problem: mode is chat, but how to you update child data?
         mode = self.mode.name.lower()
-        print(f"{len(self.text_register)=} {mode=}")
         if self.text_register:
             # then the dict must be saved with the new key (if any)
             data_set = {}
             for key, value in self.key_register.items():
                 data_set[key] = self.text_register[value]
 
-            self.data_store.data_sets[mode] = data_set
+            self.data_server.data_sets[mode] = data_set
         else:
-            self.data_store.data_sets[mode] = self.text_list
+            self.data_server.data_sets[mode] = self.display_list_raw
         self.status = Status.UPDATED
         self._dismiss()
 

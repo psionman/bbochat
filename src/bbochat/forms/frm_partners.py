@@ -3,17 +3,16 @@
 import tkinter as tk
 from tkinter import ttk
 
-from psiutils.constants import PAD, PADT, Status, Mode
-from psiutils.widgets import HAND, PsiText
-from psiutils.buttons import ButtonFrame
-from psiutils.menus import Menu, MenuItem
 from psiutils import messagebox
+from psiutils.buttons import ButtonFrame
+from psiutils.constants import PAD, PADT, Mode, Status
+from psiutils.menus import Menu, MenuItem
+from psiutils.widgets import HAND, PsiText
 
-from bbochat.data import Partner
 from bbochat.config import get_config
-from bbochat.text import Text
-
+from bbochat.data_server import Partner
 from bbochat.forms.frm_partner_edit import PartnerEditFrame
+from bbochat.text import Text
 
 txt = Text()
 
@@ -23,9 +22,9 @@ class PartnerFrame:
         self.parent = parent
         self.root = parent.root
         self.partner = parent.partner
-        self.data_store = parent.data_store
-        self.partners = self.data_store.partners
-        self.greetings = self.data_store.greetings
+        self.data_server = parent.data_server
+        self.partners = self.data_server.partners
+        self.greetings = self.data_server.greetings
         self.partners_names = self.parent.partners_names
         self.config = get_config()
         self.last_partner = self.config.last_partner

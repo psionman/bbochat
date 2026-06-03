@@ -89,7 +89,7 @@ class Pair:
         self.username_2 = username_2
 
 
-class DataStore:
+class DataServer:
     def __init__(self) -> None:
         self.partners = {}
         self.players = {}
@@ -102,7 +102,9 @@ class DataStore:
 
     def read(self):
         raw_data = self._read_data_file()
-        data = {} if raw_data == FILE_NOT_FOUND else self._get_json(raw_data)
+        app_data = (
+            {} if raw_data == FILE_NOT_FOUND else self._get_json(raw_data)
+        )
         self.data_sets = {
             "partners": {},
             "pairs": [],
@@ -113,10 +115,10 @@ class DataStore:
             "notes": {},
             "my_name": "",
         }
-        if data == INVALID_JSON:
+        if app_data == INVALID_JSON:
             return INVALID_JSON
 
-        for key, value in data.items():
+        for key, value in app_data.items():
             if key == "partners":
                 self.partners = self._get_partners(value)
                 self.data_sets["partners"] = self.partners
@@ -144,7 +146,7 @@ class DataStore:
 
     def _read_data_file(self) -> str | int | None:
         try:
-            with open(DATA_FILE, "r") as f_data:
+            with open(DATA_FILE) as f_data:
                 return f_data.read()
         except FileNotFoundError:
             return FILE_NOT_FOUND
@@ -207,7 +209,7 @@ class DataStore:
         #     print("save", key, value)
         json_data = self._data_to_json(output)
         # TODO: remove this when ready to save
-        return self._write_data_file(json_data)
+        # return self._write_data_file(json_data)
 
     @staticmethod
     def _data_to_json(output: dict) -> str:
