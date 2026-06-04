@@ -26,6 +26,7 @@ class EditSelectFrame:
     def __init__(self, parent) -> None:
         self.root = tk.Toplevel(parent.root)
         self.parent = parent
+        self.mode_data = parent.mode_data
         self.data_server = parent.data_server
 
         self.mode = parent.mode
@@ -43,22 +44,25 @@ class EditSelectFrame:
 
         # Original text in data store - used to check change
         self.original_data = [
-            item for item in parent.data.display_list_raw if item
+            item for item in self.mode_data.display_list_raw if item
         ]
 
         # Current text in frame
         self.display_list_raw = [
-            item for item in parent.data.display_list_raw if item
+            item for item in self.mode_data.display_list_raw if item
         ]
 
+        self.changes = {item: (item, item) for item in self.display_list_raw}
+
         # text_register is a dict of text items (a list) keyed on uuids
-        # key_register is a  bidict of uuids and the keys (text) to the text items list
+        # key_register is a  bidict of uuids and
+        # the keys (text) to the text items list
         self.text_register = {}
         self.key_register = bidict()
 
-        if parent.data.text_register:
-            self.text_register = parent.data.text_register
-            self.key_register = parent.data.key_register
+        if self.mode_data.text_register:
+            self.text_register = self.mode_data.text_register
+            self.key_register = self.mode_data.key_register
 
         # self.selected_item is the index of the item selected in the listbox
         self.selected_item = None
@@ -78,7 +82,7 @@ class EditSelectFrame:
         root.title(FRAME_TITLE)
 
         root.bind("<Control-x>", self._dismiss)
-        root.bind("<Control-s>", self._update_data_set)
+        root.bind("<Control-s>", self._save_data)
         root.bind("<Configure>", lambda e: window_resize(self, __file__))
 
         root.rowconfigure(0, weight=1)
@@ -127,7 +131,7 @@ class EditSelectFrame:
     def _button_frame(self, master: ttk.Frame) -> tk.Frame:
         frame = ButtonFrame(master, tk.VERTICAL)
         self.save_button = IconButton(
-            frame, txt.SAVE, "save", self._update_data_set, True
+            frame, txt.SAVE, "save", self._save_data, True
         )
         frame.buttons = [
             frame.icon_button("new", self._new_item),
@@ -199,14 +203,16 @@ class EditSelectFrame:
         #     print(f"{key}: {value}")
 
     def _edit_item(self, *args) -> None:
-        old_text = self.selected_text
         dlg = TextDialogFrame(self, "Edit", self.selected_text)
         self.root.wait_window(dlg.root)
         if dlg.text == self.selected_text:
             return
 
-        if self.text_register:
-            self._update_item_register(old_text, dlg.text)
+        # Update the changes dictionary
+        self.changes[self.selected_text] = (self.selected_text, dlg.text)
+
+        # if self.text_register:
+        #     self._update_item_register(old_text, dlg.text)
 
         index = self.display_list_raw.index(self.selected_text)
         self.display_list_raw.remove(self.selected_text)
@@ -276,20 +282,22 @@ class EditSelectFrame:
         if self.display_list_raw != self.original_data:
             self.save_button.enable()
 
-    def _update_data_set(self, *args) -> None:
-        # Problem: mode is chat, but how to you update child data?
-        mode = self.mode.name.lower()
+    def _save_data(self, *args) -> None:
         if self.text_register:
-            # then the dict must be saved with the new key (if any)
-            data_set = {}
-            for key, value in self.key_register.items():
-                data_set[key] = self.text_register[value]
-
-            self.data_server.data_sets[mode] = data_set
-        else:
-            self.data_server.data_sets[mode] = self.display_list_raw
+            self._update_data_set()
         self.status = Status.UPDATED
         self._dismiss()
+
+    def _update_data_set(self) -> None:
+        for old_text, new_text in self.changes.values():
+            if old_text != new_text:
+                # Update the text register
+                uid = self.key_register[old_text]
+                self.text_register[uid] = new_text
+                # Update the key register
+                self.key_register.pop(old_text)
+                self.key_register[new_text] = uid
+                self.mode_data.amend(self, old_text, new_text)
 
     def _dismiss(self, *args) -> None:
         self.root.destroy()

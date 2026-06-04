@@ -48,6 +48,7 @@ dependencies = [
     { name = "python-dateutil" },
     { name = "ruff" },
     { name = "structlog" },
+    { name = "tkinterweb" },
     { name = "userpaths" },
 ]
 
@@ -67,6 +68,7 @@ requires-dist = [
     { name = "python-dateutil", specifier = ">=2.9.0.post0" },
     { name = "ruff", specifier = ">=0.15.15" },
     { name = "structlog", specifier = ">=25.4.0" },
+    { name = "tkinterweb", specifier = ">=4.4.4" },
     { name = "userpaths", specifier = ">=0.1.3" },
 ]
 

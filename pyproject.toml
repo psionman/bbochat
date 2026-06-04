@@ -21,6 +21,7 @@ dependencies = [
     "python-dateutil>=2.9.0.post0",
     "ruff>=0.15.15",
     "structlog>=25.4.0",
+    "tkinterweb>=4.4.4",
     "userpaths>=0.1.3",
 ]
 

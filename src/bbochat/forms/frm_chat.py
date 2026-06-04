@@ -28,9 +28,8 @@ class ChatFrame:
         frame.rowconfigure(0, weight=1)
         frame.columnconfigure(0, weight=1)
 
-        mode = ChatMode.CHAT
-        chat_slave = self._get_chat_slave(frame, mode)
-        chat_master = self._get_chat_master(frame, mode, chat_slave)
+        chat_slave = self._get_chat_slave(frame, ChatMode.CHAT_DETAIL)
+        chat_master = self._get_chat_master(frame, ChatMode.CHAT, chat_slave)
         chat_slave.master_frame = chat_master
 
         frame.add(chat_master.main_frame, height=FRAME_WIDTH)

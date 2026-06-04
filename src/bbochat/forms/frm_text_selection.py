@@ -39,14 +39,18 @@ class TextSelectionFrame:
         self.master_frame = None
         self.data_server = parent.data_server
 
-        self.data = mode_data
+        self.mode_data = mode_data
         self.mode = mode
         self.mode_text = MODE_TEXT[mode.value]
 
         self.config_key = f"last_{self.mode.name.lower()}"
         self.config = get_config()
 
-        last_value = self.config.config[self.config_key]
+        last_value = (
+            self.config.config[self.config_key]
+            if self.config_key in self.config.config
+            else ""
+        )
         self.text_var = tk.StringVar(value=last_value)
 
         # TODO sort this
@@ -134,14 +138,18 @@ class TextSelectionFrame:
         if not selection:
             return
 
-        self.selected_text = self.data.display_list[selection[0]]
+        self.selected_text = self.mode_data.display_list[selection[0]]
 
         self.text_var.set(self.selected_text)
         self._use_item()
         self.context_menu.enable()
         if self.has_slave_frame:
             # This is a master: it has a slave frame
-            self.data.update_slave_data(
+            # This line breaks after edit all
+            self.has_slave_frame.display_list = self.mode_data.data_items[
+                self.selected_text
+            ]
+            self.mode_data.update_slave_data(
                 self.has_slave_frame, self.selected_text
             )
 
@@ -151,7 +159,7 @@ class TextSelectionFrame:
         if not dlg.text:
             return
 
-        self.data.add(self, dlg.text)
+        self.mode_data.add(self, dlg.text)
 
         self.text_var.set(dlg.text)
         self._use_item()
@@ -160,13 +168,16 @@ class TextSelectionFrame:
         self.populate_text_items(dlg.text)
 
     def _edit_item(self, *args) -> None:
+        print(f"a {self.mode_data.display_list[0]=}")
         dlg = TextDialogFrame(self, "Edit", self.selected_text, show_save=True)
         self.root.wait_window(dlg.root)
         if dlg.status != Status.UPDATED:
             return
-        self.data.amend(self, self.selected_text, dlg.text)
 
-        self.populate_text_items(self.data.display_list_raw)
+        print(f"b {self.mode_data.display_list[0]=}")
+        self.mode_data.amend(self, self.selected_text, dlg.text)
+
+        self.populate_text_items(self.mode_data.display_list_raw)
 
         self.selected_text = dlg.text
         self.text_var.set(dlg.text)
@@ -176,7 +187,7 @@ class TextSelectionFrame:
         if not messagebox.askyesno(self, txt.DELETE_TITLE, txt.DELETE_ITEM):
             return
 
-        self.data.delete(self)
+        self.mode_data.delete(self)
 
         if self.has_slave_frame:
             # This is a master: it has a slave frame
@@ -191,7 +202,7 @@ class TextSelectionFrame:
         self.root.wait_window(dlg.root)
         if dlg.status != Status.UPDATED:
             return
-        self.data.edit_all(self, dlg.display_list_raw)
+        self.mode_data.edit_all(self, dlg.display_list_raw)
 
         self.populate_text_items(dlg.selected_text)
         self.selected_text = dlg.selected_text
@@ -215,7 +226,7 @@ class TextSelectionFrame:
 
     def populate_text_items(self, selected_item: str = "") -> None:
         self.listbox.delete(0, tk.END)
-        for index, item in enumerate(self.data.display_list):
+        for index, item in enumerate(self.mode_data.display_list):
             self.listbox.insert("end", item)
             if selected_item and item == selected_item:
                 self.listbox.selection_set(index)

@@ -1,21 +1,20 @@
-from pathlib import Path
 import tkinter as tk
-from tkinter import ttk, filedialog
+from pathlib import Path
+from tkinter import filedialog, ttk
 from tkinter.colorchooser import askcolor
-from tkinterweb import HtmlFrame
 
+from psiutils import messagebox
 from psiutils.buttons import ButtonFrame, IconButton
-from psiutils.widgets import separator_frame
 from psiutils.constants import PAD, PADT, Pad, Status
 from psiutils.utilities import window_resize
-from psiutils import messagebox
+from psiutils.widgets import separator_frame
+from tkinterweb import HtmlFrame
 
 from bbochat.config import get_config
-from bbochat.utilities_bbochat import display_html
 from bbochat.constants import HTML_TEST
-from bbochat.text import Text
-
 from bbochat.forms.frm_config_css import ConfigCssFrame
+from bbochat.text import Text
+from bbochat.utilities_bbochat import display_html
 
 txt = Text()
 

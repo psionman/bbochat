@@ -40,7 +40,6 @@ class ModeData:
         # self.display_list is a cleaned version of the list in display_list_raw.
         # might be set in self._item_selected is it's a slave frame
         # Used to display items in the relevant listbox.
-        self.display_list = self._remove_commented_items()
 
         # build registers used to handle edit_all for master frames
 
@@ -49,9 +48,12 @@ class ModeData:
         # the text items list
         (self.text_register, self.key_register) = self._build_registers()
 
+    @property
+    def display_list(self) -> str:
+        return self._remove_commented_items()
+
     def add(self, frame, text) -> None:
         self.display_list_raw.append(text)
-        self.display_list = self._remove_commented_items()
 
         if self.slave:
             self.data_items[text] = []
@@ -64,15 +66,17 @@ class ModeData:
         self.save(frame.mode.name)
 
     def amend(self, frame, old_value: str, new_value: str) -> None:
-        self._update_text_list(self.display_list_raw, old_value, new_value)
-        self.display_list = self._remove_commented_items()
+        print(f"amend: {self.display_list_raw[0]=}")
+        print(f"amend: {self.display_list[0]=}")
+        print(f"old_value: {old_value} new_value: {new_value}")
+        self._update_display_list(self.display_list_raw, old_value, new_value)
 
         if self.slave:
             self.data_items[new_value] = self.data_items[old_value]
             self.data_items.pop(old_value)
         elif self.has_master:
-            data = frame.master_frame.data.data
-            self._update_text_list(
+            data = frame.master_frame.mode_data.data_items
+            self._update_display_list(
                 data[frame.master_frame.selected_text], old_value, new_value
             )
         else:
@@ -82,7 +86,6 @@ class ModeData:
 
     def delete(self, frame) -> None:
         self.display_list_raw.remove(frame.selected_text)
-        self.display_list = self._remove_commented_items()
 
         if self.slave:
             self.data_items.pop(frame.selected_text)
@@ -96,12 +99,11 @@ class ModeData:
 
     def edit_all(self, frame, display_list_raw: list[str]) -> None:
         self.display_list_raw = display_list_raw
-        self.display_list = self._remove_commented_items()
 
         if self.slave:
             pass
         elif self.has_master:
-            data = frame.master_frame.data.data
+            data = frame.master_frame.mode_data.data_items
             data[frame.master_frame.selected_text] = self.display_list_raw
         else:
             data = ""  # ,!!!!!!!!!!!!!!!!!!
@@ -110,30 +112,52 @@ class ModeData:
         self.save(frame.mode.name)
 
     def update_slave_data(self, slave, selected_text: str) -> None:
+        """
+        Updates the slave data.
+
+        Args:
+            slave: The slave frame.
+            selected_text: The selected text.
+        """
         if selected_text not in self.data_items:
             self.data_items[selected_text] = []
-        self.display_list_raw = self.data_items[selected_text]
+        # !! DON'T CHANGE THIS NEXT LINE, without it direct edit does not work
+        # self.display_list_raw = self.data_items[selected_text]
         data = self.data_items[selected_text]
-        slave.data.text_data = data
-        slave.data.display_list_raw = list(data)
-        # slave.data.display_list:
+        slave.mode_data.text_data = data
+        slave.mode_data.display_list_raw = list(data)
+        # slave.mode_data.display_list:
         #       a list of strings to appear in the slave panel
-        slave.data.display_list = self._build_display_list(
-            slave.data.display_list_raw
+        slave.mode_data.display_list_raw = self._build_display_list(
+            slave.mode_data.display_list_raw
         )
-        print(f"{slave.data.display_list=}")
+        # print(f"{slave.mode_data.display_list=}")
         slave.populate_text_items()
 
     def _delete_slave_data(self, slave) -> None:
-        slave.data.text_data = []
-        slave.data.display_list_raw = []
-        slave.data.display_list = []
+        """
+        Deletes the slave data.
+
+        Args:
+            slave: The slave frame.
+        """
+        slave.mode_data.text_data = []
+        slave.mode_data.display_list_raw = []
+        slave.mode_data.display_list = []
 
         slave.populate_text_items()
 
-    def _update_text_list(
+    def _update_display_list(
         self, display_list_raw: list[str], old_value: str, new_value: str
     ) -> None:
+        """
+        Updates the display list by replacing an old value with a new value.
+
+        Args:
+            display_list_raw: The list to update
+            old_value: The value to replace
+            new_value: The new value to insert
+        """
         index = display_list_raw.index(old_value)
         display_list_raw.remove(old_value)
         display_list_raw.insert(index, new_value)
@@ -182,8 +206,8 @@ class ModeData:
         self, display_list_raw: list[str] = None
     ) -> list[str]:
         if not display_list_raw:
-            self.display_list_raw = []
-        return self._remove_commented_items()
+            return []
+        return display_list_raw
 
     def _remove_commented_items(self) -> list[str]:
         return [
