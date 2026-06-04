@@ -48,11 +48,11 @@ class EditSelectFrame:
         ]
 
         # Current text in frame
-        self.display_list_raw = [
+        self.display_list = [
             item for item in self.mode_data.display_list_raw if item
         ]
 
-        self.changes = {item: (item, item) for item in self.display_list_raw}
+        self.changes = {item: (item, item) for item in self.display_list}
 
         # text_register is a dict of text items (a list) keyed on uuids
         # key_register is a  bidict of uuids and
@@ -159,7 +159,7 @@ class EditSelectFrame:
         if len(event.widget.curselection()) == 0:
             return
         self.selected_item = event.widget.curselection()[0]
-        self.selected_text = self.display_list_raw[self.selected_item]
+        self.selected_text = self.display_list[self.selected_item]
         self._enable_menu()
 
     def _enable_menu(self, *args) -> None:
@@ -171,7 +171,7 @@ class EditSelectFrame:
 
     def _populate_text_items(self) -> None:
         self.listbox.delete(0, tk.END)
-        for index, item in enumerate(self.display_list_raw):
+        for index, item in enumerate(self.display_list):
             self.listbox.insert("end", item)
             if self.master_selected_text and item == self.master_selected_text:
                 self.listbox.selection_set(index)
@@ -194,7 +194,7 @@ class EditSelectFrame:
                 self.key_register[dlg.text] = uid
                 self._populate_text_items()
 
-            self._add_item_to_list(len(self.display_list_raw), dlg.text)
+            self._add_item_to_list(len(self.display_list), dlg.text)
 
         # print("-" * 50)
         # for key, value in self.key_register.items():
@@ -214,12 +214,12 @@ class EditSelectFrame:
         # if self.text_register:
         #     self._update_item_register(old_text, dlg.text)
 
-        index = self.display_list_raw.index(self.selected_text)
-        self.display_list_raw.remove(self.selected_text)
+        index = self.display_list.index(self.selected_text)
+        self.display_list.remove(self.selected_text)
         self._add_item_to_list(index, dlg.text)
 
     def _add_item_to_list(self, index: int, text: str) -> None:
-        self.display_list_raw.insert(index, text)
+        self.display_list.insert(index, text)
         self.selected_text = text
         self._populate_text_items()
         self.listbox.select_set(index)
@@ -239,7 +239,7 @@ class EditSelectFrame:
         if self.key_register:
             pass  # ????
 
-        self.display_list_raw.remove(self.selected_text)
+        self.display_list.remove(self.selected_text)
         self.selected_text = ""
         self._populate_text_items()
 
@@ -249,9 +249,9 @@ class EditSelectFrame:
         if self.selected_item == 0:
             return
         index = self.selected_item
-        (self.display_list_raw[index - 1], self.display_list_raw[index]) = (
-            self.display_list_raw[index],
-            self.display_list_raw[index - 1],
+        (self.display_list[index - 1], self.display_list[index]) = (
+            self.display_list[index],
+            self.display_list[index - 1],
         )
         self._populate_text_items()
         self.listbox.select_set(index - 1)
@@ -261,12 +261,12 @@ class EditSelectFrame:
     def _move_down(self, *args) -> None:
         if self.selected_item is None:
             return
-        if self.selected_item == len(self.display_list_raw) - 1:
+        if self.selected_item == len(self.display_list) - 1:
             return
         index = self.selected_item
-        (self.display_list_raw[index + 1], self.display_list_raw[index]) = (
-            self.display_list_raw[index],
-            self.display_list_raw[index + 1],
+        (self.display_list[index + 1], self.display_list[index]) = (
+            self.display_list[index],
+            self.display_list[index + 1],
         )
         self._populate_text_items()
         self.listbox.select_set(index + 1)
@@ -279,15 +279,28 @@ class EditSelectFrame:
             self.button_frame.enable()
 
         self.save_button.disable()
-        if self.display_list_raw != self.original_data:
+        if self.display_list != self.original_data:
             self.save_button.enable()
 
     def _save_data(self, *args) -> None:
         if self.text_register:
             self._update_data_set()
-        self.mode_data.save(self.mode.name.lower())
+        self._sort_data()
+
+        mode = self.mode.name.lower()
+        self.mode_data.save(mode)
+
         self.status = Status.UPDATED
         self._dismiss()
+
+    def _sort_data(self) -> None:
+        if isinstance(self.mode_data.data_items, dict):
+            sorted_items = {}
+            for key in self.display_list:
+                sorted_items[key] = self.mode_data.data_items[key]
+            self.mode_data.data_items = sorted_items
+        else:
+            self.mode_data.data_items = self.display_list
 
     def _update_data_set(self) -> None:
         for old_text, new_text in self.changes.values():

@@ -66,9 +66,6 @@ class ModeData:
         self.save(frame.mode.name)
 
     def amend(self, frame, old_value: str, new_value: str) -> None:
-        # print(f"amend: {self.display_list_raw[0]=}")
-        # print(f"amend: {self.display_list[0]=}")
-        # print(f"old_value: {old_value} new_value: {new_value}")
         self._update_display_list(self.display_list_raw, old_value, new_value)
 
         if self.slave:
@@ -131,7 +128,6 @@ class ModeData:
         slave.mode_data.display_list_raw = self._build_display_list(
             slave.mode_data.display_list_raw
         )
-        # print(f"{slave.mode_data.display_list=}")
         slave.populate_text_items()
 
     def _delete_slave_data(self, slave) -> None:
@@ -195,11 +191,6 @@ class ModeData:
             text_register[uid] = self.data_items[key]
             key_register[key] = uid
 
-        # print("-" * 50)
-        # for key, value in key_register.items():
-        #     print(f"{key}: {value}")
-        # for key, value in key_register.inverse.items():
-        #     print(f"{key}: {value}")
         return text_register, key_register
 
     def _build_display_list(

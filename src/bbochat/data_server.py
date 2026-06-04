@@ -204,12 +204,7 @@ class DataServer:
             "notes": self.data_sets["notes"],
             "my_name": self.my_name,
         }
-        # print("-" * 25)
-        # for key, value in self.data_sets["chat"].items():
-        #     print("save", key, value)
         json_data = self._data_to_json(output)
-        # print("json_data", output["chat"])
-        # TODO: remove this when ready to save
         return self._write_data_file(json_data)
 
     @staticmethod

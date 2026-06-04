@@ -200,7 +200,7 @@ class TextSelectionFrame:
         self.root.wait_window(dlg.root)
         if dlg.status != Status.UPDATED:
             return
-        self.mode_data.edit_all(self, dlg.display_list_raw)
+        self.mode_data.edit_all(self, dlg.display_list)
 
         self.populate_text_items(dlg.selected_text)
         self.selected_text = dlg.selected_text
@@ -208,11 +208,11 @@ class TextSelectionFrame:
         self._use_item()
 
     def _update_text_list(
-        self, display_list_raw: list[str], old_text: str, new_text: str
+        self, display_list: list[str], old_text: str, new_text: str
     ) -> None:
-        index = display_list_raw.index(old_text)
-        display_list_raw.remove(old_text)
-        display_list_raw.insert(index, new_text)
+        index = display_list.index(old_text)
+        display_list.remove(old_text)
+        display_list.insert(index, new_text)
 
     def _use_item(self, *args) -> None:
         if self.text_var.get() and self.text_var.get()[0] == "#":
