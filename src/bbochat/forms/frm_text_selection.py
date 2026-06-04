@@ -168,13 +168,11 @@ class TextSelectionFrame:
         self.populate_text_items(dlg.text)
 
     def _edit_item(self, *args) -> None:
-        print(f"a {self.mode_data.display_list[0]=}")
         dlg = TextDialogFrame(self, "Edit", self.selected_text, show_save=True)
         self.root.wait_window(dlg.root)
         if dlg.status != Status.UPDATED:
             return
 
-        print(f"b {self.mode_data.display_list[0]=}")
         self.mode_data.amend(self, self.selected_text, dlg.text)
 
         self.populate_text_items(self.mode_data.display_list_raw)

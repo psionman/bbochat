@@ -285,6 +285,7 @@ class EditSelectFrame:
     def _save_data(self, *args) -> None:
         if self.text_register:
             self._update_data_set()
+        self.mode_data.save(self.mode.name.lower())
         self.status = Status.UPDATED
         self._dismiss()
 

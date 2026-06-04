@@ -66,9 +66,9 @@ class ModeData:
         self.save(frame.mode.name)
 
     def amend(self, frame, old_value: str, new_value: str) -> None:
-        print(f"amend: {self.display_list_raw[0]=}")
-        print(f"amend: {self.display_list[0]=}")
-        print(f"old_value: {old_value} new_value: {new_value}")
+        # print(f"amend: {self.display_list_raw[0]=}")
+        # print(f"amend: {self.display_list[0]=}")
+        # print(f"old_value: {old_value} new_value: {new_value}")
         self._update_display_list(self.display_list_raw, old_value, new_value)
 
         if self.slave:
