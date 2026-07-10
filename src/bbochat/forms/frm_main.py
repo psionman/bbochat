@@ -16,7 +16,7 @@ from psiutils.utilities import window_resize
 
 from bbochat.config import get_config
 from bbochat.constants import ChatMode
-from bbochat.data_server import DataServer, Pair, Player
+from bbochat.data_store import Pair, Player, data_store
 from bbochat.forms.frm_master import MasterFrame
 from bbochat.forms.frm_notes import NotesFrame
 from bbochat.forms.frm_partners import PartnerFrame
@@ -41,21 +41,19 @@ class MainFrame:
         self.config = get_config()
         self.mode = ChatMode.GREETINGS
 
-        self.data_server = DataServer()
-        ds = self.data_server
-        ds.read()
+        data_store.read()
+        data_store.subscribe(self._on_data_change)
+        self.data_server = data_store
 
-        self.players = ds.players
-        self.pairs = ds.pairs
-        self.greetings = ds.greetings
-        self.valedictions = ds.valedictions
-        self.chat = ds.chat
-        self.my_name = ds.my_name
+        self.greetings = data_store.greetings
+        self.valedictions = data_store.valedictions
+        self.chat = data_store.chat
+        self.my_name = data_store.my_name
 
         self.pair = []
 
         self.partner = ""
-        self.partners = ds.partners
+        self.partners = data_store.partners
         self.partners_names = sorted(list(self.partners.keys()))
         if (
             self.config.last_partner
@@ -91,7 +89,7 @@ class MainFrame:
         self._pair_username_change()
 
         # On setup
-        if not self.data_server.data_sets["my_name"]:
+        if not data_store.data_sets["my_name"]:
             self._get_my_name()
 
     def _create_tk_variables(self) -> None:
@@ -319,8 +317,8 @@ class MainFrame:
         ):
             self.my_name = dlg
             self.my_name_text.set(dlg)
-            self.data_server.my_name = dlg
-            self.data_server.save()
+            data_store.my_name = dlg
+            data_store.save()
 
     def _update_clipboard_colour(self):
         self._set_clipboard_colour()
@@ -414,10 +412,10 @@ class MainFrame:
         username_2 = self.username_2.get()
 
         pair = Pair(username_1, username_2)
-        self.players[username_1] = Player(name_1, username_1)
-        self.players[username_2] = Player(name_2, username_2)
-        if pair not in self.pairs:
-            self.pairs.append(Pair(username_1, username_2))
+        data_store.players[username_1] = Player(name_1, username_1)
+        data_store.players[username_2] = Player(name_2, username_2)
+        if pair not in data_store.pairs:
+            data_store.pairs.append(Pair(username_1, username_2))
 
         self.save()
         self.search.set("")
@@ -432,7 +430,7 @@ class MainFrame:
             return
 
         pair = Pair(self.username_1.get(), self.username_2.get())
-        self.pairs.remove(pair)
+        data_store.pairs.remove(pair)
         self.save()
 
         self.name_1.set("")
@@ -445,14 +443,7 @@ class MainFrame:
         self.search_entry.focus_set()
 
     def save(self, *args) -> None:
-        self.data_server.players = self.players
-        self.data_server.pairs = self.pairs
-        # self.data_server.partners = self.partners
-        # self.data_server.greetings = self.greetings
-        # self.data_server.valedictions = self.valedictions
-        # self.data_server.chat = self.chat
-        # self.data_server.my_name = self.my_name
-        self.data_server.save()
+        data_store.save()
         self.enable_buttons(False)
 
     def _pair_username_change(self, *args) -> None:
@@ -461,11 +452,11 @@ class MainFrame:
         self.username_1.set(username_1)
         self.username_2.set(username_2)
 
-        if username_1 in self.players:
-            self.name_1.set(self.players[username_1].name)
+        if username_1 in data_store.players:
+            self.name_1.set(data_store.players[username_1].name)
 
-        if username_2 in self.players:
-            self.name_2.set(self.players[username_2].name)
+        if username_2 in data_store.players:
+            self.name_2.set(data_store.players[username_2].name)
 
         self.save_button.widget.state(["disabled"])
         self.delete_button.widget.state(["disabled"])
@@ -503,6 +494,9 @@ class MainFrame:
         self.config.update("horizontal_sashes", horizontal_sashes)
         self.config.update("notes_sashes", notes_sashes)
         self.config.save()
+
+    def _on_data_change(self) -> None:
+        print("Data changed")
 
     def _dismiss(self, *args) -> None:
         self._save_sashes()

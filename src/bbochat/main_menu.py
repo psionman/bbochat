@@ -8,7 +8,7 @@ from psiutils.menus import Menu, MenuItem
 from bbochat._version import __version__
 from bbochat.config import config
 from bbochat.constants import APP_TITLE, AUTHOR, HELP_URI
-from bbochat.data_server import DataServer
+from bbochat.data_store import data_store
 from bbochat.forms.frm_config import ConfigFrame
 from bbochat.text import Text
 
@@ -41,7 +41,7 @@ class MainMenu:
         ]
 
     def _get_my_name(self) -> None:
-        data_server = DataServer()
+        data_server = data_store
         data_server.read()
         if dlg := simpledialog.askstring(
             f"{APP_TITLE} - Your name",

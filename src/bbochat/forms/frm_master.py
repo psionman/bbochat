@@ -5,6 +5,7 @@ from tkinter import ttk
 
 from bbochat.config import get_config
 from bbochat.constants import FRAME_WIDTH, ChatMode
+from bbochat.data_store import data_store
 from bbochat.forms.frm_chat import ChatFrame
 from bbochat.forms.frm_opponents import OpponentsFrame
 from bbochat.forms.frm_text_selection import TextSelectionFrame
@@ -18,7 +19,6 @@ class MasterFrame:
         # used in text_selection
         self.update_clipboard = parent.update_clipboard
         self.config = get_config()
-        self.data_server = parent.data_server
 
         self.chat = parent.data_server.data_sets["chat"]
         self.chat_list = parent.chat_list
@@ -45,14 +45,14 @@ class MasterFrame:
         frame.add(self.players_frame, width=FRAME_WIDTH)
 
         mode = ChatMode.GREETINGS
-        data_set = self.data_server.data_sets[mode.name.lower()]
-        mode_data = ModeData(self.data_server, source_data=data_set)
+        data_set = data_store.data_sets[mode.name.lower()]
+        mode_data = ModeData(source_data=data_set)
         greetings = TextSelectionFrame(self, frame, mode, mode_data)
         frame.add(greetings.main_frame, width=FRAME_WIDTH)
 
         mode = ChatMode.VALEDICTION
-        data_set = self.data_server.data_sets[mode.name.lower()]
-        mode_data = ModeData(self.data_server, source_data=data_set)
+        data_set = data_store.data_sets[mode.name.lower()]
+        mode_data = ModeData(source_data=data_set)
         valedictions = TextSelectionFrame(self, frame, mode, mode_data)
         frame.add(valedictions.main_frame, width=FRAME_WIDTH)
 

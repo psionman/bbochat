@@ -1,9 +1,12 @@
 """Data manipulation for BBO Chat."""
 
 import json
+from collections.abc import Callable
 
 from bbochat import logger
 from bbochat.constants import DATA_FILE, DONT_SAVE
+
+Listener = Callable[[], None]
 
 OK = 0
 FILE_NOT_FOUND = 1
@@ -89,7 +92,7 @@ class Pair:
         self.username_2 = username_2
 
 
-class DataServer:
+class DataStore:
     def __init__(self) -> None:
         self.partners = {}
         self.players = {}
@@ -99,6 +102,7 @@ class DataServer:
         # self.chat = []
         self.notes = {}
         self.my_name = ""
+        self._listeners = []
 
     def read(self):
         raw_data = self._read_data_file()
@@ -143,6 +147,7 @@ class DataServer:
             elif key == "my_name":
                 self.my_name = value
                 self.data_sets["my_name"] = self.my_name
+        self._notify()
 
     def _read_data_file(self) -> str | int | None:
         try:
@@ -205,6 +210,7 @@ class DataServer:
             "my_name": self.my_name,
         }
         json_data = self._data_to_json(output)
+        self._notify()
         return self._write_data_file(json_data)
 
     @staticmethod
@@ -230,3 +236,18 @@ class DataServer:
         except Exception as e:
             logger.error(f"Failed to save data: {e}")
             return None
+
+    # -- observer pattern for UI refresh -----------------------------
+    def subscribe(self, listener: Listener) -> None:
+        self._listeners.append(listener)
+
+    def unsubscribe(self, listener: Listener) -> None:
+        self._listeners.remove(listener)
+
+    def _notify(self) -> None:
+        for listener in self._listeners:
+            listener()
+
+
+# Module-level singleton - this is the instance everyone imports.
+data_store = DataStore()

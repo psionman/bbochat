@@ -37,8 +37,6 @@ class TextSelectionFrame:
         self.show_title = show_title
         self.has_slave_frame = slave
         self.master_frame = None
-        self.data_server = parent.data_server
-
         self.mode_data = mode_data
         self.mode = mode
         self.mode_text = MODE_TEXT[mode.value]

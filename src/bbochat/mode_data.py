@@ -6,6 +6,8 @@ import uuid
 
 from bidict import bidict
 
+from bbochat.data_store import data_store
+
 
 class ModeData:
     """
@@ -15,13 +17,12 @@ class ModeData:
 
     def __init__(
         self,
-        data_server: dict,
         source_data: list | dict = None,
         has_master: bool = False,
         slave=None,
     ):
 
-        self.data_server = data_server
+        self.data_server = data_store
         self.has_master = has_master
         self.slave = slave
         self.text_register = {}

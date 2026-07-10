@@ -5,6 +5,7 @@ from tkinter import ttk
 
 from bbochat.config import get_config
 from bbochat.constants import FRAME_WIDTH, ChatMode
+from bbochat.data_store import data_store
 from bbochat.forms.frm_text_selection import TextSelectionFrame
 from bbochat.mode_data import ModeData
 
@@ -14,7 +15,6 @@ class ChatFrame:
         self.parent = parent
         self.root = parent.root
         self.config = get_config()
-        self.data_server = parent.data_server
         self.config_key = f"last_{mode}"
 
         self.chat_line = parent.chat_line
@@ -40,9 +40,7 @@ class ChatFrame:
     def _get_chat_slave(
         self, master: ttk.Frame, mode: str
     ) -> TextSelectionFrame:
-        mode_data = ModeData(
-            self.data_server, source_data=None, has_master=True, slave=False
-        )
+        mode_data = ModeData(source_data=None, has_master=True, slave=False)
 
         return TextSelectionFrame(
             self,
@@ -58,9 +56,8 @@ class ChatFrame:
         self, master: ttk.Frame, mode: ChatMode, chat_slave: TextSelectionFrame
     ) -> TextSelectionFrame:
 
-        data_set = self.data_server.data_sets[mode.name.lower()]
+        data_set = data_store.data_sets[mode.name.lower()]
         mode_data = ModeData(
-            self.data_server,
             source_data=data_set,
             has_master=False,
             slave=True,

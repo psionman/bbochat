@@ -1,4 +1,4 @@
-from bbochat.data_server import DataServer
+from bbochat.data_store import data_store
 from bbochat.forms.frm_config import ConfigFrame
 from bbochat.forms.frm_edit_select import EditSelectFrame
 
@@ -33,8 +33,7 @@ class ModuleCaller:
         self.root.wait_window(dlg.root)
 
     def _edit(self) -> None:
-        self.data_server = DataServer()
-        ds = self.data_server
+        ds = data_store
         ds.read()
         dlg = EditSelectFrame(self, "greetings")
         self.root.wait_window(dlg.root)

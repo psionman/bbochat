@@ -1,7 +1,6 @@
+from projects.constants import ICON_DIR
 from psiutils.buttons import ButtonFrame as PsiButtonFrame
 from psiutils.buttons import IconButton
-
-from projects.constants import ICON_DIR
 
 buttons = {
     "help": ("Help", "help"),

@@ -27,7 +27,6 @@ class EditSelectFrame:
         self.root = tk.Toplevel(parent.root)
         self.parent = parent
         self.mode_data = parent.mode_data
-        self.data_server = parent.data_server
 
         self.mode = parent.mode
 

@@ -3,6 +3,7 @@
 import tkinter as tk
 from tkinter import ttk
 
+from bbochat.data_store import data_store
 from psiutils import messagebox
 from psiutils.buttons import ButtonFrame
 from psiutils.constants import PAD, Mode, Status
@@ -23,8 +24,7 @@ class NotesFrame:
         self.parent = parent
         self.root = parent.root
         self.config = get_config()
-        self.data_server = parent.data_server
-        self.notes = self.data_server.notes
+        self.notes = data_store.notes
         self.category = ""
 
         # tk variables
