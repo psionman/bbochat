@@ -8,7 +8,6 @@ from datetime import datetime
 from pathlib import Path
 from tkinter import filedialog, ttk
 
-from bbochat.data_store import Partner
 from dateutil.parser import parse  # type: ignore
 from psiutils import messagebox
 from psiutils.buttons import ButtonFrame, IconButton
@@ -23,6 +22,7 @@ from bbochat.constants import (
     TXT_FILE_TYPES,
     YYYYMMDD,
 )
+from bbochat.data_store import Partner
 from bbochat.forms.frm_report import ReportFrame
 from bbochat.text import Text
 

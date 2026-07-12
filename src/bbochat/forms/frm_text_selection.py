@@ -9,7 +9,7 @@ from psiutils.constants import PAD, Status
 from psiutils.menus import Menu, MenuItem
 from psiutils.widgets import HAND
 
-from bbochat.config import get_config
+from bbochat.config import config
 from bbochat.constants import MODE_TEXT, ChatMode
 from bbochat.forms.frm_edit_select import EditSelectFrame
 from bbochat.forms.frm_text_dialog import TextDialogFrame
@@ -17,6 +17,9 @@ from bbochat.mode_data import ModeData
 from bbochat.text import Text
 
 txt = Text()
+
+WHITE = "#ffffff"
+BLACK = "#000000"
 
 
 class TextSelectionFrame:
@@ -40,9 +43,11 @@ class TextSelectionFrame:
         self.mode_data = mode_data
         self.mode = mode
         self.mode_text = MODE_TEXT[mode.value]
+        self.use_frame = None
 
         self.config_key = f"last_{self.mode.name.lower()}"
-        self.config = get_config()
+        self.config = config
+        config.subscribe(self._on_config_change)
 
         last_value = (
             self.config.config[self.config_key]
@@ -50,11 +55,6 @@ class TextSelectionFrame:
             else ""
         )
         self.text_var = tk.StringVar(value=last_value)
-
-        # TODO sort this
-        self.config.colours["chat-detail"] = self.config.colours[
-            ChatMode.CHAT.name
-        ]
 
         # self.selected_text contains the text selected from the listbox
         self.selected_text = ""
@@ -65,6 +65,7 @@ class TextSelectionFrame:
         self.context_menu = self._context_menu()
 
         self.populate_text_items()
+        self.root.update_idletasks()
 
     def _main_frame(self, master: ttk.Frame) -> ttk.Frame:
         frame = ttk.Frame(master)
@@ -89,8 +90,8 @@ class TextSelectionFrame:
         self.listbox.bind("<FocusOut>", self._on_focus_out)
 
         if self.show_use_frame:
-            use_frame = self._use_frame(frame)
-            use_frame.grid(row=2, column=0, sticky=tk.EW)
+            self.use_frame = self._use_frame(frame)
+            self.use_frame.grid(row=2, column=0, sticky=tk.EW)
 
         return frame
 
@@ -99,12 +100,19 @@ class TextSelectionFrame:
         self.listbox.config(selectbackground=colour)
 
     def _on_focus_out(self, event=None):
-        self.listbox.config(selectbackground="#ffffff")
-        self.listbox.config(selectforeground="#000000")
+        self.listbox.config(selectbackground=WHITE)
+        self.listbox.config(selectforeground=BLACK)
 
     def _use_frame(self, master) -> ttk.Frame:
         frame = ttk.Frame(master)
         frame.columnconfigure(0, weight=1)
+        self._populate_use_frame(frame)
+        return frame
+
+    def _populate_use_frame(self, frame: ttk.Frame):
+        if frame:
+            for widget in frame.winfo_children():
+                widget.destroy()
 
         label = ttk.Label(frame, text=f"Selected {self.mode_text}")
         label.grid(row=0, column=0, pady=PAD)
@@ -215,8 +223,8 @@ class TextSelectionFrame:
     def _use_item(self, *args) -> None:
         if self.text_var.get() and self.text_var.get()[0] == "#":
             self.text_var.set("")
+        print(f"Using self.parent.parent: {self.text_var.get()}, {self.mode}")
         self.parent.parent.update_clipboard(self.text_var.get(), self.mode)
-        self.config = get_config()
         self.config.update(self.config_key, self.text_var.get())
         self.config.save()
 
@@ -237,6 +245,10 @@ class TextSelectionFrame:
         context_menu = Menu(self.root, menu_items)
         context_menu.enable(False)
         return context_menu
+
+    def _on_config_change(self) -> None:
+        if self.use_frame:
+            self._populate_use_frame(self.use_frame)
 
     def _show_context_menu(self, event: tk.Event) -> None:
         self.context_menu.tk_popup(event.x_root, event.y_root)

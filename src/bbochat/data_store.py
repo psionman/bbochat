@@ -103,6 +103,10 @@ class DataStore:
         self.notes = {}
         self.my_name = ""
         self._listeners = []
+        self._name_1: str = ""
+        self._name_2: str = ""
+        self._username_1: str = ""
+        self._username_2: str = ""
 
     def read(self):
         raw_data = self._read_data_file()
@@ -156,6 +160,42 @@ class DataStore:
         except FileNotFoundError:
             return FILE_NOT_FOUND
         return None
+
+    @property
+    def name_1(self) -> str:
+        return self._name_1
+
+    @name_1.setter
+    def name_1(self, value: str) -> None:
+        self._name_1 = value
+        self._notify()
+
+    @property
+    def name_2(self) -> str:
+        return self._name_2
+
+    @name_2.setter
+    def name_2(self, value: str) -> None:
+        self._name_2 = value
+        self._notify()
+
+    @property
+    def username_1(self) -> str:
+        return self._username_1
+
+    @username_1.setter
+    def username_1(self, value: str) -> None:
+        self._username_1 = value
+        self._notify()
+
+    @property
+    def username_2(self) -> str:
+        return self._username_2
+
+    @username_2.setter
+    def username_2(self, value: str) -> None:
+        self._username_2 = value
+        self._notify()
 
     @staticmethod
     def _get_json(data: str) -> dict | None:

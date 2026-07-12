@@ -82,7 +82,6 @@ class EditSelectFrame:
 
         root.bind("<Control-x>", self._dismiss)
         root.bind("<Control-s>", self._save_data)
-        root.bind("<Configure>", lambda e: window_resize(self, __file__))
 
         root.rowconfigure(0, weight=1)
         root.columnconfigure(0, weight=1)
@@ -92,6 +91,8 @@ class EditSelectFrame:
 
         sizegrip = ttk.Sizegrip(root)
         sizegrip.grid(sticky=tk.SE)
+        self.root.update_idletasks()
+        root.bind("<Configure>", lambda e: window_resize(self, __file__))
 
     def _main_frame(self, master: ttk.Frame) -> ttk.Frame:
         frame = ttk.Frame(master)

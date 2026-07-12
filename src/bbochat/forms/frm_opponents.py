@@ -22,16 +22,12 @@ class OpponentsFrame:
         self.config = get_config()
 
         # tk variables
-        self.search = parent.parent.search
-        self.name_1 = parent.parent.name_1
-        self.name_2 = parent.parent.name_2
-        self.username_1 = parent.parent.username_1
-        self.username_2 = parent.parent.username_2
+        self.search = tk.StringVar()
 
         self.opponents_frame = self._opponents_frame(master)
 
         self.search_pairs = []
-        self.name_search()
+        self._name_search()
         self._populate_pair_tree()
 
     def _opponents_frame(self, master: ttk.Frame) -> ttk.Frame:
@@ -44,7 +40,7 @@ class OpponentsFrame:
 
         self.search_entry = ttk.Entry(frame, textvariable=self.search)
         self.search_entry.grid(row=1, column=0, sticky=tk.EW)
-        self.search_entry.bind("<KeyRelease>", self.name_search)
+        self.search_entry.bind("<KeyRelease>", self._name_search)
         self.search_entry.focus_set()
 
         self.pair_tree = self._pair_tree(frame)
@@ -80,7 +76,7 @@ class OpponentsFrame:
             tree.column(col_key, width=col_width, anchor=tk.W)
         return tree
 
-    def name_search(self, *args) -> None:
+    def _name_search(self, *args) -> None:
         pairs = []
         input_text = self.search.get()
         for pair in data_store.pairs:
@@ -102,9 +98,7 @@ class OpponentsFrame:
             data_store.players[values[0]],
             data_store.players[values[1]],
         ]
-        self.username_1.set(self.pair[0].username)
-        self.name_1.set(self.pair[0].name)
-        self.username_2.set(self.pair[1].username)
-        self.name_2.set(self.pair[1].name)
-
-        self.parent.parent.pair_tree_clicked()
+        data_store.username_1 = self.pair[0].username
+        data_store.username_2 = self.pair[1].username
+        data_store.name_1 = self.pair[0].name
+        data_store.name_2 = self.pair[1].name

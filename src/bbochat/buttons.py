@@ -4,6 +4,7 @@ from psiutils.buttons import IconButton
 
 buttons = {
     "help": ("Help", "help"),
+    "folder-open": ("Open here", "folder-open"),
 }
 
 

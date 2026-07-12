@@ -1,5 +1,6 @@
 """Config for BBO Chat."""
 
+from collections.abc import Callable
 from pathlib import Path
 
 from psiconfig import TomlConfig as BaseTomlConfig
@@ -12,17 +13,7 @@ from bbochat.constants import (
     ChatMode,
 )
 
-
-class TomlConfig(BaseTomlConfig):
-    """Redefinition of TomlConfig to allow for css."""
-
-    def __init__(self, path: str, defaults: dict, restore_defaults: bool):
-        super().__init__(path, defaults, restore_defaults)
-
-    def save(self) -> None:
-        if "css" in self.config:
-            self.config.pop("css")
-        super().save()
+Listener = Callable[[], None]
 
 
 DEFAULT_CONFIG = {
@@ -45,9 +36,6 @@ DEFAULT_CONFIG = {
         "frm_notes_edit": "880x550",
     },
     "colours": {
-        # 'greeting': 'limegreen',
-        # 'valediction': 'salmon',
-        # 'chat': 'aqua',
         f"{ChatMode.GREETINGS.name}": "limegreen",
         f"{ChatMode.VALEDICTION.name}": "salmon",
         f"{ChatMode.CHAT.name}": "aqua",
@@ -65,14 +53,38 @@ DEFAULT_CONFIG = {
         "font-size": 15,
         "font-weight": "normal",
     },
-    # 'css': {
-    #     'body': {'color': 'black', 'font-size': 12},
-    #     'h1': {'color': 'green', 'font-size': 20},
-    #     'h2': {'color': 'green', 'font-size': 18},
-    #     'h3': {'color': 'green', 'font-size': 16},
-    #     'p,ul': {'color': 'black', 'font-size': 15, 'font-weight': 'normal'},
-    # },
 }
+
+
+class TomlConfig(BaseTomlConfig):
+    """Redefinition of TomlConfig to allow for css."""
+
+    def __init__(self, path: str, defaults: dict, restore_defaults: bool):
+        super().__init__(path, defaults, restore_defaults)
+        self._listeners: list[Listener] = []
+        self.last_config = self.config.copy()
+
+    def save(self) -> None:
+        if "css" in self.config:
+            self.config.pop("css")
+        test_config = self.config.copy()
+        test_config.pop("geometry", {})
+        self.last_config.pop("geometry", {})
+        if test_config != self.last_config:
+            self.last_config = test_config.copy()
+            super().save()
+            self._notify()
+
+    # -- observer pattern for UI refresh -----------------------------
+    def subscribe(self, listener: Listener) -> None:
+        self._listeners.append(listener)
+
+    def unsubscribe(self, listener: Listener) -> None:
+        self._listeners.remove(listener)
+
+    def _notify(self) -> None:
+        for listener in self._listeners:
+            listener()
 
 
 def get_config(restore_defaults: bool = False) -> TomlConfig:
@@ -106,4 +118,5 @@ def _get_css(toml_config: TomlConfig) -> TomlConfig:
     return css
 
 
+# Module-level singleton (TomlConfig) - this is the instance everyone imports.
 config = get_config()

@@ -3,7 +3,6 @@
 import tkinter as tk
 from tkinter import ttk
 
-from bbochat.config import get_config
 from bbochat.constants import FRAME_WIDTH, ChatMode
 from bbochat.data_store import data_store
 from bbochat.forms.frm_text_selection import TextSelectionFrame
@@ -14,7 +13,6 @@ class ChatFrame:
     def __init__(self, parent, master: ttk.Frame, mode: int) -> None:
         self.parent = parent
         self.root = parent.root
-        self.config = get_config()
         self.config_key = f"last_{mode}"
 
         self.chat_line = parent.chat_line

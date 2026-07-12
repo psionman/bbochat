@@ -3,18 +3,17 @@
 import tkinter as tk
 from tkinter import ttk
 
-from bbochat.data_store import data_store
 from psiutils import messagebox
 from psiutils.buttons import ButtonFrame
 from psiutils.constants import PAD, Mode, Status
 from psiutils.menus import Menu, MenuItem
 from psiutils.widgets import HAND
-from tkinterweb import HtmlFrame
+from tkhtmlview import HTMLText
 
 from bbochat.config import get_config
+from bbochat.data_store import data_store
 from bbochat.forms.frm_notes_edit import NotesEditFrame
 from bbochat.text import Text
-from bbochat.utilities_bbochat import display_html
 
 txt = Text()
 
@@ -78,11 +77,7 @@ class NotesFrame:
         frame.rowconfigure(1, weight=1)
         frame.columnconfigure(0, weight=1)
 
-        self.notes_text = HtmlFrame(
-            frame,
-            horizontal_scrollbar="auto",
-            messages_enabled=False,
-        )
+        self.notes_text = HTMLText(frame)
         self.notes_text.grid(row=0, column=0, sticky=tk.NSEW)
 
         return frame
@@ -149,4 +144,4 @@ class NotesFrame:
         self.context_menu.tk_popup(event.x_root, event.y_root)
 
     def _create_report(self, report: str) -> str:
-        display_html(self.notes_text, report, self.config.css)
+        self.notes_text.set_html(report.replace("\n", "<br>"))

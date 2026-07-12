@@ -7,21 +7,12 @@ readme = "README.md"
 requires-python = ">=3.10"
 
 dependencies = [
-    "appdirs>=1.4.4",
     "bidict>=0.23.1",
     "clipboard>=0.0.4",
-    "emoji>=2.14.1",
-    "enums>=0.0.2",
-    "icecream>=2.1.4",
-    "markdown>=3.8",
-    "psi-toml>=0.0.18",
-    "psiconfig>=0.0.15",
-    "psiutils>=0.2.33",
-    "pygobject>=3.54.2",
+    "emoji>=2.15.0",
+    "psiutils>=1.0.2",
     "python-dateutil>=2.9.0.post0",
-    "ruff>=0.15.15",
-    "structlog>=25.4.0",
-    "tkinterweb>=4.4.4",
+    "tkhtmlview>=0.3.2",
     "userpaths>=0.1.3",
 ]
 

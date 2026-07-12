@@ -14,7 +14,7 @@ from psiutils.buttons import ButtonFrame, IconButton
 from psiutils.constants import PAD
 from psiutils.utilities import window_resize
 
-from bbochat.config import get_config
+from bbochat.config import config, get_config
 from bbochat.constants import ChatMode
 from bbochat.data_store import Pair, Player, data_store
 from bbochat.forms.frm_master import MasterFrame
@@ -38,7 +38,8 @@ DEFAULT_GEOMETRY = "1250x700"
 class MainFrame:
     def __init__(self, root: tk.Tk) -> None:
         self.root = root
-        self.config = get_config()
+        self.config = config
+        config.subscribe(self._on_config_change)
         self.mode = ChatMode.GREETINGS
 
         data_store.read()
@@ -55,21 +56,20 @@ class MainFrame:
         self.partner = ""
         self.partners = data_store.partners
         self.partners_names = sorted(list(self.partners.keys()))
-        if (
-            self.config.last_partner
-            and self.config.last_partner in self.partners
-        ):
-            self.partner = self.partners[self.config.last_partner]
+        if config.last_partner and config.last_partner in self.partners:
+            self.partner = self.partners[config.last_partner]
 
         # tk variables
         self._create_tk_variables()
         self.username_1.trace_add("write", self._pair_username_change)
         self.username_2.trace_add("write", self._pair_username_change)
+        self.name_1.trace_add("write", self._update_clipboard)
+        self.name_2.trace_add("write", self._update_clipboard)
 
         self.last_mode_text = {
-            ChatMode.GREETINGS: self.config.last_greeting,
-            ChatMode.VALEDICTION: self.config.last_valediction,
-            ChatMode.CHAT: self.config.last_chat,
+            ChatMode.GREETINGS: config.last_greeting,
+            ChatMode.VALEDICTION: config.last_valediction,
+            ChatMode.CHAT: config.last_chat,
         }
 
         self.save_button = None
@@ -85,7 +85,7 @@ class MainFrame:
         self.pair_tree = self.master_tab.pair_tree
         self.search_entry = self.master_tab.search_entry
 
-        self._update_clipboard_colour()
+        self._set_clipboard_colour()
         self._pair_username_change()
 
         # On setup
@@ -101,19 +101,19 @@ class MainFrame:
         self.username_2 = tk.StringVar()
         self.name_1 = tk.StringVar()
         self.name_2 = tk.StringVar()
-        self.randomize = tk.BooleanVar(value=self.config.randomize_name_order)
+        self.randomize = tk.BooleanVar(value=config.randomize_name_order)
 
         greeting = self.partner.greeting if self.partner else ""
         self.greeting = tk.StringVar(value=greeting)
         self.greetings_list = tk.StringVar(value=self.greetings)
-        self.valediction = tk.StringVar(value=self.config.last_valediction)
+        self.valediction = tk.StringVar(value=config.last_valediction)
         self.chat_list = tk.StringVar(value=self.chat)
         self.system = tk.StringVar()
         self.chat_line = tk.StringVar()
 
         # Partners
         self.partners_list = tk.StringVar(value=self.partners_names)
-        self.selected_partner = tk.StringVar(value=self.config.last_partner)
+        self.selected_partner = tk.StringVar(value=config.last_partner)
         self.my_name_text = tk.StringVar(value=self.my_name)
         self.partners_name = tk.StringVar(value="")
         self.partners_username = tk.StringVar()
@@ -123,12 +123,6 @@ class MainFrame:
         root.protocol("WM_DELETE_WINDOW", self._dismiss)
         root.geometry(self._geometry())
         root.title(FRAME_TITLE)
-        root.bind("<Control-x>", self._dismiss)
-        root.bind("<Control-g>", self._greeting)
-        root.bind("<Control-v>", self._valediction)
-        root.bind("<Control-c>", self._chat)
-        # root.bind("<Control-s>", self.save)
-        root.bind("<Configure>", lambda e: window_resize(self, __file__))
 
         root.rowconfigure(0, weight=1)
         root.columnconfigure(0, weight=1)
@@ -136,25 +130,28 @@ class MainFrame:
         main_menu = MainMenu(self)
         main_menu.create()
 
-        frame = ttk.Frame(root)
-        frame.grid(row=0, column=0, padx=0)
-        frame.rowconfigure(0, weight=1)
-        frame.columnconfigure(0, weight=1)
-
-        main_frame = self._main_frame(frame)
+        main_frame = self._main_frame(root)
         main_frame.grid(row=0, column=0, sticky=tk.NSEW, padx=0, pady=PAD)
 
-        self.button_frame = self._button_frame(frame)
+        self.button_frame = self._button_frame(root)
         self.button_frame.grid(
             row=1, column=0, sticky=tk.EW, padx=PAD, pady=PAD
         )
 
-        sizegrip = ttk.Sizegrip(frame)
+        sizegrip = ttk.Sizegrip(root)
         sizegrip.grid(sticky=tk.SE)
+
+        self.root.update_idletasks()
+        root.bind("<Control-x>", self._dismiss)
+        root.bind("<Control-g>", self._greeting)
+        root.bind("<Control-v>", self._valediction)
+        root.bind("<Control-c>", self._chat)
+        # root.bind("<Control-s>", self.save)
+        root.bind("<Configure>", lambda e: window_resize(self, __file__))
 
     def _geometry(self) -> str:
         try:
-            geometry = self.config.geometry[Path(__file__).stem]
+            geometry = config.geometry[Path(__file__).stem]
             width = int(geometry.split("x")[0])
             return DEFAULT_GEOMETRY if width < 10 else geometry
         except tk.TclError:
@@ -246,14 +243,12 @@ class MainFrame:
 
         entry = ttk.Entry(frame, textvariable=self.name_1)
         entry.grid(row=2, column=3, pady=PAD)
-        entry.bind("<KeyRelease>", self._update_clipboard)
 
         entry = ttk.Entry(frame, textvariable=self.username_2)
         entry.grid(row=1, column=4, padx=PAD)
 
         entry = ttk.Entry(frame, textvariable=self.name_2)
         entry.grid(row=2, column=4, pady=PAD)
-        entry.bind("<KeyRelease>", self._update_clipboard)
 
         self.save_button = IconButton(
             frame, txt.SAVE, "save", self._save_names, True
@@ -320,11 +315,12 @@ class MainFrame:
             data_store.my_name = dlg
             data_store.save()
 
-    def _update_clipboard_colour(self):
+    def _on_config_change(self, *args):
+        self.randomize.set(config.randomize_name_order)
         self._set_clipboard_colour()
 
     def _set_clipboard_colour(self):
-        colour = self.config.colours[self.mode.name]
+        colour = config.colours[self.mode.name]
         entry_style = ttk.Style()
         entry_style.configure(
             "clipboard_entry.TEntry",
@@ -336,17 +332,13 @@ class MainFrame:
     def _update_clipboard(self, *args) -> None:
         self.update_clipboard()
 
-    def pair_tree_clicked(self) -> None:
-        self.mode = ChatMode.GREETINGS
-        self.update_clipboard()
-
     def update_clipboard(
         self, message: str = "", mode: int = None, *args
     ) -> None:
         if mode is not None:
             self.last_mode_text[mode] = message
             self.mode = mode
-        self._update_clipboard_colour()
+        self._set_clipboard_colour()
 
         if not message:
             if mode is None:
@@ -418,9 +410,9 @@ class MainFrame:
             data_store.pairs.append(Pair(username_1, username_2))
 
         self.save()
-        self.search.set("")
+        # self.search.set("")
         self.pair_tree.delete(*self.pair_tree.get_children())
-        self.search.set(self.username_1.get())
+        # self.search.set(self.username_1.get())
         self.search_entry.focus_set()
         self.master_tab.opponents_frame.name_search()
         self.update_clipboard()
@@ -438,8 +430,9 @@ class MainFrame:
         self.username_1.set("")
         self.username_2.set("")
         self._pair_username_change()
-        self.search.set("")
+        # self.search.set("")
         self.pair_tree.delete(*self.pair_tree.get_children())
+        # self.search.set(self.username_1.get())
         self.search_entry.focus_set()
 
     def save(self, *args) -> None:
@@ -449,8 +442,8 @@ class MainFrame:
     def _pair_username_change(self, *args) -> None:
         username_1 = self.username_1.get().lower()
         username_2 = self.username_2.get().lower()
-        self.username_1.set(username_1)
-        self.username_2.set(username_2)
+        self.username_1.set(self.username_1.get().lower())
+        self.username_2.set(self.username_2.get().lower())
 
         if username_1 in data_store.players:
             self.name_1.set(data_store.players[username_1].name)
@@ -465,14 +458,10 @@ class MainFrame:
             self.delete_button.widget.state(["!disabled"])
 
     def enable_buttons(self, enable: bool = True) -> None:
-        if not self.button_frame:
-            return
         if not enable:
             self.button_frame.enable(False)
             return
 
-        if self.button_frame.enabled is True:
-            return
         self.button_frame.enable(True)
 
     def _save_sashes(self) -> None:
@@ -489,14 +478,17 @@ class MainFrame:
             for index in range(NOTES_FRAME_COUNT)
         ]
 
-        self.config = get_config()
-        self.config.update("vertical_sashes", vertical_sashes)
-        self.config.update("horizontal_sashes", horizontal_sashes)
-        self.config.update("notes_sashes", notes_sashes)
-        self.config.save()
+        config = get_config()
+        config.update("vertical_sashes", vertical_sashes)
+        config.update("horizontal_sashes", horizontal_sashes)
+        config.update("notes_sashes", notes_sashes)
+        config.save()
 
     def _on_data_change(self) -> None:
-        print("Data changed")
+        self.name_1.set(data_store.name_1)
+        self.name_2.set(data_store.name_2)
+        self.username_1.set(data_store.username_1)
+        self.username_2.set(data_store.username_2)
 
     def _dismiss(self, *args) -> None:
         self._save_sashes()

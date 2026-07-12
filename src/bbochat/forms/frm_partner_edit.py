@@ -4,7 +4,6 @@ import tkinter as tk
 from pathlib import Path
 from tkinter import ttk
 
-from bbochat.data_store import Partner, data_store
 from psiutils.buttons import ButtonFrame
 from psiutils.constants import PAD, PADB, PADR, Mode, Status
 from psiutils.utilities import window_resize
@@ -12,6 +11,7 @@ from psiutils.widgets import clickable_widget
 
 from bbochat.config import get_config
 from bbochat.constants import ICON_FILE
+from bbochat.data_store import Partner, data_store
 
 FRAME_TITLE = "New partner"
 
@@ -61,7 +61,6 @@ class PartnerEditFrame:
         root.grab_set()
         root.transient(self.parent.root)
         root.bind("<Control-x>", self._dismiss)
-        root.bind("<Configure>", lambda e: window_resize(self, __file__))
 
         row = 0
         root.rowconfigure(0, weight=1)
@@ -78,6 +77,8 @@ class PartnerEditFrame:
 
         sizegrip = ttk.Sizegrip(root)
         sizegrip.grid(sticky=tk.SE)
+        self.root.update_idletasks()
+        root.bind("<Configure>", lambda e: window_resize(self, __file__))
 
     def _main_frame(self, master: ttk.Frame) -> ttk.Frame:
         frame = ttk.Frame(master)
@@ -160,7 +161,7 @@ class PartnerEditFrame:
         self.partner.greeting = self.greeting.get()
         self.partner.notes = self.notes_text.get(0.0, tk.END)
         self.partners[self.partner.username] = self.partner
-        self.parent.parent.save()
+        data_store.save()
         self.status = Status.OK
         self._dismiss()
 

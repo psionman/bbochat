@@ -3,7 +3,6 @@
 import tkinter as tk
 from tkinter import ttk
 
-from bbochat.data_store import Partner, data_store
 from psiutils import messagebox
 from psiutils.buttons import ButtonFrame
 from psiutils.constants import PAD, PADT, Mode, Status
@@ -11,6 +10,7 @@ from psiutils.menus import Menu, MenuItem
 from psiutils.widgets import HAND, PsiText
 
 from bbochat.config import get_config
+from bbochat.data_store import Partner, data_store
 from bbochat.forms.frm_partner_edit import PartnerEditFrame
 from bbochat.text import Text
 

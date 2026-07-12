@@ -5,18 +5,27 @@ from tkinter.colorchooser import askcolor
 
 from psiutils import messagebox
 from psiutils.buttons import ButtonFrame, IconButton
-from psiutils.constants import PAD, PADT, Pad, Status
+from psiutils.constants import PAD, PADT, Status
 from psiutils.utilities import window_resize
 from psiutils.widgets import separator_frame
 from tkinterweb import HtmlFrame
 
-from bbochat.config import get_config
-from bbochat.constants import HTML_TEST
+from bbochat.config import config
+from bbochat.constants import HTML_TEST, ICON_DIR, ChatMode
 from bbochat.forms.frm_config_css import ConfigCssFrame
 from bbochat.text import Text
 from bbochat.utilities_bbochat import display_html
 
 txt = Text()
+
+
+class ColourLabel(ttk.Label):
+    def __init__(self, *args, **kwargs):
+        self.colour = ""
+        if "colour" in kwargs:
+            self.colour = kwargs["colour"]
+            kwargs.pop("colour")
+        super().__init__(*args, **kwargs)
 
 
 class ConfigFrame:
@@ -25,10 +34,11 @@ class ConfigFrame:
     def __init__(self, parent):
         self.root = tk.Toplevel(parent.root)
         self.parent = parent
-        self.config = get_config()
-        self.colours = dict(self.config.colours)
-        self.css = self.config.css
+        self.config = config
+        self.colours = dict(config.colours)
+        self.css = config.css
         self.css_element = None
+        self.style = ttk.Style()
 
         self.button_frame = None
         self.greeting_entry = None
@@ -37,14 +47,20 @@ class ConfigFrame:
         self.html_frame = None
 
         # tk variables
-        self.data_directory = tk.StringVar(value=self.config.data_directory)
+        self.data_directory = tk.StringVar(value=config.data_directory)
         self.randomize_name_order = tk.BooleanVar(
-            value=self.config.randomize_name_order
+            value=config.randomize_name_order
         )
-        self.show_tooltips = tk.BooleanVar(value=self.config.show_tooltips)
+        self.show_tooltips = tk.BooleanVar(value=config.show_tooltips)
         self.tournament_notes_directory = tk.StringVar(
-            value=self.config.tournament_notes_directory
+            value=config.tournament_notes_directory
         )
+
+        # Colour items
+        for key, chat_mode in ChatMode.__members__.items():
+            colour = config.colours.get(key, "#000000")
+            setattr(self, chat_mode.name, tk.StringVar(value=colour))
+            setattr(self, f"{chat_mode.name}_original", colour)
 
         self.data_directory.trace_add("write", self._check_value_changed)
         self.tournament_notes_directory.trace_add(
@@ -53,13 +69,8 @@ class ConfigFrame:
         self.randomize_name_order.trace_add("write", self._check_value_changed)
         self.show_tooltips.trace_add("write", self._check_value_changed)
 
+        self.colour_entries = {}
         self._show()
-
-        self.colour_entries = {
-            "greeting": self.greeting_entry,
-            "valediction": self.valediction_entry,
-            "chat": self.chat_entry,
-        }
         self._update_mode_colours()
 
         self.display_html()
@@ -72,26 +83,21 @@ class ConfigFrame:
 
         root.bind("<Control-x>", self._dismiss)
         root.bind("<Control-s>", self._save_config)
-        root.bind("<Configure>", lambda e: window_resize(self, __file__))
-
         root.rowconfigure(0, weight=1)
         root.columnconfigure(0, weight=1)
 
-        frame = ttk.Frame(root)
-        frame.grid(row=0, column=0, padx=0, sticky=tk.NSEW)
-        frame.rowconfigure(0, weight=1)
-        frame.columnconfigure(0, weight=1)
-
-        main_frame = self._main_frame(frame)
+        main_frame = self._main_frame(root)
         main_frame.grid(row=0, column=0, sticky=tk.NSEW, padx=PAD, pady=PAD)
 
-        self.button_frame = self._button_frame(frame)
+        self.button_frame = self._button_frame(root)
         self.button_frame.grid(
             row=8, column=0, columnspan=9, sticky=tk.EW, padx=PAD, pady=PAD
         )
 
-        sizegrip = ttk.Sizegrip(frame)
+        sizegrip = ttk.Sizegrip(root)
         sizegrip.grid(sticky=tk.SE)
+        self.root.update_idletasks()
+        root.bind("<Configure>", lambda e: window_resize(self, __file__))
 
     def _main_frame(self, master: ttk.Frame) -> ttk.Frame:
         frame = ttk.Frame(master)
@@ -107,7 +113,7 @@ class ConfigFrame:
             text="Randomize opp's name order",
             variable=self.randomize_name_order,
         )
-        check_button.grid(row=row, column=1, sticky=tk.W)
+        check_button.grid(row=row, column=1, columnspan=4, sticky=tk.W)
 
         row += 1
         check_button = ttk.Checkbutton(
@@ -120,41 +126,9 @@ class ConfigFrame:
         separator.grid(row=row, column=0, columnspan=5, sticky=tk.EW, padx=PAD)
 
         row += 1
-        label = ttk.Label(frame, text="Greeting")
-        label.grid(row=row, column=0, sticky=tk.E, padx=PAD, pady=PAD)
-        self.greeting_entry = ttk.Entry(frame)
-        self.greeting_entry.grid(
-            row=row, column=1, sticky=tk.EW, padx=PAD, pady=PAD
-        )
-        button = ttk.Button(frame, text=txt.ELLIPSIS)
-        button.grid(row=row, column=2, padx=Pad.W)
-        button.bind("<Button-1>", lambda e: self._ask_colour("greeting"))
-
-        row += 1
-        label = ttk.Label(frame, text="Valediction")
-        label.grid(row=row, column=0, sticky=tk.E, padx=PAD, pady=PAD)
-        self.valediction_entry = ttk.Entry(frame)
-        self.valediction_entry.grid(
-            row=row, column=1, sticky=tk.EW, padx=PAD, pady=PAD
-        )
-
-        button = ttk.Button(frame, text=txt.ELLIPSIS)
-        button.grid(row=row, column=2, padx=Pad.W)
-        button.bind("<Button-1>", lambda e: self._ask_colour("valediction"))
-
-        row += 1
-        label = ttk.Label(frame, text="Chat")
-        label.grid(row=row, column=0, sticky=tk.E, padx=PAD, pady=PAD)
-        self.chat_entry = ttk.Entry(frame)
-        self.chat_entry.grid(
-            row=row, column=1, sticky=tk.EW, padx=PAD, pady=PAD
-        )
-        button = ttk.Button(frame, text=txt.ELLIPSIS)
-        button.grid(row=row, column=2, padx=Pad.W)
-
-        button = ttk.Button(frame, text=txt.ELLIPSIS)
-        button.grid(row=row, column=2, padx=Pad.W)
-        button.bind("<Button-1>", lambda e: self._ask_colour("chat"))
+        for mode in ChatMode:
+            self._add_colour_widgets(frame, row, mode.name)
+            row += 1
 
         row += 1
         separator = separator_frame(frame, "css")
@@ -163,7 +137,7 @@ class ConfigFrame:
         row += 1
         self.html_frame = HtmlFrame(frame, messages_enabled=False, height=200)
         self.html_frame.grid(row=row, column=1, columnspan=3, sticky=tk.EW)
-        self.html_frame.grid_propagate(0)
+        # self.html_frame.grid_propagate(0)
 
         button = IconButton(frame, txt.EDIT, "edit", self._css_edit)
         button.grid(row=row, column=4, sticky=tk.N, padx=PAD)
@@ -198,6 +172,41 @@ class ConfigFrame:
         button.grid(row=row, column=4, padx=PAD, pady=PADT)
 
         return frame
+
+    def _add_colour_widgets(
+        self, frame: tk.Frame, row: int, colour_key: str
+    ) -> None:
+        label = ttk.Label(frame, text=colour_key.capitalize())
+        label.grid(row=row, column=0, sticky=tk.E, padx=PAD, pady=PAD)
+
+        entry = ttk.Entry(
+            frame, textvariable=getattr(self, colour_key), width=10
+        )
+        entry.grid(row=row, column=1, sticky=tk.EW)
+        # entry.bind(
+        #     "<FocusOut>",
+        #     lambda e, k=colour_key: self._validate_colour_change(k),
+        # )
+        self.colour_entries[colour_key] = entry
+
+        colour = getattr(self, colour_key).get()
+        self.style.configure(f"{colour}.TLabel", background=colour)
+
+        # label = ColourLabel(
+        #     frame,
+        #     width=10,
+        #     style=f"{colour}.TLabel",
+        #     colour=colour,
+        # )
+        # label.grid(row=row, column=2, sticky=tk.W, padx=PAD)
+        button = IconButton(
+            frame,
+            txt.SELECT,
+            "palette",
+            lambda k=colour_key: self._get_color(k),
+            icon_path=ICON_DIR,
+        )
+        button.grid(row=row, column=3, padx=PAD, pady=(0, 5), sticky=tk.W)
 
     def _button_frame(self, master: ttk.Frame) -> tk.Frame:
         frame = ButtonFrame(master, tk.HORIZONTAL)
@@ -241,7 +250,7 @@ class ConfigFrame:
             or self.css != self.config.css
         )
 
-    def _ask_colour(self, mode: str) -> None:
+    def _get_color(self, mode: str) -> None:
         colour = askcolor(
             initialcolor=self.colours[mode],
             title=f"{mode.capitalize()} colour",
@@ -279,7 +288,7 @@ class ConfigFrame:
         self.config.update("colours", dict(self.colours))
         self.config.update("css", dict(self.css))
         self.config.save()
-        self.config = get_config()
+        # self.config = get_config()
         self._dismiss()
 
     def display_html(self) -> None:
