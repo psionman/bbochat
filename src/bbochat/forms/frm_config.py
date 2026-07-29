@@ -96,8 +96,11 @@ class ConfigFrame:
 
         sizegrip = ttk.Sizegrip(root)
         sizegrip.grid(sticky=tk.SE)
+
         self.root.update_idletasks()
-        root.bind("<Configure>", lambda e: window_resize(self, __file__))
+        root.bind(
+            "<Configure>", lambda e: window_resize(root, __file__, config)
+        )
 
     def _main_frame(self, master: ttk.Frame) -> ttk.Frame:
         frame = ttk.Frame(master)

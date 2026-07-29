@@ -10,7 +10,7 @@ from psiutils.constants import PAD
 from psiutils.utilities import window_resize
 from tkinterweb import HtmlFrame
 
-from bbochat.config import get_config
+from bbochat.config import config
 from bbochat.constants import APP_TITLE
 from bbochat.utilities_bbochat import display_html
 
@@ -23,7 +23,6 @@ class ReportFrame:
         self.parent = parent
         self.partner = parent.partner
         self.date = parent.report_date
-        self.config = get_config()
         self.path = parent.path.get()
 
         self.html_frame = None
@@ -36,7 +35,7 @@ class ReportFrame:
 
     def _show(self) -> None:
         root = self.root
-        root.geometry(self.config.geometry[Path(__file__).stem])
+        root.geometry(config.geometry[Path(__file__).stem])
         root.transient(self.parent.root)
         root.title(FRAME_TITLE)
         root.bind(
@@ -100,7 +99,7 @@ class ReportFrame:
             output = f"{output}\n\n <h2>General notes</h2>"
             output = f"{output}\n\n{self._parse_md(notes['general_notes'])}"
 
-        html = display_html(self.html_frame, output, self.config.css)
+        html = display_html(self.html_frame, output, config.css)
         self._save_html(html)
         return html
 

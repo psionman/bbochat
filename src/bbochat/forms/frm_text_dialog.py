@@ -10,7 +10,7 @@ from psiutils.constants import PAD, Status
 from psiutils.utilities import window_resize
 from psiutils.widgets import Tooltip
 
-from bbochat.config import get_config
+from bbochat.config import config
 from bbochat.constants import APP_TITLE
 from bbochat.text import Text
 
@@ -28,7 +28,6 @@ class TextDialogFrame:
         self.root = tk.Toplevel(parent.root)
 
         self.parent = parent
-        self.config = get_config()
         self.title = title
         self.default = default
         self.text_ = default
@@ -41,7 +40,7 @@ class TextDialogFrame:
 
         # tk variables
         self.text_value = tk.StringVar(value=default)
-        tooltip = txt.TOOLTIP if self.config.show_tooltips else ""
+        tooltip = txt.TOOLTIP if config.show_tooltips else ""
         self.tooltip_text = tk.StringVar(value=tooltip)
         self.hidden_item = tk.BooleanVar()
         self._hidden_item()
@@ -53,10 +52,14 @@ class TextDialogFrame:
 
     def _show(self) -> None:
         root = self.root
-        root.geometry(self.config.geometry[Path(__file__).stem])
+        root.geometry(config.geometry[Path(__file__).stem])
         root.transient(self.parent.root)
         root.title(f"{APP_TITLE} - {self.title}")
-        root.bind("<Configure>", lambda e: window_resize(self, __file__))
+
+        root.update_idletasks()
+        root.bind(
+            "<Configure>", lambda e: window_resize(root, __file__, config)
+        )
 
         root.bind("<Control-x>", self._dismiss)
 
@@ -142,6 +145,8 @@ class TextDialogFrame:
         self.text_ = self.text_value.get()
         if self.hidden_item.get():
             self.text_ = f"# {self.text_}"
+        if self.show_save:
+            config.update(self.title, self.text_)
         self.status = Status.UPDATED
         self._dismiss()
 

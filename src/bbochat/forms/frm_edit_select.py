@@ -13,7 +13,7 @@ from psiutils.menus import Menu, MenuItem
 from psiutils.utilities import window_resize
 from psiutils.widgets import HAND
 
-from bbochat.config import get_config
+from bbochat.config import config
 from bbochat.forms.frm_text_dialog import TextDialogFrame
 from bbochat.text import Text
 
@@ -38,7 +38,6 @@ class EditSelectFrame:
         # in the calling function
         self.master_selected_text = parent.selected_text
 
-        self.config = get_config()
         self.status = Status.NULL
 
         # Original text in data store - used to check change
@@ -76,7 +75,7 @@ class EditSelectFrame:
 
     def _show(self) -> None:
         root = self.root
-        root.geometry(self.config.geometry[Path(__file__).stem])
+        root.geometry(config.geometry[Path(__file__).stem])
         root.transient(self.parent.root)
         root.title(FRAME_TITLE)
 
@@ -91,8 +90,11 @@ class EditSelectFrame:
 
         sizegrip = ttk.Sizegrip(root)
         sizegrip.grid(sticky=tk.SE)
+
         self.root.update_idletasks()
-        root.bind("<Configure>", lambda e: window_resize(self, __file__))
+        root.bind(
+            "<Configure>", lambda e: window_resize(root, __file__, config)
+        )
 
     def _main_frame(self, master: ttk.Frame) -> ttk.Frame:
         frame = ttk.Frame(master)

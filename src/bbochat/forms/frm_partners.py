@@ -9,7 +9,7 @@ from psiutils.constants import PAD, PADT, Mode, Status
 from psiutils.menus import Menu, MenuItem
 from psiutils.widgets import HAND, PsiText
 
-from bbochat.config import get_config
+from bbochat.config import config
 from bbochat.data_store import Partner, data_store
 from bbochat.forms.frm_partner_edit import PartnerEditFrame
 from bbochat.text import Text
@@ -25,8 +25,7 @@ class PartnerFrame:
         self.partners = data_store.partners
         self.greetings = data_store.greetings
         self.partners_names = self.parent.partners_names
-        self.config = get_config()
-        self.last_partner = self.config.last_partner
+        self.last_partner = config.last_partner
         self.greeting = parent.greeting
 
         # tk variables
@@ -83,11 +82,8 @@ class PartnerFrame:
             cursor=HAND,
         )
         self.listbox.grid(row=1, column=0, sticky=tk.NSEW)
-        if (
-            self.config.last_partner
-            and self.config.last_partner in self.partners_names
-        ):
-            index = self.partners_names.index(self.config.last_partner)
+        if config.last_partner and config.last_partner in self.partners_names:
+            index = self.partners_names.index(config.last_partner)
             self.listbox.select_set(index)
         self.listbox.bind("<<ListboxSelect>>", self._partner_selected)
         self.listbox.bind("<Button-3>", self._show_context_menu)
@@ -152,8 +148,8 @@ class PartnerFrame:
         self.partner = self.partners[partners_names[selection[0]]]
         self.parent.tournament_tab.change_partner(self.partner)
         self._update_partner_values()
-        self.config.config["last_partner"] = self.partner.username
-        self.config.save()
+        config.config["last_partner"] = self.partner.username
+        config.save()
 
     def _update_partner_values(self) -> None:
         if not self.partner:

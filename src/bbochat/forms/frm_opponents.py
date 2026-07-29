@@ -6,7 +6,6 @@ from tkinter import ttk
 from psiutils.constants import PAD
 from psiutils.treeview import sort_treeview
 
-from bbochat.config import get_config
 from bbochat.data_store import data_store
 
 PAIR_TREE_COLUMNS = (
@@ -19,7 +18,6 @@ class OpponentsFrame:
     def __init__(self, parent, master: ttk.Frame) -> None:
         self.parent = parent
         self.root = parent.root
-        self.config = get_config()
 
         # tk variables
         self.search = tk.StringVar()

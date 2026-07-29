@@ -39,6 +39,7 @@ DEFAULT_CONFIG = {
         f"{ChatMode.GREETINGS.name}": "limegreen",
         f"{ChatMode.VALEDICTION.name}": "salmon",
         f"{ChatMode.CHAT.name}": "aqua",
+        f"{ChatMode.CHAT_DETAIL.name}": "aqua",
     },
     "vertical_sashes": [(250, 1), (465, 1), (720, 1)],
     "horizontal_sashes": [(1, 165)],
@@ -72,8 +73,8 @@ class TomlConfig(BaseTomlConfig):
         self.last_config.pop("geometry", {})
         if test_config != self.last_config:
             self.last_config = test_config.copy()
-            super().save()
-            self._notify()
+        super().save()
+        # self._notify()
 
     # -- observer pattern for UI refresh -----------------------------
     def subscribe(self, listener: Listener) -> None:

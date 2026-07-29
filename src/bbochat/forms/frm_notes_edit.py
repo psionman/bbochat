@@ -8,7 +8,7 @@ from psiutils.buttons import ButtonFrame
 from psiutils.constants import PAD, Mode, Status
 from psiutils.utilities import window_resize
 
-from bbochat.config import get_config
+from bbochat.config import config
 from bbochat.constants import APP_TITLE
 from bbochat.data_store import data_store
 
@@ -21,7 +21,6 @@ class NotesEditFrame:
         self.notes = parent.notes
         self.notes_text = ""
 
-        self.config = get_config()
         self.title = f"{APP_TITLE} - {Mode[mode].name.capitalize()} notes"
         self.status = Status.UNDEFINED
 
@@ -37,7 +36,7 @@ class NotesEditFrame:
 
     def show(self) -> None:
         root = self.root
-        root.geometry(self.config.geometry[Path(__file__).stem])
+        root.geometry(config.geometry[Path(__file__).stem])
         root.transient(self.parent.root)
         root.title(self.title)
 
@@ -56,8 +55,11 @@ class NotesEditFrame:
 
         sizegrip = ttk.Sizegrip(root)
         sizegrip.grid(sticky=tk.SE)
+
         self.root.update_idletasks()
-        root.bind("<Configure>", lambda e: window_resize(self, __file__))
+        root.bind(
+            "<Configure>", lambda e: window_resize(root, __file__, config)
+        )
 
     def _main_frame(self, master: ttk.Frame) -> ttk.Frame:
         frame = ttk.Frame(master)

@@ -9,7 +9,7 @@ from psiutils.constants import PAD, PADB, PADR, Mode, Status
 from psiutils.utilities import window_resize
 from psiutils.widgets import clickable_widget
 
-from bbochat.config import get_config
+from bbochat.config import config
 from bbochat.constants import ICON_FILE
 from bbochat.data_store import Partner, data_store
 
@@ -24,7 +24,6 @@ class PartnerEditFrame:
         self.partners = parent.partners
         self.greetings = data_store.greetings
         self.status = Status.NULL
-        self.config = get_config()
 
         self.notes_text = None
 
@@ -54,13 +53,12 @@ class PartnerEditFrame:
 
     def _show(self) -> None:
         root = self.root
-        root.geometry(self.config.geometry[Path(__file__).stem])
+        root.geometry(config.geometry[Path(__file__).stem])
         root.title(f"{self.mode.name.capitalize()} partner")
         root.iconphoto(False, tk.PhotoImage(file=ICON_FILE))
         root.wait_visibility()
         root.grab_set()
         root.transient(self.parent.root)
-        root.bind("<Control-x>", self._dismiss)
 
         row = 0
         root.rowconfigure(0, weight=1)
@@ -77,8 +75,12 @@ class PartnerEditFrame:
 
         sizegrip = ttk.Sizegrip(root)
         sizegrip.grid(sticky=tk.SE)
+
         self.root.update_idletasks()
-        root.bind("<Configure>", lambda e: window_resize(self, __file__))
+        root.bind("<Control-x>", self._dismiss)
+        root.bind(
+            "<Configure>", lambda e: window_resize(root, __file__, config)
+        )
 
     def _main_frame(self, master: ttk.Frame) -> ttk.Frame:
         frame = ttk.Frame(master)

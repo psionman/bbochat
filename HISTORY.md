@@ -1,5 +1,11 @@
 # BBO Chat - History
 
+## Version 0.0.3 29 July 2026
+1. Add devin-next
+
+## Version 0.0.2 29 July 2026
+1. Added CHAT_DETAIL colour to default config
+
 ## Version 0.0.1 12 July 2026
 1. Changed data_server to data_store
 2. changed parent.parent. data_server data_store

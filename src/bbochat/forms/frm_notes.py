@@ -10,7 +10,6 @@ from psiutils.menus import Menu, MenuItem
 from psiutils.widgets import HAND
 from tkhtmlview import HTMLText
 
-from bbochat.config import get_config
 from bbochat.data_store import data_store
 from bbochat.forms.frm_notes_edit import NotesEditFrame
 from bbochat.text import Text
@@ -22,7 +21,6 @@ class NotesFrame:
     def __init__(self, parent, master):
         self.parent = parent
         self.root = parent.root
-        self.config = get_config()
         self.notes = data_store.notes
         self.category = ""
 

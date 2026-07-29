@@ -146,8 +146,9 @@ class MainFrame:
         root.bind("<Control-g>", self._greeting)
         root.bind("<Control-v>", self._valediction)
         root.bind("<Control-c>", self._chat)
-        # root.bind("<Control-s>", self.save)
-        root.bind("<Configure>", lambda e: window_resize(self, __file__))
+        root.bind(
+            "<Configure>", lambda e: window_resize(root, __file__, config)
+        )
 
     def _geometry(self) -> str:
         try:
