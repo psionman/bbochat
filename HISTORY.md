@@ -2,6 +2,7 @@
 
 ## Version 0.0.4 6 August 2026
 1. Fix bug in saving sashes on close
+2. Get version etc. from pyproject.toml
 
 ## Version 0.0.3 29 July 2026
 1. Add devin-next

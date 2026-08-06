@@ -5,15 +5,21 @@ from tkinter import simpledialog
 from psiutils import messagebox
 from psiutils.menus import Menu, MenuItem
 
-from bbochat._version import __version__
+from bbochat import (
+    __app_name__,
+    __author__,
+    __summary__,
+    __version__,
+)
 from bbochat.config import config
-from bbochat.constants import APP_TITLE, AUTHOR, HELP_URI
+from bbochat.constants import APP_TITLE, HELP_URI
 from bbochat.data_store import data_store
 from bbochat.forms.frm_config import ConfigFrame
 from bbochat.text import Text
 
 txt = Text()
-SPACES = " " * 20
+SPACES = 30
+SEPARATOR = "-" * 50
 
 
 class MainMenu:
@@ -77,9 +83,15 @@ class MainMenu:
 
     def _show_about(self):
         about = (
-            f"{APP_TITLE}\nVersion: {__version__}\nAuthor: {AUTHOR} {SPACES}"
+            f"{__summary__}\n"
+            f"{SEPARATOR}\n"
+            f"{txt.VERSION}: {__version__}\n"
+            f"{SEPARATOR}\n"
+            f"{txt.AUTHOR}: {__author__:<{SPACES}}"
         )
-        messagebox.showinfo(self, title=f"About {APP_TITLE}", message=about)
+        messagebox.showinfo(
+            self, title=f"{txt.ABOUT} {__app_name__}", message=about
+        )
 
     def _dismiss(self, *args):
         self.root.destroy()

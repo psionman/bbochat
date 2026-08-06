@@ -1,6 +1,6 @@
 [project]
 name = "bbochat"
-version = "0.0.3"
+version = "0.0.4"
 description = "Chat manager for BBO"
 authors = [{name = "Jeff Watkins", email = "jeffwatkins2000@gmail.com"}]
 readme = "README.md"
