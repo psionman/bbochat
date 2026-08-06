@@ -14,7 +14,7 @@ from psiutils.buttons import ButtonFrame, IconButton
 from psiutils.constants import PAD
 from psiutils.utilities import window_resize
 
-from bbochat.config import config, get_config
+from bbochat.config import config
 from bbochat.constants import ChatMode
 from bbochat.data_store import Pair, Player, data_store
 from bbochat.forms.frm_master import MasterFrame
@@ -38,7 +38,7 @@ DEFAULT_GEOMETRY = "1250x700"
 class MainFrame:
     def __init__(self, root: tk.Tk) -> None:
         self.root = root
-        self.config = config
+        self.config = None  # Used to save sashes (see self._dismiss)
         config.subscribe(self._on_config_change)
         self.mode = ChatMode.GREETINGS
 
@@ -478,12 +478,11 @@ class MainFrame:
             self.tournament_tab.notes_panel.sash_coord(index)
             for index in range(NOTES_FRAME_COUNT)
         ]
-
-        config = get_config()
         config.update("vertical_sashes", vertical_sashes)
         config.update("horizontal_sashes", horizontal_sashes)
         config.update("notes_sashes", notes_sashes)
         config.save()
+        self.config = config
 
     def _on_data_change(self) -> None:
         self.name_1.set(data_store.name_1)
@@ -494,3 +493,5 @@ class MainFrame:
     def _dismiss(self, *args) -> None:
         self._save_sashes()
         self.root.destroy()
+        # Need to do this because window_resize is called in close
+        self.config.save()
