@@ -6,6 +6,7 @@ from pathlib import Path
 from tkinter import ttk
 from tkinter.colorchooser import askcolor
 
+from bbochat.utilities import display_html
 from psiutils.buttons import ButtonFrame
 from psiutils.constants import PAD, Pad, Status
 from psiutils.utilities import window_resize
@@ -14,7 +15,6 @@ from tkinterweb import HtmlFrame
 
 from bbochat.constants import APP_TITLE, HTML_TEST
 from bbochat.text import Text
-from bbochat.utilities_bbochat import display_html
 
 txt = Text()
 FRAME_TITLE = f"{APP_TITLE} - css  {txt.CONFIG}"

@@ -5,6 +5,7 @@ import tkinter as tk
 from pathlib import Path
 from tkinter import ttk
 
+from bbochat.utilities import display_html
 from psiutils.buttons import ButtonFrame
 from psiutils.constants import PAD
 from psiutils.utilities import window_resize
@@ -12,7 +13,6 @@ from tkinterweb import HtmlFrame
 
 from bbochat.config import config
 from bbochat.constants import APP_TITLE
-from bbochat.utilities_bbochat import display_html
 
 FRAME_TITLE = f"{APP_TITLE} - Report"
 

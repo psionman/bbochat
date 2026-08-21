@@ -3,6 +3,7 @@ from pathlib import Path
 from tkinter import filedialog, ttk
 from tkinter.colorchooser import askcolor
 
+from bbochat.utilities import display_html
 from psiutils import messagebox
 from psiutils.buttons import ButtonFrame, IconButton
 from psiutils.constants import PAD, PADT, Status
@@ -14,7 +15,6 @@ from bbochat.config import config
 from bbochat.constants import HTML_TEST, ICON_DIR, ChatMode
 from bbochat.forms.frm_config_css import ConfigCssFrame
 from bbochat.text import Text
-from bbochat.utilities_bbochat import display_html
 
 txt = Text()
 

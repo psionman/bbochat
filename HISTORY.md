@@ -1,5 +1,8 @@
 # BBO Chat - History
 
+## Version 0.0.5 21 August 2026
+1. Rename utilities to utilities
+
 ## Version 0.0.4 6 August 2026
 1. Fix bug in saving sashes on close
 2. Get version etc. from pyproject.toml

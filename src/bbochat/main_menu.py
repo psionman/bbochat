@@ -78,7 +78,7 @@ class MainMenu:
         webbrowser.open(HELP_URI)
 
     def _show_data_directory(self):
-        directory = f"Data directory: {config.data_directory} {SPACES}"
+        directory = f"Data directory: {config.data_directory} {' ' * SPACES}"
         messagebox.showinfo(self, title="Data directory", message=directory)
 
     def _show_about(self):
