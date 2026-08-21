@@ -107,7 +107,6 @@ class DataStore:
         self._name_2: str = ""
         self._username_1: str = ""
         self._username_2: str = ""
-        self.tournament_notes: bool = False
 
     def read(self):
         raw_data = self._read_data_file()

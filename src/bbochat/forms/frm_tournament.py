@@ -37,6 +37,7 @@ class TournamentFrame:
         self.report_date = datetime.now()
         self.report_button = None
         self.board_notes = None
+        self.original_notes = {}
         self.general_notes = None
 
         # Tk variables
@@ -46,7 +47,7 @@ class TournamentFrame:
         date = datetime.now().strftime(YYYYMMDD)
         path = Path(path, f"{date}.txt")
 
-        self.path = tk.StringVar()
+        self.notes_path = tk.StringVar()
         self.set_path()
         self.tooltip_text = tk.StringVar(value=txt.REPORT_HELP)
 
@@ -64,7 +65,7 @@ class TournamentFrame:
             path = Path(DATA_DIR, self.partner.username)
         date = datetime.now().strftime(YYYYMMDD)
         path = Path(path, f"{date}.txt")
-        self.path.set(path)
+        self.notes_path.set(path)
         self._get_date_from_path()
 
     def _get_notes_frame(self, master: ttk.Frame) -> ttk.Frame:
@@ -80,7 +81,7 @@ class TournamentFrame:
         label = ttk.Label(frame, text="Path")
         label.grid(row=1, column=0, padx=PAD)
 
-        entry = ttk.Entry(frame, textvariable=self.path)
+        entry = ttk.Entry(frame, textvariable=self.notes_path)
         entry.grid(row=1, column=1, sticky=tk.EW)
 
         self.button_frame = self._button_frame(frame)
@@ -110,7 +111,7 @@ class TournamentFrame:
         frame.buttons = [
             frame.icon_button("open", self._open_file),
             open_todays,
-            frame.icon_button("save", self._save, True),
+            frame.icon_button("save", self.save_notes, True),
             # help_button,
         ]
 
@@ -172,36 +173,33 @@ class TournamentFrame:
         self._notes_contents()
         self._value_changed()
 
-    def _save(self, *args) -> None:
+    def notes_changed(self) -> bool:
+        return self._get_current_notes() != self.original_notes
+
+    def _get_current_notes(self) -> dict[str, str]:
         board_notes = self.board_notes.get("1.0", tk.END)
         general_notes = self.general_notes.get("1.0", tk.END)
-        notes = {
+        return {
             "board_notes": board_notes.strip("\n"),
             "general_notes": general_notes.strip("\n"),
         }
 
-        # path = Path(self.path.get())
-        # Path(path.parent).mkdir(parents=True, exist_ok=True)
-        # f_notes = filedialog.asksaveasfile(
-        #     initialfile=path,
-        #     mode='w',
-        #     defaultextension=".txt")
-        # if f_notes is None:
-        #     return
+    def save_notes(self, *args) -> None:
+        notes = self._get_current_notes()
 
-        with open(self.path.get(), "w", encoding="utf-8") as f_notes:
+        with open(self.notes_path.get(), "w", encoding="utf-8") as f_notes:
             json.dump(notes, f_notes)
 
         self._value_changed()
 
     def _open_file(self, *args) -> None:
-        path = Path(self.path.get()).parent
+        path = Path(self.notes_path.get()).parent
         if not path.exists():
             path.mkdir(parents=True, exist_ok=True)
 
         if path := filedialog.askopenfilename(
             initialdir=path,
-            initialfile=self.path.get(),
+            initialfile=self.notes_path.get(),
             parent=self.root,
             filetypes=TXT_FILE_TYPES,
         ):
@@ -212,7 +210,7 @@ class TournamentFrame:
                     'Notes file must be a ".txt" file.',
                 )
                 return
-            self.path.set(path)
+            self.notes_path.set(path)
             self._notes_contents()
             self._get_date_from_path()
             self.button_frame.enable()
@@ -224,11 +222,11 @@ class TournamentFrame:
         self.button_frame.enable()
 
     def _get_date_from_path(self) -> datetime:
-        if match := re.search(r"[0-9]" * 8, str(self.path.get())):
+        if match := re.search(r"[0-9]" * 8, str(self.notes_path.get())):
             date = parse(match.group())
 
     def _get_notes_and_display(self) -> None:
-        if not self.path.get().is_file():
+        if not self.notes_path.get().is_file():
             return
 
     def _notes_contents(self) -> str:
@@ -236,6 +234,7 @@ class TournamentFrame:
         self.board_notes.delete("0.0", tk.END)
 
         notes = self.get_notes_content()
+        self.original_notes = notes.copy()
         if "board_notes" in notes:
             self.board_notes.insert("1.0", notes["board_notes"])
         if "general_notes" in notes:
@@ -243,7 +242,7 @@ class TournamentFrame:
 
     def get_notes_content(self) -> dict[str]:
         with contextlib.suppress(FileNotFoundError):
-            with open(self.path.get()) as f_notes:
+            with open(self.notes_path.get()) as f_notes:
                 return json.load(f_notes)
         return {}
 

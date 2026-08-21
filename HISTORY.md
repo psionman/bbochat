@@ -1,7 +1,8 @@
 # BBO Chat - History
 
 ## Version 0.0.5 21 August 2026
-1. Rename utilities to utilities
+1. Rename utilities_bbochat to utilities
+2. Add notes changed detection on close
 
 ## Version 0.0.4 6 August 2026
 1. Fix bug in saving sashes on close
@@ -21,3 +22,4 @@
 
 
 ## Version 0.0.0 12 Mar 2025 Initial
+

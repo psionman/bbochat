@@ -1,11 +1,12 @@
 [project]
 name = "bbochat"
-version = "0.0.4"
+version = "0.0.5"
 description = "Chat manager for BBO"
-authors = [{name = "Jeff Watkins", email = "jeffwatkins2000@gmail.com"}]
+authors = [
+    { name = "Jeff Watkins", email = "jeffwatkins2000@gmail.com" },
+]
 readme = "README.md"
 requires-python = ">=3.10"
-
 dependencies = [
     "bidict>=0.23.1",
     "clipboard>=0.0.4",
@@ -26,7 +27,15 @@ line-length = 79
 target-version = "py310"
 
 [tool.ruff.lint]
-select = ["E", "F", "I", "N", "W", "B", "UP"]
+select = [
+    "E",
+    "F",
+    "I",
+    "N",
+    "W",
+    "B",
+    "UP",
+]
 
 [tool.mypy]
 python_version = "3.10"
@@ -34,5 +43,7 @@ warn_return_any = true
 disallow_untyped_defs = true
 
 [build-system]
-requires = ["uv-build"]
+requires = [
+    "uv-build",
+]
 build-backend = "uv_build"
