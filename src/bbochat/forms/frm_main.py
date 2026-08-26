@@ -35,7 +35,7 @@ NOTES_FRAME_COUNT = 1
 DEFAULT_GEOMETRY = "1250x700"
 
 
-class MainFrame:
+class AppFrame:
     def __init__(self, root: tk.Tk) -> None:
         self.root = root
         self.config = None  # Used to save sashes (see self._dismiss)

@@ -25,7 +25,6 @@ FRAME_TITLE = "Edit"
 class EditSelectFrame:
     def __init__(self, parent) -> None:
         self.root = tk.Toplevel(parent.root)
-        self.parent = parent
         self.mode_data = parent.mode_data
 
         self.mode = parent.mode
@@ -76,7 +75,7 @@ class EditSelectFrame:
     def _show(self) -> None:
         root = self.root
         root.geometry(config.geometry[Path(__file__).stem])
-        root.transient(self.parent.root)
+        root.transient(self.root)
         root.title(FRAME_TITLE)
 
         root.bind("<Control-x>", self._dismiss)

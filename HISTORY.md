@@ -1,5 +1,8 @@
 # BBO Chat - History
 
+## Version 0.0.6 21 August 2026
+1. Import ModuleCaller from psiutils.module_caller
+
 ## Version 0.0.5 21 August 2026
 1. Rename utilities_bbochat to utilities
 2. Add notes changed detection on close
@@ -20,6 +23,6 @@
 3. Added properties for name_1, name_2, username_1, username_2
 4. Used config.subscibe to pass colours through to forms
 
-
-## Version 0.0.0 12 Mar 2025 Initial
+## Version 0.0.0 12 Mar 2025 
+1. Initial commit
 
