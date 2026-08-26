@@ -22,7 +22,7 @@ def main():
         "module", nargs="?", default=None, help="Module to load"
     )
     parser.add_argument(
-        "project", nargs="?", default=None, help="Project name"
+        "primary", nargs="?", default=None, help="Primary argument"
     )
     parser.add_argument(
         "secondary", nargs="?", default=None, help="Secondary argument"

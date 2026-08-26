@@ -75,7 +75,6 @@ class EditSelectFrame:
     def _show(self) -> None:
         root = self.root
         root.geometry(config.geometry[Path(__file__).stem])
-        root.transient(self.root)
         root.title(FRAME_TITLE)
 
         root.bind("<Control-x>", self._dismiss)

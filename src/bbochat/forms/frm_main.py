@@ -491,13 +491,13 @@ class AppFrame:
         self.username_2.set(data_store.username_2)
 
     def _dismiss(self, *args) -> None:
-        if self.tournament_tab.notes_changed():
-            response = tk.messagebox.askyesno(
-                "Save Notes",
-                "Do you want to save the board notes?",
-            )
-            if response:
-                self.tournament_tab.save_notes()
+        # if self.tournament_tab.notes_changed():
+        #     response = tk.messagebox.askyesno(
+        #         "Save Notes",
+        #         "Do you want to save the board notes?",
+        #     )
+        #     if response:
+        #         self.tournament_tab.save_notes()
         self._save_sashes()
         self.root.destroy()
         # Need to do this because window_resize is called in close
