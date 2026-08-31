@@ -34,6 +34,8 @@ class ModuleCaller(ModuleCallerBase):
             source_data=data_store.data_sets[self.mode.name.lower()]
         )
         dlg = EditSelectFrame(self)
+        dlg.root.transient(self.root)
+        dlg.root.grab_set()
         self.root.wait_window(dlg.root)
 
     def chat_mode_from_string(self, name: str) -> ChatMode:

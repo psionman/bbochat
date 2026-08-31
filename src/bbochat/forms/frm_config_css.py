@@ -6,15 +6,16 @@ from pathlib import Path
 from tkinter import ttk
 from tkinter.colorchooser import askcolor
 
-from bbochat.utilities import display_html
 from psiutils.buttons import ButtonFrame
 from psiutils.constants import PAD, Pad, Status
 from psiutils.utilities import window_resize
 from psiutils.widgets import clickable_widget
 from tkinterweb import HtmlFrame
 
+from bbochat.config import config
 from bbochat.constants import APP_TITLE, HTML_TEST
 from bbochat.text import Text
+from bbochat.utilities import display_html
 
 txt = Text()
 FRAME_TITLE = f"{APP_TITLE} - css  {txt.CONFIG}"
@@ -33,8 +34,7 @@ class ConfigCssFrame:
     def __init__(self, parent: tk.Frame) -> None:
         self.focus = False
         self.root = tk.Toplevel(parent.root)
-        self.parent = parent
-        self.config = parent.config
+        # self.parent = parent
         self.css = deepcopy(parent.css)
         self.status = Status.NULL
 
@@ -65,8 +65,7 @@ class ConfigCssFrame:
 
     def _show(self) -> None:
         root = self.root
-        root.geometry(self.config.geometry[Path(__file__).stem])
-        root.transient(self.parent.root)
+        root.geometry(config.geometry[Path(__file__).stem])
         root.title(FRAME_TITLE)
         root.bind(
             "<Configure>",

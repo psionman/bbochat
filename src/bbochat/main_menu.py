@@ -62,6 +62,8 @@ class MainMenu:
     def _show_config_frame(self):
         """Display the config frame."""
         dlg = ConfigFrame(self)
+        dlg.root.transient(self.root)
+        dlg.root.grab_set()
         self.root.wait_window(dlg.root)
 
     def _help_menu_items(self) -> list:

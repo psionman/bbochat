@@ -1,5 +1,8 @@
 # BBO Chat - History
 
+## Version 0.0.7 31 August 2026
+1. Tidy frm_config
+
 ## Version 0.0.6 21 August 2026
 1. Import ModuleCaller from psiutils.module_caller
 2. Add edit module with params: mode to edit, text to select (optional)

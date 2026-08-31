@@ -1,33 +1,25 @@
 """Main procedure for BBOChat."""
 
-import argparse
 import sys
 import tkinter as tk
 
 from psiutils.utilities import display_icon
 from psiutils.widgets import get_styles
 
-from bbochat import __app_name__, __version__, logger
+from bbochat import __app_name__, __version__
 from bbochat.constants import APP_TITLE, ICON_FILE
 from bbochat.forms.frm_main import AppFrame
 from bbochat.module_caller import ModuleCaller
 
+PARSER_ARGS = (
+    ("module", "Module to load"),
+    ("primary", "Primary argument"),
+    ("secondary", "Secondary argument"),
+)
+
 
 def main():
     """Call the GUI loop."""
-    logger.info("Application started")
-
-    parser = argparse.ArgumentParser(description=APP_TITLE)
-    parser.add_argument(
-        "module", nargs="?", default=None, help="Module to load"
-    )
-    parser.add_argument(
-        "primary", nargs="?", default=None, help="Primary argument"
-    )
-    parser.add_argument(
-        "secondary", nargs="?", default=None, help="Secondary argument"
-    )
-    args = parser.parse_args()
 
     root = tk.Tk()
     root.title(APP_TITLE)
@@ -37,13 +29,15 @@ def main():
 
     get_styles()
 
-    if args.module:
-        try:
-            ModuleCaller(root, args)
-        except Exception:
-            root.destroy()
-    else:
-        AppFrame(root)
+    if PARSER_ARGS:
+        args = ModuleCaller.create_parser(PARSER_ARGS)
+        if args.module:
+            try:
+                ModuleCaller(root, args)
+            except Exception:
+                root.destroy()
+        else:
+            AppFrame(root)
 
     root.mainloop()
 

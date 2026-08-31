@@ -3,7 +3,6 @@ from pathlib import Path
 from tkinter import filedialog, ttk
 from tkinter.colorchooser import askcolor
 
-from bbochat.utilities import display_html
 from psiutils import messagebox
 from psiutils.buttons import ButtonFrame, IconButton
 from psiutils.constants import PAD, PADT, Status
@@ -11,10 +10,11 @@ from psiutils.utilities import window_resize
 from psiutils.widgets import separator_frame
 from tkinterweb import HtmlFrame
 
-from bbochat.config import config
+from bbochat.config import config, get_config
 from bbochat.constants import HTML_TEST, ICON_DIR, ChatMode
 from bbochat.forms.frm_config_css import ConfigCssFrame
 from bbochat.text import Text
+from bbochat.utilities import display_html
 
 txt = Text()
 
@@ -31,10 +31,8 @@ class ColourLabel(ttk.Label):
 class ConfigFrame:
     """ConfigFrame for BBO Chat."""
 
-    def __init__(self, parent):
+    def __init__(self, parent) -> None:
         self.root = tk.Toplevel(parent.root)
-        self.parent = parent
-        self.config = config
         self.colours = dict(config.colours)
         self.css = config.css
         self.css_element = None
@@ -77,9 +75,8 @@ class ConfigFrame:
 
     def _show(self) -> None:
         root = self.root
-        root.geometry(self.config.geometry[Path(__file__).stem])
+        root.geometry(config.geometry[Path(__file__).stem])
         root.title(txt.CONFIG)
-        root.transient(self.parent.root)
 
         root.bind("<Control-x>", self._dismiss)
         root.bind("<Control-s>", self._save_config)
@@ -155,7 +152,6 @@ class ConfigFrame:
 
         entry = ttk.Entry(frame, textvariable=self.data_directory)
         entry.grid(row=row, column=1, columnspan=3, sticky=tk.EW, padx=PADT)
-        # self.root.after(1, lambda: entry.focus_force())
 
         button = ttk.Button(
             frame, text="...", command=self._get_data_directory
@@ -242,15 +238,15 @@ class ConfigFrame:
         return directory
 
     def _value_changed(self) -> bool:
-        name_order = self.config.randomize_name_order
-        notes_directory = self.config.tournament_notes_directory
+        name_order = config.randomize_name_order
+        notes_directory = config.tournament_notes_directory
         return (
-            self.data_directory.get() != self.config.data_directory
+            self.data_directory.get() != config.data_directory
             or self.tournament_notes_directory.get() != notes_directory
             or self.randomize_name_order.get() != name_order
-            or self.show_tooltips.get() != self.config.show_tooltips
-            or self.colours != self.config.colours
-            or self.css != self.config.css
+            or self.show_tooltips.get() != config.show_tooltips
+            or self.colours != config.colours
+            or self.css != config.css
         )
 
     def _get_color(self, mode: str) -> None:
@@ -282,16 +278,16 @@ class ConfigFrame:
 
     def _save_config(self, *args) -> None:
         name_order = self.randomize_name_order.get()
-        self.config.update("data_directory", self.data_directory.get())
-        self.config.update(
+        config.update("data_directory", self.data_directory.get())
+        config.update(
             "tournament_notes_directory", self.tournament_notes_directory.get()
         )
-        self.config.update("randomize_name_order", name_order)
-        self.config.update("show_tooltips", self.show_tooltips.get())
-        self.config.update("colours", dict(self.colours))
-        self.config.update("css", dict(self.css))
-        self.config.save()
-        # self.config = get_config()
+        config.update("randomize_name_order", name_order)
+        config.update("show_tooltips", self.show_tooltips.get())
+        config.update("colours", dict(self.colours))
+        config.update("css", dict(self.css))
+        config.save()
+        # config = get_config()
         self._dismiss()
 
     def display_html(self) -> None:
@@ -299,6 +295,8 @@ class ConfigFrame:
 
     def _css_edit(self) -> None:
         dlg = ConfigCssFrame(self)
+        dlg.root.transient(self.root)
+        dlg.root.grab_set()
         self.root.wait_window(dlg.root)
         if dlg.status != Status.OK:
             return
@@ -310,22 +308,22 @@ class ConfigFrame:
 
     def _restore_defaults(self, *args) -> None:
         message = " Restore defaults (cannot undo)?"
+        # TODO implement this
         if messagebox.askyesno(
             self, title="Restore defaults", message=message
         ):
-            self.config = get_config(restore_defaults=True)
-        self.colours = dict(self.config.colours)
-        self.css = self.config.css
+            config = get_config(restore_defaults=True)
+        self.colours = dict(config.colours)
+        self.css = config.css
 
-        self.data_directory.set(self.config.data_directory)
-        self.randomize_name_order.set(self.config.randomize_name_order)
-        self.show_tooltips.set(self.config.show_tooltips)
-        self.tournament_notes_directory.set(
-            self.config.tournament_notes_directory
-        )
+        self.data_directory.set(config.data_directory)
+        self.randomize_name_order.set(config.randomize_name_order)
+        self.show_tooltips.set(config.show_tooltips)
+        self.tournament_notes_directory.set(config.tournament_notes_directory)
 
         self._update_mode_colours()
-        self.display_html()
+        # self.display_html()
 
     def _dismiss(self, *args) -> None:
+        self.root.grab_release()
         self.root.destroy()
