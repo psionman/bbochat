@@ -7,6 +7,8 @@ from psiutils.constants import PAD
 from psiutils.treeview import sort_treeview
 
 from bbochat.data_store import data_store
+from bbochat.message import chat_message
+from bbochat.pair import PairNew
 
 PAIR_TREE_COLUMNS = (
     ("username1", "Opp 1", 100),
@@ -16,7 +18,6 @@ PAIR_TREE_COLUMNS = (
 
 class OpponentsFrame:
     def __init__(self, parent, master: ttk.Frame) -> None:
-        self.parent = parent
         self.root = parent.root
 
         # tk variables
@@ -25,7 +26,7 @@ class OpponentsFrame:
         self.opponents_frame = self._opponents_frame(master)
 
         self.search_pairs = []
-        self._name_search()
+        self.name_search()
         self._populate_pair_tree()
 
     def _opponents_frame(self, master: ttk.Frame) -> ttk.Frame:
@@ -38,7 +39,7 @@ class OpponentsFrame:
 
         self.search_entry = ttk.Entry(frame, textvariable=self.search)
         self.search_entry.grid(row=1, column=0, sticky=tk.EW)
-        self.search_entry.bind("<KeyRelease>", self._name_search)
+        self.search_entry.bind("<KeyRelease>", self.name_search)
         self.search_entry.focus_set()
 
         self.pair_tree = self._pair_tree(frame)
@@ -74,29 +75,30 @@ class OpponentsFrame:
             tree.column(col_key, width=col_width, anchor=tk.W)
         return tree
 
-    def _name_search(self, *args) -> None:
+    def name_search(self, *args) -> None:
         pairs = []
         input_text = self.search.get()
         for pair in data_store.pairs:
-            if input_text in pair.username_1:
-                pairs.append([pair.username_1, pair.username_2])
-            elif input_text in pair.username_2:
-                pairs.append([pair.username_2, pair.username_1])
+            if input_text in pair.player_1.username:
+                pairs.append([pair.player_1.username, pair.player_2.username])
+            elif input_text in pair.player_2.username:
+                pairs.append([pair.player_2.username, pair.player_1.username])
         pairs.sort(key=lambda item: item[1])
         pairs.sort(key=lambda item: item[0])
         self.search_pairs = pairs
         self._populate_pair_tree()
 
     def _pair_tree_clicked(self, *args) -> None:
-        self.selected_item = self.pair_tree.selection()
-        values = self.pair_tree.item(self.selected_item)["values"]
+        selected_item = self.pair_tree.selection()
+        values = self.pair_tree.item(selected_item)["values"]
         if not values:
             return
-        self.pair = [
-            data_store.players[values[0]],
-            data_store.players[values[1]],
-        ]
-        data_store.username_1 = self.pair[0].username
-        data_store.username_2 = self.pair[1].username
-        data_store.name_1 = self.pair[0].name
-        data_store.name_2 = self.pair[1].name
+        player_1 = data_store.players[values[0]]
+        player_2 = data_store.players[values[1]]
+
+        chat_message.pair = PairNew(player_1, player_2)
+
+        # data_store.username_1 = self.pair[0].username
+        # data_store.username_2 = self.pair[1].username
+        # data_store.name_1 = self.pair[0].name
+        # data_store.name_2 = self.pair[1].name

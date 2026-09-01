@@ -15,11 +15,8 @@ from bbochat.mode_data import ModeData
 class MasterFrame:
     def __init__(self, parent, master):
         self.root = parent.root
-        self.parent = parent
-        self.update_clipboard = parent.update_clipboard
 
-        self.chat = parent.data_server.data_sets["chat"]
-        self.chat_list = parent.chat_list
+        self.chat = data_store.chat
         self.chat_line = parent.chat_line
 
         self.master_frame = self._master_frame(master)
@@ -49,7 +46,7 @@ class MasterFrame:
         frame.add(greetings.main_frame, width=FRAME_WIDTH)
 
         mode = ChatMode.VALEDICTION
-        data_set = data_store.data_sets[mode.name.lower()]
+        data_set = data_store.data_sets["valedictions"]
         mode_data = ModeData(source_data=data_set)
         valedictions = TextSelectionFrame(self, frame, mode, mode_data)
         frame.add(valedictions.main_frame, width=FRAME_WIDTH)

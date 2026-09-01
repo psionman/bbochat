@@ -1,14 +1,11 @@
 """MainFrame for BBO Chat."""
 
 import contextlib
-import random
-import re
 import tkinter as tk
 from pathlib import Path
 from tkinter import ttk
 
 import clipboard
-import emoji
 from psiutils import messagebox
 from psiutils.buttons import IconButton
 from psiutils.constants import PAD
@@ -17,13 +14,15 @@ from psiutils.utilities import window_resize
 from bbochat.buttons import ButtonFrame
 from bbochat.config import config
 from bbochat.constants import ChatMode
-from bbochat.data_store import Pair, Player, data_store
+from bbochat.data_store import data_store
 from bbochat.forms.frm_master import MasterFrame
 from bbochat.forms.frm_notes import NotesFrame
 from bbochat.forms.frm_partners import PartnerFrame
 from bbochat.forms.frm_tournament import TournamentFrame
 from bbochat.main_menu import MainMenu
 from bbochat.message import chat_message
+from bbochat.pair import PairNew
+from bbochat.player import Player
 from bbochat.text import Text
 from bbochat.utilities import get_my_name
 
@@ -47,14 +46,8 @@ class AppFrame:
         config.subscribe(self._on_config_change)
         self.mode = ChatMode.GREETINGS
 
-        data_store.read()
         data_store.subscribe(self._on_data_change)
         self.data_server = data_store
-
-        self.greetings = data_store.greetings
-        self.valedictions = data_store.valedictions
-        self.chat = data_store.chat
-        self.my_name = data_store.my_name
         chat_message.my_name = data_store.my_name
 
         self.pair = []
@@ -95,7 +88,9 @@ class AppFrame:
         # On setup
         if not data_store.data_sets["my_name"]:
             self._get_my_name()
+        chat_message.randomize = config.randomize_name_order
         chat_message.subscribe(self._chat_message_publish)
+
         if config.last_partner and config.last_partner in self.partners:
             self.partner = self.partners[config.last_partner]
             chat_message.partner = self.partner
@@ -113,16 +108,16 @@ class AppFrame:
 
         greeting = self.partner.greeting if self.partner else ""
         self.greeting = tk.StringVar(value=greeting)
-        self.greetings_list = tk.StringVar(value=self.greetings)
+        # self.greetings_list = tk.StringVar(value=data_store.greetings)
         self.valediction = tk.StringVar(value=config.last_valediction)
-        self.chat_list = tk.StringVar(value=self.chat)
+        # self.chat_list = tk.StringVar(value=data_store.chat)
         self.system = tk.StringVar()
         self.chat_line = tk.StringVar()
 
         # Partners
         self.partners_list = tk.StringVar(value=self.partners_names)
         self.selected_partner = tk.StringVar(value=config.last_partner)
-        self.my_name_text = tk.StringVar(value=self.my_name)
+        self.my_name_text = tk.StringVar(value=data_store.my_name)
         self.partners_name = tk.StringVar(value="")
         self.partners_username = tk.StringVar()
 
@@ -264,7 +259,10 @@ class AppFrame:
         self.delete_button.grid(row=2, column=5, padx=PAD, pady=PAD)
 
         check_button = ttk.Checkbutton(
-            frame, text="Randomize opp's names order", variable=self.randomize
+            frame,
+            text="Randomize opp's names order",
+            variable=self.randomize,
+            command=self._on_randomize_change,
         )
         check_button.grid(row=1, column=6, rowspan=2, sticky=tk.W)
 
@@ -330,9 +328,18 @@ class AppFrame:
 
     def _chat_message_publish(self) -> None:
         self.my_name_text.set(chat_message.my_name)
+        self.partner = chat_message.partner
         self.partners_username.set(
             f"{self.partner.username}, {self.partner.name}"
         )
+        if chat_message.pair:
+            self.username_1.set(chat_message.pair.player_1.username)
+            self.username_2.set(chat_message.pair.player_2.username)
+
+        # if chat_message.message:
+        message = chat_message.output_message()
+        self.update_clipboard(message, chat_message.mode)
+        self.clipboard.set(message)
 
     def update_clipboard(
         self, message: str = "", mode: int = None, *args
@@ -341,56 +348,9 @@ class AppFrame:
             mode = DEFAULT_MODE
         self.mode = mode
         self._set_clipboard_colour()
-        self._create_message(message)
-
-    def _create_message(self, message: str) -> None:
-        if self.partner:
-            names = f"{self.partner.name} and {self.my_name}"
-            system = self.partner.system
-        else:
-            names = f"{self.my_name}"
-            system = ""
-
-        opps = self._get_opps()
-        message = message.replace("<opps>", opps)
-        message = message.replace("<names>", names)
-        message = message.replace("<system>", system)
-        self.clipboard.set(message)
-        self.copy_to_clipboard()
 
     def copy_to_clipboard(self, *args) -> None:
-        text = self.clipboard.get()
-        emoji_re = r":.*:"
-
-        found = True
-        while found:
-            match = re.search(emoji_re, text)
-            if not match:
-                break
-            emoji_text = match.group()
-            emoji_ = emoji.emojize(emoji_text)
-            text = text.replace(emoji_text, emoji_)
-            if emoji_text == emoji_:
-                found = False
-        clipboard.copy(text)
-
-    def _get_opps(self) -> str:
-        opp_1, opp_2 = self.name_1.get(), self.name_2.get()
-        if self.randomize.get():
-            opps = [opp_1, opp_2]
-            choice = random.choice([0, 1])
-            opp_1 = opps[choice]
-            choice = (choice + 1) % 2
-            opp_2 = opps[choice]
-
-        if opp_1.lower() == "robot":
-            opp_1, opp_2 = opp_2, opp_1
-        if opp_2.lower() == "robot":
-            opp_2 = ""
-
-        if opp_1:
-            return f"{opp_1} and {opp_2}" if opp_2 else opp_1
-        return opp_2
+        clipboard.copy(self.clipboard.get())
 
     def _save_names(self, *args) -> None:
         name_1 = self.name_1.get()
@@ -398,11 +358,13 @@ class AppFrame:
         username_1 = self.username_1.get()
         username_2 = self.username_2.get()
 
-        pair = Pair(username_1, username_2)
-        data_store.players[username_1] = Player(name_1, username_1)
-        data_store.players[username_2] = Player(name_2, username_2)
+        player_1 = Player(name_1, username_1)
+        player_2 = Player(name_2, username_2)
+        pair = PairNew(player_1, player_2)
+        data_store.players[username_1] = player_1
+        data_store.players[username_2] = player_2
         if pair not in data_store.pairs:
-            data_store.pairs.append(Pair(username_1, username_2))
+            data_store.pairs.append(pair)
 
         self.save()
         # self.search.set("")
@@ -410,13 +372,17 @@ class AppFrame:
         # self.search.set(self.username_1.get())
         self.search_entry.focus_set()
         self.master_tab.opponents_frame.name_search()
+        chat_message.pair = pair
         self.update_clipboard()
 
     def _delete_pair(self, *args) -> None:
         if not messagebox.askyesno(self, txt.DELETE_TITLE, txt.DELETE_PAIR):
             return
 
-        pair = Pair(self.username_1.get(), self.username_2.get())
+        pair = PairNew(
+            data_store.players[self.username_1.get()],
+            data_store.players[self.username_2.get()],
+        )
         data_store.pairs.remove(pair)
         self.save()
 
@@ -429,6 +395,9 @@ class AppFrame:
         self.pair_tree.delete(*self.pair_tree.get_children())
         # self.search.set(self.username_1.get())
         self.search_entry.focus_set()
+
+    def _on_randomize_change(self) -> None:
+        chat_message.randomize = self.randomize.get()
 
     def save(self, *args) -> None:
         data_store.save()
@@ -479,10 +448,11 @@ class AppFrame:
         self.config = config
 
     def _on_data_change(self) -> None:
-        self.name_1.set(data_store.name_1)
-        self.name_2.set(data_store.name_2)
-        self.username_1.set(data_store.username_1)
-        self.username_2.set(data_store.username_2)
+        # self.name_1.set(data_store.player_1.name)
+        # self.name_2.set(data_store.player_2.name)
+        # self.username_1.set(data_store.player_1.username)
+        # self.username_2.set(data_store.player_2.username)
+        pass
 
     def _dismiss(self, *args) -> None:
         # if self.tournament_tab.notes_changed():

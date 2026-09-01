@@ -9,6 +9,7 @@ import clipboard
 import emoji
 
 from bbochat.constants import ChatMode
+from bbochat.pair import PairNew
 from bbochat.partner import Partner
 
 DEFAULT_MODE = ChatMode.GREETINGS
@@ -20,14 +21,31 @@ class Message:
     """Message class."""
 
     def __init__(self) -> None:
-        self.mode = DEFAULT_MODE
-        self.message = ""
-        self.randomize = False
-        self._my_name = ""
-        self._partner: Partner = None
-        self._opponent_1 = ""
-        self._opponent_2 = ""
-        self.listeners = []
+        self._mode: ChatMode = DEFAULT_MODE
+        self._message: str = ""
+        self._randomize: bool = False
+        self._my_name: str = ""
+        self._partner: Partner | None = None
+        self._pair: PairNew | None = None
+        self.listeners: list[Listener] = []
+
+    @property
+    def mode(self) -> ChatMode:
+        return self._mode
+
+    @mode.setter
+    def mode(self, value: ChatMode) -> None:
+        self._mode = value
+        self._notify()
+
+    @property
+    def message(self) -> str:
+        return self._message
+
+    @message.setter
+    def message(self, value: str) -> None:
+        self._message = value
+        self._notify()
 
     @property
     def my_name(self) -> str:
@@ -47,69 +65,68 @@ class Message:
         if not isinstance(value, Partner):
             raise TypeError("partner must be a Partner instance")
         self._partner = value
+        if self._partner:
+            self.message = self._partner.greeting
         self._notify()
 
     @property
-    def opponent_1(self) -> str:
-        return self._opponent_1
+    def pair(self) -> PairNew:
+        return self._pair
 
-    @opponent_1.setter
-    def opponent_1(self, value: str) -> None:
-        self._opponent_1 = value
+    @pair.setter
+    def pair(self, value: PairNew) -> None:
+        self._pair = value
         self._notify()
 
     @property
-    def opponent_2(self) -> str:
-        return self._opponent_2
+    def randomize(self) -> bool:
+        return self._randomize
 
-    @opponent_2.setter
-    def opponent_2(self, value: str) -> None:
-        self._opponent_2 = value
+    @randomize.setter
+    def randomize(self, value: bool) -> None:
+        self._randomize = value
         self._notify()
 
-    def update_clipboard(
-        self, message: str = "", mode: int = None, *args
-    ) -> None:
-        if mode is None:
-            mode = DEFAULT_MODE
-        self.mode = mode
-        self._set_clipboard_colour()
-        self._create_message(message)
+    def output_message(self) -> str:
+        names, system = self._get_names_and_system()
+        opps = self._get_opps()
 
-    def _create_message(self, message: str) -> None:
+        message = self.message.replace("<opps>", opps)
+        message = message.replace("<names>", names)
+        message = message.replace("<system>", system)
+        message = self._insert_emojis(message)
+        clipboard.copy(message)
+        return message
+
+    def _get_names_and_system(self) -> tuple[str, str]:
         if self._partner:
             names = f"{self._partner.name} and {self._my_name}"
             system = self._partner.system
         else:
             names = f"{self._my_name}"
             system = ""
+        return names, system
 
-        opps = self._get_opps()
-        message = message.replace("<opps>", opps)
-        message = message.replace("<names>", names)
-        message = message.replace("<system>", system)
-        self.clipboard.set(message)
-        self.copy_to_clipboard()
-
-    def copy_to_clipboard(self, *args) -> None:
-        text = self.clipboard.get()
+    def _insert_emojis(self, message: str) -> str:
         emoji_re = r":.*:"
 
-        found = True
-        while found:
-            match = re.search(emoji_re, text)
+        while True:
+            match = re.search(emoji_re, message)
             if not match:
                 break
             emoji_text = match.group()
             emoji_ = emoji.emojize(emoji_text)
-            text = text.replace(emoji_text, emoji_)
+            message = message.replace(emoji_text, emoji_)
             if emoji_text == emoji_:
-                found = False
-        clipboard.copy(text)
+                break
+        return message
 
     def _get_opps(self) -> str:
-        opp_1, opp_2 = self._opponent_1, self._opponent_2
-        if self.randomize:
+        if not self.pair:
+            return ""
+
+        opp_1, opp_2 = self.pair.player_1.name, self.pair.player_2.name
+        if self._randomize:
             opps = [opp_1, opp_2]
             choice = random.choice([0, 1])
             opp_1 = opps[choice]

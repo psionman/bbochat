@@ -13,7 +13,6 @@ class ChatFrame:
     def __init__(self, parent, master: ttk.Frame, mode: int) -> None:
         self.root = parent.root
         self.config_key = f"last_{mode}"
-        self.parent = parent
 
         self.chat_line = parent.chat_line
         self.chat_frame = self._main_frame(master)

@@ -14,6 +14,7 @@ from bbochat.config import config
 from bbochat.constants import MODE_TEXT, ChatMode
 from bbochat.forms.frm_edit_select import EditSelectFrame
 from bbochat.forms.frm_text_dialog import TextDialogFrame
+from bbochat.message import chat_message
 from bbochat.mode_data import ModeData
 from bbochat.text import Text
 
@@ -35,7 +36,6 @@ class TextSelectionFrame:
         slave=None,
     ) -> None:
 
-        self.parent = parent
         self.root = parent.root
         self.show_use_frame = show_use_frame
         self.show_title = show_title
@@ -228,7 +228,8 @@ class TextSelectionFrame:
     def _use_item(self, *args) -> None:
         if self.text_var.get() and self.text_var.get()[0] == "#":
             self.text_var.set("")
-        self.parent.parent.update_clipboard(self.text_var.get(), self.mode)
+        chat_message.message = self.text_var.get()
+        chat_message.mode = self.mode
         self.config.update(self.config_key, self.text_var.get())
         self.config.save()
 

@@ -1,5 +1,8 @@
 # BBO Chat - History
 
+## Version 0.0.8 01 September 2026
+1. Implement message.py as dynamic data repository
+
 ## Version 0.0.7 31 August 2026
 1. Tidy frm_config
 

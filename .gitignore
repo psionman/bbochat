@@ -1,13 +1,47 @@
-# Byte-compiled / optimized / DLL files
-**/__pycache__/
+# --- Python ---
+__pycache__/
 *.py[cod]
 *$py.class
+*.egg-info/
+.eggs/
+build/
+dist/
+*.egg
 
-*.json
-*.txt
-*.csv
-*.toml
+# --- Virtual environments / package managers ---
+.venv/
+venv/
+uv.lock.tmp
 
+# --- Environment / secrets (never commit) ---
+.env
+.env.*
+!.env.example
+
+# --- Editors / IDEs ---
 .vscode/
-/build
+.idea/
+*.swp
+*.swo
+
+# --- OS cruft ---
+.DS_Store
+Thumbs.db
+
+# --- Testing / coverage ---
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+
+# --- Project-specific data/build ---
 /data
+/build
+*.log
+dump.txt
+
+# --- Node/Svelte (if applicable in this repo) ---
+node_modules/
+.svelte-kit/
+/build

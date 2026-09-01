@@ -23,7 +23,6 @@ SEPARATOR = "-" * 50
 
 class MainMenu:
     def __init__(self, parent):
-        self.parent = parent
         self.root = parent.root
 
     def create(self):

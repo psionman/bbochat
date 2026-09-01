@@ -5,7 +5,7 @@ from collections.abc import Callable
 
 from bbochat import logger
 from bbochat.constants import DATA_FILE, DONT_SAVE
-from bbochat.pair import Pair
+from bbochat.pair import PairNew
 from bbochat.partner import Partner
 from bbochat.player import Player
 
@@ -34,10 +34,11 @@ class DataStore:
         self._name_2: str = ""
         self._username_1: str = ""
         self._username_2: str = ""
+        self.read()
 
     def read(self):
         raw_data = self._read_data_file()
-        app_data = (
+        application_data = (
             {} if raw_data == FILE_NOT_FOUND else self._get_json(raw_data)
         )
         self.data_sets = {
@@ -50,34 +51,25 @@ class DataStore:
             "notes": {},
             "my_name": "",
         }
-        if app_data == INVALID_JSON:
+        if application_data == INVALID_JSON:
             return INVALID_JSON
 
-        for key, value in app_data.items():
-            if key == "partners":
-                self.partners = self._get_partners(value)
-                self.data_sets["partners"] = self.partners
-            elif key == "players":
-                self.players = self._get_players(value)
-                self.data_sets["players"] = self.players
-            elif key == "pairs":
-                self.pairs = self._get_pairs(value)
-                self.data_sets["pairs"] = self.pairs
-            elif key == "greetings":
-                self.greetings = value
-                self.data_sets["greetings"] = self.greetings
-            elif key == "valedictions":
-                self.valedictions = value
-                self.data_sets["valediction"] = self.valedictions
-            elif key == "chat":
-                self.chat = value
-                self.data_sets["chat"] = value
-            elif key == "notes":
-                self.notes = value
-                self.data_sets["notes"] = self.notes
-            elif key == "my_name":
-                self.my_name = value
-                self.data_sets["my_name"] = self.my_name
+        data_sets = {
+            "players": self._get_players,
+            "partners": self._get_partners,
+            "pairs": self._get_pairs,
+            "greetings": lambda x: x,
+            "valedictions": lambda x: x,
+            "chat": lambda x: x,
+            "notes": lambda x: x,
+            "my_name": lambda x: x,
+        }
+        for data_set, getter in data_sets.items():
+            if data_set in application_data:
+                setattr(self, data_set, getter(application_data[data_set]))
+                self.data_sets[data_set] = getattr(self, data_set)
+        # print(self.data_sets["valedictions"])
+        # self.valediction = self.data_sets["valedictions"]
         self._notify()
 
     def _read_data_file(self) -> str | int | None:
@@ -87,42 +79,6 @@ class DataStore:
         except FileNotFoundError:
             return FILE_NOT_FOUND
         return None
-
-    @property
-    def name_1(self) -> str:
-        return self._name_1
-
-    @name_1.setter
-    def name_1(self, value: str) -> None:
-        self._name_1 = value
-        self._notify()
-
-    @property
-    def name_2(self) -> str:
-        return self._name_2
-
-    @name_2.setter
-    def name_2(self, value: str) -> None:
-        self._name_2 = value
-        self._notify()
-
-    @property
-    def username_1(self) -> str:
-        return self._username_1
-
-    @username_1.setter
-    def username_1(self, value: str) -> None:
-        self._username_1 = value
-        self._notify()
-
-    @property
-    def username_2(self) -> str:
-        return self._username_2
-
-    @username_2.setter
-    def username_2(self, value: str) -> None:
-        self._username_2 = value
-        self._notify()
 
     @staticmethod
     def _get_json(data: str) -> dict | None:
@@ -150,12 +106,12 @@ class DataStore:
             players[player.username] = player
         return players
 
-    @staticmethod
-    def _get_pairs(data: list) -> list[Player]:
+    def _get_pairs(self, data: tuple[str]) -> list[Player]:
         pairs = []
-        for raw_pair in data:
-            pair = Pair()
-            pair.deserialize(raw_pair[0], raw_pair[1])
+        for pair_list in data:
+            pair = PairNew(
+                self.players[pair_list[0]], self.players[pair_list[1]]
+            )
             pairs.append(pair)
         return pairs
 
@@ -171,7 +127,7 @@ class DataStore:
                 for player in self.players.values()
             },
             "greetings": self.data_sets["greetings"],
-            "valedictions": self.data_sets["valediction"],
+            "valedictions": self.data_sets["valedictions"],
             "chat": self.data_sets["chat"],
             "notes": self.data_sets["notes"],
             "my_name": self.my_name,
@@ -218,3 +174,4 @@ class DataStore:
 
 # Module-level singleton - this is the instance everyone imports.
 data_store = DataStore()
+# data_store.read()

@@ -20,7 +20,6 @@ txt = Text()
 
 class PartnerFrame:
     def __init__(self, parent, master):
-        self.parent = parent
         self.root = parent.root
         self.partner = parent.partner
         self.partners = data_store.partners
@@ -56,7 +55,7 @@ class PartnerFrame:
         self._update_partner_values()
 
     def _get_partners_frame(self, master) -> ttk.Frame:
-        frame = ttk.Frame(master, style="yellow.TFrame")
+        frame = ttk.Frame(master)
         frame.rowconfigure(0, weight=1)
         frame.columnconfigure(1, weight=1)
 
@@ -154,30 +153,21 @@ class PartnerFrame:
 
         self.partner = self.partners[user_name]
         # TODO: Update the tournament tab with the new partner
-        self.parent.tournament_tab.change_partner(self.partner)
+        # self.parent.tournament_tab.change_partner(self.partner)
         self._update_partner_values()
         config.config["last_partner"] = self.partner.username
         config.save()
-        print(f"Partner selected: {self.partner}")
         chat_message.partner = self.partner
 
     def _update_partner_values(self) -> None:
         if not self.partner:
             return
 
-        # self.partners_username.set(
-        #     f"{self.partner.username}, {self.partner.name}"
-        # )
         self.greeting.set(self.partner.greeting)
         self.partners_name.set(self.partner.name)
         self.system.set(self.partner.system)
         self.notes_text.delete("0.0", tk.END)
         self.notes_text.insert("0.0", self.partner.notes)
-
-        # self.parent.partner = self.partner
-        # self.parent.greeting.set(self.partner.greeting)
-        # self.parent.update_clipboard()
-        # chat_message.partner = self.partner
 
     def _partner_changed(self, *args) -> None:
         self.button_frame.enable(False)
@@ -238,7 +228,7 @@ class PartnerFrame:
             self.partner = Partner()
         self._update_partner_values()
         self.partners_list.set(sorted(list(self.partners)))
-        self.parent.save()
+        data_store.save()
 
     def _save(self, *args) -> None:
         self.partner.name = self.partners_name.get()
@@ -247,7 +237,7 @@ class PartnerFrame:
         self.partner.notes = self.notes_text.get(0.0, tk.END)
         self.partners[self.partner.username] = self.partner
         self._update_partner_values()
-        self.parent.save()
+        data_store.save()
         messagebox.showinfo(self, "", "Partner saved")
 
     def _context_menu(self) -> tk.Menu:

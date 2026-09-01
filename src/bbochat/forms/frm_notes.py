@@ -19,7 +19,6 @@ txt = Text()
 
 class NotesFrame:
     def __init__(self, parent, master):
-        self.parent = parent
         self.root = parent.root
         self.notes = data_store.notes
         self.category = ""
@@ -115,7 +114,8 @@ class NotesFrame:
         if not messagebox.askyesno(self, txt.DELETE_TITLE, txt.DELETE_ITEM):
             return
         self.notes.pop(self.category)
-        self.parent.save()
+
+        data_store.save()
         self._create_report("")
         self.categories.set(sorted(list(self.notes)))
         self.category = ""
