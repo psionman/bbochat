@@ -5,6 +5,9 @@ from collections.abc import Callable
 
 from bbochat import logger
 from bbochat.constants import DATA_FILE, DONT_SAVE
+from bbochat.pair import Pair
+from bbochat.partner import Partner
+from bbochat.player import Player
 
 Listener = Callable[[], None]
 
@@ -14,82 +17,6 @@ INVALID_JSON = 2
 
 if DONT_SAVE:
     logger.warn(f"DONT_SAVE={DONT_SAVE}")
-
-
-class Partner:
-    def __init__(self) -> None:
-        self.username: str = ""
-        self.name: str = ""
-        self.system: str = ""
-        self.greeting: str = ""
-        self.notes: str = ""
-
-    def __repr__(self):
-        return f"Partner: {self.username} {self.name}"
-
-    def serialize(self) -> dict:
-        return [self.name, self.system, self.greeting, self.notes]
-
-    def deserialize(self, username: str, item: list[str]) -> None:
-        self.username = username
-        if not item:
-            return
-
-        self.name = item[0]
-        if len(item) < 2:
-            return
-
-        self.system = item[1]
-        if len(item) < 3:
-            return
-
-        self.greeting = item[2]
-        if len(item) < 4:
-            return
-
-        self.notes = item[3]
-
-
-class Player:
-    def __init__(self, name: str = "", username: str = "") -> None:
-        self.name: str = name
-        self.username: str = username
-
-    def __repr__(self):
-        return f"Player: {self.username} {self.name}"
-
-    def serialize(self) -> dict:
-        return {self.username: self.name}
-
-    def deserialize(self, username, name):
-        self.name = name
-        self.username = username
-
-
-class Pair:
-    def __init__(self, username_1: str = "", username_2: str = "") -> None:
-        if username_1 > username_2:
-            username_1, username_2 = username_2, username_1
-        self.username_1: str = username_1
-        self.username_2: str = username_2
-
-    def __repr__(self):
-        return f"Pair: {self.username_1} {self.username_2}"
-
-    def __eq__(self, other) -> bool:
-        return (
-            self.username_1 == other.username_1
-            and self.username_2 == other.username_2
-        )
-
-    def serialize(self) -> dict:
-        if self.username_1 > self.username_2:
-            self.username_1, self.username_2 = self.username_2, self.username_1
-        return [self.username_1, self.username_2]
-
-    def deserialize(self, username_1, username_2):
-        self.username_1 = username_1
-        self.username_2 = username_2
 
 
 class DataStore:

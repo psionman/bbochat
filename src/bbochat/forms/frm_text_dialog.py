@@ -5,11 +5,11 @@ from pathlib import Path
 from tkinter import ttk
 
 import emoji
-from psiutils.buttons import ButtonFrame
 from psiutils.constants import PAD, Status
 from psiutils.utilities import window_resize
 from psiutils.widgets import Tooltip
 
+from bbochat.buttons import ButtonFrame
 from bbochat.config import config
 from bbochat.constants import APP_TITLE
 from bbochat.text import Text
@@ -27,7 +27,6 @@ class TextDialogFrame:
     ) -> None:
         self.root = tk.Toplevel(parent.root)
 
-        self.parent = parent
         self.title = title
         self.default = default
         self.text_ = default
@@ -53,7 +52,6 @@ class TextDialogFrame:
     def _show(self) -> None:
         root = self.root
         root.geometry(config.geometry[Path(__file__).stem])
-        root.transient(self.parent.root)
         root.title(f"{APP_TITLE} - {self.title}")
 
         root.update_idletasks()
@@ -155,4 +153,5 @@ class TextDialogFrame:
         return self.text_
 
     def _dismiss(self, *args) -> None:
+        self.root.grab_release()
         self.root.destroy()

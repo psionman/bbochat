@@ -4,11 +4,11 @@ import tkinter as tk
 from pathlib import Path
 from tkinter import ttk
 
-from psiutils.buttons import ButtonFrame
 from psiutils.constants import PAD, PADB, PADR, Mode, Status
 from psiutils.utilities import window_resize
 from psiutils.widgets import clickable_widget
 
+from bbochat.buttons import ButtonFrame
 from bbochat.config import config
 from bbochat.constants import ICON_FILE
 from bbochat.data_store import Partner, data_store
@@ -19,7 +19,6 @@ FRAME_TITLE = "New partner"
 class PartnerEditFrame:
     def __init__(self, parent: tk.Frame, mode: int, partner: Partner = None):
         self.root = tk.Toplevel(parent.root)
-        self.parent = parent
         self.mode = mode
         self.partners = parent.partners
         self.greetings = data_store.greetings
@@ -58,7 +57,6 @@ class PartnerEditFrame:
         root.iconphoto(False, tk.PhotoImage(file=ICON_FILE))
         root.wait_visibility()
         root.grab_set()
-        root.transient(self.parent.root)
 
         row = 0
         root.rowconfigure(0, weight=1)
@@ -168,4 +166,5 @@ class PartnerEditFrame:
         self._dismiss()
 
     def _dismiss(self, *args) -> None:
+        self.root.grab_release()
         self.root.destroy()

@@ -4,11 +4,12 @@ import tkinter as tk
 from tkinter import ttk
 
 from psiutils import messagebox
-from psiutils.buttons import ButtonFrame, IconButton
+from psiutils.buttons import IconButton
 from psiutils.constants import PAD, Status
 from psiutils.menus import Menu, MenuItem
 from psiutils.widgets import HAND
 
+from bbochat.buttons import ButtonFrame
 from bbochat.config import config
 from bbochat.constants import MODE_TEXT, ChatMode
 from bbochat.forms.frm_edit_select import EditSelectFrame
@@ -35,7 +36,7 @@ class TextSelectionFrame:
     ) -> None:
 
         self.parent = parent
-        self.root = self.parent.root
+        self.root = parent.root
         self.show_use_frame = show_use_frame
         self.show_title = show_title
         self.has_slave_frame = slave
@@ -161,6 +162,8 @@ class TextSelectionFrame:
 
     def _new_item(self, *args) -> None:
         dlg = TextDialogFrame(self, "New", show_save=True)
+        dlg.root.transient(self.root)
+        dlg.root.grab_set()
         self.root.wait_window(dlg.root)
         if not dlg.text:
             return
@@ -175,6 +178,8 @@ class TextSelectionFrame:
 
     def _edit_item(self, *args) -> None:
         dlg = TextDialogFrame(self, "Edit", self.selected_text, show_save=True)
+        dlg.root.transient(self.root)
+        dlg.root.grab_set()
         self.root.wait_window(dlg.root)
         if dlg.status != Status.UPDATED:
             return
@@ -223,7 +228,6 @@ class TextSelectionFrame:
     def _use_item(self, *args) -> None:
         if self.text_var.get() and self.text_var.get()[0] == "#":
             self.text_var.set("")
-        print(f"Using self.parent.parent: {self.text_var.get()}, {self.mode}")
         self.parent.parent.update_clipboard(self.text_var.get(), self.mode)
         self.config.update(self.config_key, self.text_var.get())
         self.config.save()

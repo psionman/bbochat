@@ -4,12 +4,12 @@ import tkinter as tk
 from tkinter import ttk
 
 from psiutils import messagebox
-from psiutils.buttons import ButtonFrame
 from psiutils.constants import PAD, Mode, Status
 from psiutils.menus import Menu, MenuItem
 from psiutils.widgets import HAND
 from tkhtmlview import HTMLText
 
+from bbochat.buttons import ButtonFrame
 from bbochat.data_store import data_store
 from bbochat.forms.frm_notes_edit import NotesEditFrame
 from bbochat.text import Text
@@ -92,6 +92,8 @@ class NotesFrame:
 
     def _new(self, *args) -> None:
         dlg = NotesEditFrame(self, Mode.NEW)
+        dlg.root.transient(self.root)
+        dlg.root.grab_set()
         self.root.wait_window(dlg.root)
         if dlg.status != Status.UPDATED:
             return
@@ -100,6 +102,8 @@ class NotesFrame:
 
     def _edit(self, *args) -> None:
         dlg = NotesEditFrame(self, Mode.EDIT)
+        dlg.root.transient(self.root)
+        dlg.root.grab_set()
         self.root.wait_window(dlg.root)
         if dlg.status != Status.UPDATED:
             return

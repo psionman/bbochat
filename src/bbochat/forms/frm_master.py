@@ -14,9 +14,8 @@ from bbochat.mode_data import ModeData
 
 class MasterFrame:
     def __init__(self, parent, master):
-        self.parent = parent
         self.root = parent.root
-        # used in text_selection
+        self.parent = parent
         self.update_clipboard = parent.update_clipboard
 
         self.chat = parent.data_server.data_sets["chat"]

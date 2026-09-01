@@ -1,12 +1,17 @@
 """Common utility functions for BBO Chat."""
 
+import contextlib
+import json
 import re
 from pathlib import Path
+from tkinter import simpledialog
 
 import markdown
 from tkinterweb import HtmlFrame
 
-from bbochat.constants import USER_DATA_DIR
+from bbochat.constants import APP_TITLE, USER_DATA_DIR
+from bbochat.data_store import data_store
+from bbochat.message import chat_message
 
 SUIT_CONVERSION = {
     "S": ("&spades;", "black"),
@@ -77,3 +82,22 @@ def _css_from_dict(css: dict) -> str:
             css_str = f"{css_str}{attribute}:{value};"
         css_str = f"{css_str}}}"
     return css_str
+
+
+def get_notes_content(notes_path: str) -> dict[str]:
+    with contextlib.suppress(FileNotFoundError):
+        with open(notes_path) as f_notes:
+            return json.load(f_notes)
+    return {}
+
+
+def get_my_name() -> None:
+    data_store.read()
+    if my_name := simpledialog.askstring(
+        f"{APP_TITLE} - Your name",
+        "Enter the name that you wish to be known by",
+        initialvalue=data_store.my_name,
+    ):
+        data_store.my_name = my_name
+        data_store.save()
+        chat_message.my_name = my_name

@@ -1,6 +1,5 @@
 """Notes tab for BBO Chat notebook"""
 
-import contextlib
 import json
 import re
 import tkinter as tk
@@ -10,10 +9,11 @@ from tkinter import filedialog, ttk
 
 from dateutil.parser import parse  # type: ignore
 from psiutils import messagebox
-from psiutils.buttons import ButtonFrame, IconButton
+from psiutils.buttons import IconButton
 from psiutils.constants import PAD
 from psiutils.widgets import PsiText, Tooltip
 
+from bbochat.buttons import ButtonFrame
 from bbochat.config import config
 from bbochat.constants import (
     DATA_DIR,
@@ -25,13 +25,13 @@ from bbochat.constants import (
 from bbochat.data_store import Partner
 from bbochat.forms.frm_report import ReportFrame
 from bbochat.text import Text
+from bbochat.utilities import get_notes_content
 
 txt = Text()
 
 
 class TournamentFrame:
     def __init__(self, parent, master):
-        self.parent = parent
         self.root = parent.root
         self.partner = parent.partner
         self.report_date = datetime.now()
@@ -233,21 +233,17 @@ class TournamentFrame:
         self.general_notes.delete("0.0", tk.END)
         self.board_notes.delete("0.0", tk.END)
 
-        notes = self.get_notes_content()
+        notes = get_notes_content(self.notes_path.get())
         self.original_notes = notes.copy()
         if "board_notes" in notes:
             self.board_notes.insert("1.0", notes["board_notes"])
         if "general_notes" in notes:
             self.general_notes.insert("1.0", notes["general_notes"])
 
-    def get_notes_content(self) -> dict[str]:
-        with contextlib.suppress(FileNotFoundError):
-            with open(self.notes_path.get()) as f_notes:
-                return json.load(f_notes)
-        return {}
-
     def _report(self, *args) -> None:
         dlg = ReportFrame(self)
+        dlg.root.transient(self.root)
+        dlg.root.grab_set()
         self.root.wait_window(dlg.root)
 
     def _value_changed(self, *args):  # *args essential here to make it work

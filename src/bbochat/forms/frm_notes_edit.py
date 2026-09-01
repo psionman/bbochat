@@ -4,10 +4,10 @@ import tkinter as tk
 from pathlib import Path
 from tkinter import ttk
 
-from psiutils.buttons import ButtonFrame
 from psiutils.constants import PAD, Mode, Status
 from psiutils.utilities import window_resize
 
+from bbochat.buttons import ButtonFrame
 from bbochat.config import config
 from bbochat.constants import APP_TITLE
 from bbochat.data_store import data_store
@@ -16,13 +16,12 @@ from bbochat.data_store import data_store
 class NotesEditFrame:
     def __init__(self, parent: ttk.Frame, mode: int) -> None:
         self.root = tk.Toplevel(parent.root)
-        self.parent = parent
         self.mode = mode
         self.notes = parent.notes
         self.notes_text = ""
 
-        self.title = f"{APP_TITLE} - {Mode[mode].name.capitalize()} notes"
-        self.status = Status.UNDEFINED
+        self.title = f"{APP_TITLE} - {mode.name.capitalize()} notes"
+        self.status = Status.NULL
 
         category = "" if mode == Mode.NEW else parent.category
         self.text = ""
@@ -37,7 +36,6 @@ class NotesEditFrame:
     def show(self) -> None:
         root = self.root
         root.geometry(config.geometry[Path(__file__).stem])
-        root.transient(self.parent.root)
         root.title(self.title)
 
         root.bind("<Control-x>", self._dismiss)
@@ -68,7 +66,7 @@ class NotesEditFrame:
         label = ttk.Label(frame, text="Category")
         label.grid(row=0, column=0, sticky=tk.E)
 
-        state = "readonly" if self.mode == Mode["edit"] else ""
+        state = "readonly" if self.mode == Mode.EDIT else ""
         entry = ttk.Entry(frame, textvariable=self.category_text, state=state)
         entry.grid(row=0, column=1, sticky=tk.W, padx=PAD)
         entry.focus_set()
@@ -107,4 +105,5 @@ class NotesEditFrame:
         self.root.destroy()
 
     def _dismiss(self, *args) -> None:
+        self.root.grab_release()
         self.root.destroy()

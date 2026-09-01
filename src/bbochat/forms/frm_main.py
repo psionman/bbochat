@@ -5,15 +5,16 @@ import random
 import re
 import tkinter as tk
 from pathlib import Path
-from tkinter import messagebox, simpledialog, ttk
+from tkinter import ttk
 
 import clipboard
 import emoji
 from psiutils import messagebox
-from psiutils.buttons import ButtonFrame, IconButton
+from psiutils.buttons import IconButton
 from psiutils.constants import PAD
 from psiutils.utilities import window_resize
 
+from bbochat.buttons import ButtonFrame
 from bbochat.config import config
 from bbochat.constants import ChatMode
 from bbochat.data_store import Pair, Player, data_store
@@ -22,10 +23,14 @@ from bbochat.forms.frm_notes import NotesFrame
 from bbochat.forms.frm_partners import PartnerFrame
 from bbochat.forms.frm_tournament import TournamentFrame
 from bbochat.main_menu import MainMenu
+from bbochat.message import chat_message
 from bbochat.text import Text
+from bbochat.utilities import get_my_name
 
 txt = Text()
 FRAME_TITLE = "BBO Chat"
+
+DEFAULT_MODE = ChatMode.GREETINGS
 
 VERTICAL_FRAME_COUNT = 3
 HORIZONTAL_FRAME_COUNT = 1
@@ -50,14 +55,13 @@ class AppFrame:
         self.valedictions = data_store.valedictions
         self.chat = data_store.chat
         self.my_name = data_store.my_name
+        chat_message.my_name = data_store.my_name
 
         self.pair = []
 
-        self.partner = ""
+        self.partner = None
         self.partners = data_store.partners
         self.partners_names = sorted(list(self.partners.keys()))
-        if config.last_partner and config.last_partner in self.partners:
-            self.partner = self.partners[config.last_partner]
 
         # tk variables
         self._create_tk_variables()
@@ -91,6 +95,10 @@ class AppFrame:
         # On setup
         if not data_store.data_sets["my_name"]:
             self._get_my_name()
+        chat_message.subscribe(self._chat_message_publish)
+        if config.last_partner and config.last_partner in self.partners:
+            self.partner = self.partners[config.last_partner]
+            chat_message.partner = self.partner
 
     def _create_tk_variables(self) -> None:
         self.clipboard = tk.StringVar()
@@ -121,7 +129,7 @@ class AppFrame:
     def _show(self):
         root = self.root
         root.protocol("WM_DELETE_WINDOW", self._dismiss)
-        root.geometry(self._geometry())
+        root.geometry(config.geometry[Path(__file__).stem])
         root.title(FRAME_TITLE)
 
         root.rowconfigure(0, weight=1)
@@ -137,11 +145,13 @@ class AppFrame:
         self.button_frame.grid(
             row=1, column=0, sticky=tk.EW, padx=PAD, pady=PAD
         )
-
+        self._bind_window_events()
         sizegrip = ttk.Sizegrip(root)
         sizegrip.grid(sticky=tk.SE)
 
+    def _bind_window_events(self):
         self.root.update_idletasks()
+        root = self.root
         root.bind("<Control-x>", self._dismiss)
         root.bind("<Control-g>", self._greeting)
         root.bind("<Control-v>", self._valediction)
@@ -149,14 +159,6 @@ class AppFrame:
         root.bind(
             "<Configure>", lambda e: window_resize(root, __file__, config)
         )
-
-    def _geometry(self) -> str:
-        try:
-            geometry = config.geometry[Path(__file__).stem]
-            width = int(geometry.split("x")[0])
-            return DEFAULT_GEOMETRY if width < 10 else geometry
-        except tk.TclError:
-            return DEFAULT_GEOMETRY
 
     def _main_frame(self, master: ttk.Frame) -> ttk.Frame:
         frame = ttk.Frame(master)
@@ -306,18 +308,11 @@ class AppFrame:
         self.update_clipboard()
 
     def _get_my_name(self) -> None:
-        if dlg := simpledialog.askstring(
-            "Your name",
-            "Enter the name that you wish to be known by",
-            parent=self.root,
-        ):
-            self.my_name = dlg
-            self.my_name_text.set(dlg)
-            data_store.my_name = dlg
-            data_store.save()
+        get_my_name()
 
     def _on_config_change(self, *args):
         self.randomize.set(config.randomize_name_order)
+        chat_message.randomize = config.randomize_name_order
         self._set_clipboard_colour()
 
     def _set_clipboard_colour(self):
@@ -333,20 +328,19 @@ class AppFrame:
     def _update_clipboard(self, *args) -> None:
         self.update_clipboard()
 
+    def _chat_message_publish(self) -> None:
+        self.my_name_text.set(chat_message.my_name)
+        self.partners_username.set(
+            f"{self.partner.username}, {self.partner.name}"
+        )
+
     def update_clipboard(
         self, message: str = "", mode: int = None, *args
     ) -> None:
-        if mode is not None:
-            self.last_mode_text[mode] = message
-            self.mode = mode
+        if mode is None:
+            mode = DEFAULT_MODE
+        self.mode = mode
         self._set_clipboard_colour()
-
-        if not message:
-            if mode is None:
-                message = self.last_mode_text[ChatMode.GREETINGS]
-            else:
-                message = self.last_mode_text[mode]
-
         self._create_message(message)
 
     def _create_message(self, message: str) -> None:

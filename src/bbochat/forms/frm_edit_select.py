@@ -7,12 +7,13 @@ from tkinter import ttk
 
 from bidict import bidict
 from psiutils import messagebox
-from psiutils.buttons import ButtonFrame, IconButton
+from psiutils.buttons import IconButton
 from psiutils.constants import PAD, Status
 from psiutils.menus import Menu, MenuItem
 from psiutils.utilities import window_resize
 from psiutils.widgets import HAND
 
+from bbochat.buttons import ButtonFrame
 from bbochat.config import config
 from bbochat.forms.frm_text_dialog import TextDialogFrame
 from bbochat.text import Text
@@ -185,6 +186,8 @@ class EditSelectFrame:
 
     def _new_item(self, *args) -> None:
         dlg = TextDialogFrame(self, "New")
+        dlg.root.transient(self.root)
+        dlg.root.grab_set()
         self.root.wait_window(dlg.root)
         if dlg.text:
             if self.text_register:
@@ -204,6 +207,8 @@ class EditSelectFrame:
 
     def _edit_item(self, *args) -> None:
         dlg = TextDialogFrame(self, "Edit", self.selected_text)
+        dlg.root.transient(self.root)
+        dlg.root.grab_set()
         self.root.wait_window(dlg.root)
         if dlg.text == self.selected_text:
             return

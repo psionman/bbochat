@@ -4,14 +4,15 @@ import tkinter as tk
 from tkinter import ttk
 
 from psiutils import messagebox
-from psiutils.buttons import ButtonFrame
 from psiutils.constants import PAD, PADT, Mode, Status
 from psiutils.menus import Menu, MenuItem
 from psiutils.widgets import HAND, PsiText
 
+from bbochat.buttons import ButtonFrame
 from bbochat.config import config
 from bbochat.data_store import Partner, data_store
 from bbochat.forms.frm_partner_edit import PartnerEditFrame
+from bbochat.message import chat_message
 from bbochat.text import Text
 
 txt = Text()
@@ -33,12 +34,11 @@ class PartnerFrame:
         self.selected_partner = parent.selected_partner
         self.partners_name = parent.partners_name
         self.system = parent.system
-        self.partners_username = parent.partners_username
+        # self.partners_username = parent.partners_username
         self.partners_names = parent.partners_names
 
         self.partners_frame = self._get_partners_frame(master)
         self.partners_frame.grid(row=0, column=0, sticky=tk.EW)
-        self._update_partner_values()
 
         self.system.trace_add("write", self._partner_changed)
         self.partners_name.trace_add("write", self._partner_changed)
@@ -49,9 +49,14 @@ class PartnerFrame:
         if self.partner:
             self.button_frame.enable()
             self.context_menu.enable()
+        chat_message.subscribe(self._chat_message_publish)
+
+    def _chat_message_publish(self):
+        self.partner = chat_message.partner
+        self._update_partner_values()
 
     def _get_partners_frame(self, master) -> ttk.Frame:
-        frame = ttk.Frame(master)
+        frame = ttk.Frame(master, style="yellow.TFrame")
         frame.rowconfigure(0, weight=1)
         frame.columnconfigure(1, weight=1)
 
@@ -141,32 +146,38 @@ class PartnerFrame:
 
     def _partner_selected(self, event: object = None) -> None:
         # TODO What happens if a tournament file is open?
-        selection = event.widget.curselection()
-        if not selection:
+        selected_index = event.widget.curselection()
+        if not selected_index:
             return
         partners_names = sorted(list(self.partners))
-        self.partner = self.partners[partners_names[selection[0]]]
+        user_name = partners_names[selected_index[0]]
+
+        self.partner = self.partners[user_name]
+        # TODO: Update the tournament tab with the new partner
         self.parent.tournament_tab.change_partner(self.partner)
         self._update_partner_values()
         config.config["last_partner"] = self.partner.username
         config.save()
+        print(f"Partner selected: {self.partner}")
+        chat_message.partner = self.partner
 
     def _update_partner_values(self) -> None:
         if not self.partner:
             return
 
-        self.partners_username.set(
-            f"{self.partner.username}, {self.partner.name}"
-        )
+        # self.partners_username.set(
+        #     f"{self.partner.username}, {self.partner.name}"
+        # )
         self.greeting.set(self.partner.greeting)
         self.partners_name.set(self.partner.name)
         self.system.set(self.partner.system)
         self.notes_text.delete("0.0", tk.END)
         self.notes_text.insert("0.0", self.partner.notes)
 
-        self.parent.partner = self.partner
-        self.parent.greeting.set(self.partner.greeting)
-        self.parent.update_clipboard()
+        # self.parent.partner = self.partner
+        # self.parent.greeting.set(self.partner.greeting)
+        # self.parent.update_clipboard()
+        # chat_message.partner = self.partner
 
     def _partner_changed(self, *args) -> None:
         self.button_frame.enable(False)
@@ -189,6 +200,8 @@ class PartnerFrame:
 
     def _new(self, *args) -> None:
         dlg = PartnerEditFrame(self, Mode.NEW)
+        dlg.root.transient(self.root)
+        dlg.root.grab_set()
         self.root.wait_window(dlg.root)
         if dlg.status != Status.OK:
             return
@@ -207,6 +220,8 @@ class PartnerFrame:
 
     def _edit(self, *args) -> None:
         dlg = PartnerEditFrame(self, Mode.EDIT, partner=self.partner)
+        dlg.root.transient(self.root)
+        dlg.root.grab_set()
         self.root.wait_window(dlg.root)
         if dlg.status != Status.OK:
             return

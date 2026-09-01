@@ -6,12 +6,12 @@ from pathlib import Path
 from tkinter import ttk
 from tkinter.colorchooser import askcolor
 
-from psiutils.buttons import ButtonFrame
 from psiutils.constants import PAD, Pad, Status
 from psiutils.utilities import window_resize
 from psiutils.widgets import clickable_widget
 from tkinterweb import HtmlFrame
 
+from bbochat.buttons import ButtonFrame
 from bbochat.config import config
 from bbochat.constants import APP_TITLE, HTML_TEST
 from bbochat.text import Text
@@ -34,7 +34,6 @@ class ConfigCssFrame:
     def __init__(self, parent: tk.Frame) -> None:
         self.focus = False
         self.root = tk.Toplevel(parent.root)
-        # self.parent = parent
         self.css = deepcopy(parent.css)
         self.status = Status.NULL
 

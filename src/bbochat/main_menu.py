@@ -1,6 +1,5 @@
 import tkinter as tk
 import webbrowser
-from tkinter import simpledialog
 
 from psiutils import messagebox
 from psiutils.menus import Menu, MenuItem
@@ -12,10 +11,10 @@ from bbochat import (
     __version__,
 )
 from bbochat.config import config
-from bbochat.constants import APP_TITLE, HELP_URI
-from bbochat.data_store import data_store
+from bbochat.constants import HELP_URI
 from bbochat.forms.frm_config import ConfigFrame
 from bbochat.text import Text
+from bbochat.utilities import get_my_name
 
 txt = Text()
 SPACES = 30
@@ -47,17 +46,7 @@ class MainMenu:
         ]
 
     def _get_my_name(self) -> None:
-        data_server = data_store
-        data_server.read()
-        if dlg := simpledialog.askstring(
-            f"{APP_TITLE} - Your name",
-            "Enter the name that you wish to be known by",
-            parent=self.root,
-            initialvalue=data_server.my_name,
-        ):
-            data_server.my_name = dlg
-            data_server.save()
-            self.parent.my_name_text.set(dlg)
+        get_my_name()
 
     def _show_config_frame(self):
         """Display the config frame."""

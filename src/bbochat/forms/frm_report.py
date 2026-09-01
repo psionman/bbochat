@@ -5,12 +5,11 @@ import tkinter as tk
 from pathlib import Path
 from tkinter import ttk
 
-from bbochat.utilities import display_html
-from psiutils.buttons import ButtonFrame
 from psiutils.constants import PAD
 from psiutils.utilities import window_resize
 from tkinterweb import HtmlFrame
 
+from bbochat.buttons import ButtonFrame
 from bbochat.config import config
 from bbochat.constants import APP_TITLE
 
@@ -20,7 +19,6 @@ FRAME_TITLE = f"{APP_TITLE} - Report"
 class ReportFrame:
     def __init__(self, parent: tk.Frame) -> None:
         self.root = tk.Toplevel(parent.root)
-        self.parent = parent
         self.partner = parent.partner
         self.date = parent.report_date
         self.path = parent.path.get()
@@ -36,7 +34,6 @@ class ReportFrame:
     def _show(self) -> None:
         root = self.root
         root.geometry(config.geometry[Path(__file__).stem])
-        root.transient(self.parent.root)
         root.title(FRAME_TITLE)
         root.bind(
             "<Configure>",
@@ -83,25 +80,26 @@ class ReportFrame:
         return frame
 
     def _create_report(self) -> str:
-        notes = self.parent.get_notes_content()
-        output = "# Tournament report"
-        output = f"{output}\n\n Date: {self.date.strftime('%d %B %Y')}"
-        output = (
-            f"{output}\n\n Partner: "
-            f"{self.partner.name} ({self.partner.username})"
-        )
+        # notes = get_notes_content(self.path)
+        # output = "# Tournament report"
+        # output = f"{output}\n\n Date: {self.date.strftime('%d %B %Y')}"
+        # output = (
+        #     f"{output}\n\n Partner: "
+        #     f"{self.partner.name} ({self.partner.username})"
+        # )
 
-        if "board_notes" in notes and notes["board_notes"]:
-            output = f"{output}\n\n <h2>Board notes</h2>"
-            output = f"{output}\n\n{self._parse_md(notes['board_notes'])}"
+        # if "board_notes" in notes and notes["board_notes"]:
+        #     output = f"{output}\n\n <h2>Board notes</h2>"
+        #     output = f"{output}\n\n{self._parse_md(notes['board_notes'])}"
 
-        if "general_notes" in notes and notes["general_notes"]:
-            output = f"{output}\n\n <h2>General notes</h2>"
-            output = f"{output}\n\n{self._parse_md(notes['general_notes'])}"
+        # if "general_notes" in notes and notes["general_notes"]:
+        #     output = f"{output}\n\n <h2>General notes</h2>"
+        #     output = f"{output}\n\n{self._parse_md(notes['general_notes'])}"
 
-        html = display_html(self.html_frame, output, config.css)
-        self._save_html(html)
-        return html
+        # html = display_html(self.html_frame, output, config.css)
+        # self._save_html(html)
+        # return html
+        pass
 
     def _parse_md(self, text: str) -> str:
         match = re.findall(r"[b][0-9]{1,}[.]", text)
@@ -115,4 +113,5 @@ class ReportFrame:
             f_html.write(html)
 
     def _dismiss(self, *args) -> None:
+        self.root.grab_release()
         self.root.destroy()

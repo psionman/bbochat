@@ -1,23 +1,26 @@
-from projects.constants import ICON_DIR
-from psiutils.buttons import ButtonFrame as PsiButtonFrame
-from psiutils.buttons import IconButton
+# buttons.py
+import os
+import tkinter as tk
 
-buttons = {
-    "help": ("Help", "help"),
-    "folder-open": ("Open here", "folder-open"),
-}
+from dotenv import load_dotenv
+from psiutils.buttons import ButtonFrame as ButtonFrameBase
+
+load_dotenv()
 
 
-class ButtonFrame(PsiButtonFrame):
+class ButtonFrame(ButtonFrameBase):
     def __init__(
         self,
-        *args,
-        sticky: str = "",
-        dimmable: bool = False,
+        master: tk.Frame,
+        orientation: str = tk.HORIZONTAL,
+        button_config_path: str = os.getenv("ICON_BUTTON_CONFIG_PATH"),
+        icon_path: str = os.getenv("ICON_IMAGE_PATH"),
         **kwargs: dict,
-    ) -> None:
-        super().__init__(*args, **kwargs)
-        for name, button in buttons.items():
-            self.icon_buttons[name] = IconButton(
-                self, button[0], button[1], icon_path=ICON_DIR
-            )
+    ):
+        super().__init__(
+            master,
+            orientation,
+            button_config_path,
+            icon_path=icon_path,
+            **kwargs,
+        )
