@@ -14,7 +14,7 @@ from bbochat.config import config
 from bbochat.constants import MODE_TEXT, ChatMode
 from bbochat.forms.frm_edit_select import EditSelectFrame
 from bbochat.forms.frm_text_dialog import TextDialogFrame
-from bbochat.message import chat_message
+from bbochat.message import message_store
 from bbochat.mode_data import ModeData
 from bbochat.text import Text
 
@@ -228,9 +228,9 @@ class TextSelectionFrame:
     def _use_item(self, *args) -> None:
         if self.text_var.get() and self.text_var.get()[0] == "#":
             self.text_var.set("")
-        chat_message.message = self.text_var.get()
-        chat_message.mode = self.mode
-        chat_message.selected_messages[self.mode] = self.text_var.get()
+        message_store.mode = self.mode
+        message_store.selected_messages[self.mode] = self.text_var.get()
+        message_store.message = self.text_var.get()
         self.config.update(self.config_key, self.text_var.get())
         self.config.save()
 

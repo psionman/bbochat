@@ -11,7 +11,7 @@ from tkinterweb import HtmlFrame
 
 from bbochat.constants import APP_TITLE, USER_DATA_DIR
 from bbochat.data_store import data_store
-from bbochat.message import chat_message
+from bbochat.message import message_store
 
 SUIT_CONVERSION = {
     "S": ("&spades;", "black"),
@@ -100,4 +100,4 @@ def get_my_name() -> None:
     ):
         data_store.my_name = my_name
         data_store.save()
-        chat_message.my_name = my_name
+        message_store.my_name = my_name

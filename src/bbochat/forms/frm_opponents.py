@@ -8,7 +8,7 @@ from psiutils.treeview import sort_treeview
 
 from bbochat.constants import ChatMode
 from bbochat.data_store import data_store
-from bbochat.message import chat_message
+from bbochat.message import message_store
 from bbochat.pair import PairNew
 
 PAIR_TREE_COLUMNS = (
@@ -97,8 +97,8 @@ class OpponentsFrame:
         player_1 = data_store.players[values[0]]
         player_2 = data_store.players[values[1]]
 
-        chat_message.pair = PairNew(player_1, player_2)
-        chat_message.mode = ChatMode.GREETINGS
-        chat_message.message = chat_message.selected_messages[
+        message_store.pair = PairNew(player_1, player_2)
+        message_store.mode = ChatMode.GREETINGS
+        message_store.message = message_store.selected_messages[
             ChatMode.GREETINGS
         ]

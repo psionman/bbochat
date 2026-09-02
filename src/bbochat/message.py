@@ -29,6 +29,8 @@ class Message:
         self._pair: PairNew | None = None
         self.listeners: list[Listener] = []
         self.selected_messages = {}
+        self.history = {}
+        self._notifying = False
 
     @property
     def mode(self) -> ChatMode:
@@ -46,6 +48,7 @@ class Message:
     @message.setter
     def message(self, value: str) -> None:
         self._message = value
+        self._add_to_history()
         self._notify()
 
     @property
@@ -87,17 +90,6 @@ class Message:
     def randomize(self, value: bool) -> None:
         self._randomize = value
         self._notify()
-
-    def output_message(self) -> str:
-        names, system = self._get_names_and_system()
-        opps = self._get_opps()
-
-        message = self.message.replace("<opps>", opps)
-        message = message.replace("<names>", names)
-        message = message.replace("<system>", system)
-        message = self._insert_emojis(message)
-        clipboard.copy(message)
-        return message
 
     def _get_names_and_system(self) -> tuple[str, str]:
         if self._partner:
@@ -143,6 +135,23 @@ class Message:
             return f"{opp_1} and {opp_2}" if opp_2 else opp_1
         return opp_2
 
+    def output_message(self) -> str:
+        names, system = self._get_names_and_system()
+        opps = self._get_opps()
+
+        message = self.message.replace("<opps>", opps)
+        message = message.replace("<names>", names)
+        message = message.replace("<system>", system)
+        message = self._insert_emojis(message)
+        clipboard.copy(message)
+        return message
+
+    def _add_to_history(self) -> None:
+        if self.message in self.history:
+            self.history.pop(self.message)
+        self.history = {self.message: self.mode, **self.history}
+        self._notify()
+
     # -- observer pattern for UI refresh -----------------------------
     def subscribe(self, listener: Listener) -> None:
         self.listeners.append(listener)
@@ -151,10 +160,16 @@ class Message:
         self.listeners.remove(listener)
 
     def _notify(self, caller: str = "") -> None:
-        if caller:
-            print(f"Notifying listeners from {caller}")
-        for listener in self.listeners:
-            listener()
+        if self._notifying:
+            return
+        self._notifying = True
+        try:
+            if caller:
+                print(f"Notifying listeners from {caller}")
+            for listener in self.listeners:
+                listener()
+        finally:
+            self._notifying = False
 
 
-chat_message = Message()
+message_store = Message()

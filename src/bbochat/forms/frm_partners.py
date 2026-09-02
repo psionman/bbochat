@@ -12,7 +12,7 @@ from bbochat.buttons import ButtonFrame
 from bbochat.config import config
 from bbochat.data_store import Partner, data_store
 from bbochat.forms.frm_partner_edit import PartnerEditFrame
-from bbochat.message import chat_message
+from bbochat.message import message_store
 from bbochat.text import Text
 
 txt = Text()
@@ -49,10 +49,10 @@ class PartnerFrame:
         if self.partner:
             self.button_frame.enable()
             self.context_menu.enable()
-        chat_message.subscribe(self._chat_message_publish)
+        message_store.subscribe(self._chat_message_publish)
 
     def _chat_message_publish(self):
-        self.partner = chat_message.partner
+        self.partner = message_store.partner
         self._update_partner_values()
 
     def _get_partners_frame(self, master) -> ttk.Frame:
@@ -158,7 +158,7 @@ class PartnerFrame:
         self._update_partner_values()
         config.config["last_partner"] = self.partner.username
         config.save()
-        chat_message.partner = self.partner
+        message_store.partner = self.partner
 
     def _update_partner_values(self) -> None:
         if not self.partner:

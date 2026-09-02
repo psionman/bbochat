@@ -12,7 +12,7 @@ from bbochat.buttons import ButtonFrame
 from bbochat.config import config
 from bbochat.constants import ICON_FILE
 from bbochat.data_store import Partner, data_store
-from bbochat.message import chat_message
+from bbochat.message import message_store
 
 FRAME_TITLE = "New partner"
 
@@ -162,7 +162,7 @@ class PartnerEditFrame:
         self.partner.greeting = self.greeting.get()
         self.partner.notes = self.notes_text.get(0.0, tk.END)
         self.partners[self.partner.username] = self.partner
-        chat_message.partner = self.partner
+        message_store.partner = self.partner
         data_store.save()
         self.status = Status.OK
         self._dismiss()

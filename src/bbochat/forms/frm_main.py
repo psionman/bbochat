@@ -20,7 +20,7 @@ from bbochat.forms.frm_notes import NotesFrame
 from bbochat.forms.frm_partners import PartnerFrame
 from bbochat.forms.frm_tournament import TournamentFrame
 from bbochat.main_menu import MainMenu
-from bbochat.message import chat_message
+from bbochat.message import message_store
 from bbochat.pair import PairNew
 from bbochat.player import Player
 from bbochat.text import Text
@@ -31,7 +31,7 @@ FRAME_TITLE = "BBO Chat"
 
 DEFAULT_MODE = ChatMode.GREETINGS
 
-VERTICAL_FRAME_COUNT = 3
+VERTICAL_FRAME_COUNT = 4
 HORIZONTAL_FRAME_COUNT = 1
 NOTES_FRAME_COUNT = 1
 
@@ -48,7 +48,7 @@ class AppFrame:
 
         data_store.subscribe(self._on_data_change)
         self.data_server = data_store
-        chat_message.my_name = data_store.my_name
+        message_store.my_name = data_store.my_name
 
         self.pair = []
 
@@ -88,13 +88,14 @@ class AppFrame:
         # On setup
         if not data_store.data_sets["my_name"]:
             self._get_my_name()
-        chat_message.randomize = config.randomize_name_order
-        chat_message.subscribe(self._chat_message_publish)
+        message_store.randomize = config.randomize_name_order
+        message_store.subscribe(self._chat_message_publish)
+        self.last_message = ""
 
         if config.last_partner and config.last_partner in self.partners:
             self.partner = self.partners[config.last_partner]
-            chat_message.partner = self.partner
-            chat_message.selected_messages[ChatMode.GREETINGS] = (
+            message_store.partner = self.partner
+            message_store.selected_messages[ChatMode.GREETINGS] = (
                 self.partner.greeting
             )
 
@@ -313,7 +314,7 @@ class AppFrame:
 
     def _on_config_change(self, *args):
         self.randomize.set(config.randomize_name_order)
-        chat_message.randomize = config.randomize_name_order
+        message_store.randomize = config.randomize_name_order
         self._set_clipboard_colour()
 
     def _set_clipboard_colour(self):
@@ -330,19 +331,24 @@ class AppFrame:
         self.update_clipboard()
 
     def _chat_message_publish(self) -> None:
-        self.my_name_text.set(chat_message.my_name)
-        self.partner = chat_message.partner
+        self.my_name_text.set(message_store.my_name)
+        self.partner = message_store.partner
         self.partners_username.set(
             f"{self.partner.username}, {self.partner.name}"
         )
-        if chat_message.pair:
-            self.username_1.set(chat_message.pair.player_1.username)
-            self.username_2.set(chat_message.pair.player_2.username)
 
-        # if chat_message.message:
-        message = chat_message.output_message()
-        self.update_clipboard(message, chat_message.mode)
-        self.clipboard.set(message)
+        if message_store.pair:
+            self.username_1.set(message_store.pair.player_1.username)
+            self.username_2.set(message_store.pair.player_2.username)
+
+        if self.last_message != message_store.message:
+            # input(
+            #     f"Message changed from {self.last_message} to {message_store.message}"
+            # )
+            message = message_store.output_message()
+            self.update_clipboard(message, message_store.mode)
+            self.clipboard.set(message)
+        self.last_message = message_store.message
 
     def update_clipboard(
         self, message: str = "", mode: int = None, *args
@@ -375,7 +381,7 @@ class AppFrame:
         # self.search.set(self.username_1.get())
         self.search_entry.focus_set()
         self.master_tab.opponents_frame.name_search()
-        chat_message.pair = pair
+        message_store.pair = pair
         self.update_clipboard()
 
     def _delete_pair(self, *args) -> None:
@@ -400,7 +406,7 @@ class AppFrame:
         self.search_entry.focus_set()
 
     def _on_randomize_change(self) -> None:
-        chat_message.randomize = self.randomize.get()
+        message_store.randomize = self.randomize.get()
 
     def save(self, *args) -> None:
         data_store.save()
