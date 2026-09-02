@@ -1,5 +1,8 @@
 # BBO Chat - History
 
+## Version 0.0.9 02 September 2026
+1. Load last partner's greeting on startup
+
 ## Version 0.0.8 01 September 2026
 1. Implement message.py as dynamic data repository
 

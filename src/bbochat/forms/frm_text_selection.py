@@ -230,6 +230,7 @@ class TextSelectionFrame:
             self.text_var.set("")
         chat_message.message = self.text_var.get()
         chat_message.mode = self.mode
+        chat_message.selected_messages[self.mode] = self.text_var.get()
         self.config.update(self.config_key, self.text_var.get())
         self.config.save()
 

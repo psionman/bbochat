@@ -94,6 +94,9 @@ class AppFrame:
         if config.last_partner and config.last_partner in self.partners:
             self.partner = self.partners[config.last_partner]
             chat_message.partner = self.partner
+            chat_message.selected_messages[ChatMode.GREETINGS] = (
+                self.partner.greeting
+            )
 
     def _create_tk_variables(self) -> None:
         self.clipboard = tk.StringVar()

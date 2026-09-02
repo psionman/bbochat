@@ -6,6 +6,7 @@ from tkinter import ttk
 from psiutils.constants import PAD
 from psiutils.treeview import sort_treeview
 
+from bbochat.constants import ChatMode
 from bbochat.data_store import data_store
 from bbochat.message import chat_message
 from bbochat.pair import PairNew
@@ -97,8 +98,7 @@ class OpponentsFrame:
         player_2 = data_store.players[values[1]]
 
         chat_message.pair = PairNew(player_1, player_2)
-
-        # data_store.username_1 = self.pair[0].username
-        # data_store.username_2 = self.pair[1].username
-        # data_store.name_1 = self.pair[0].name
-        # data_store.name_2 = self.pair[1].name
+        chat_message.mode = ChatMode.GREETINGS
+        chat_message.message = chat_message.selected_messages[
+            ChatMode.GREETINGS
+        ]

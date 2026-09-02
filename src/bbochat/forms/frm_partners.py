@@ -20,6 +20,7 @@ txt = Text()
 
 class PartnerFrame:
     def __init__(self, parent, master):
+        self.parent = parent
         self.root = parent.root
         self.partner = parent.partner
         self.partners = data_store.partners

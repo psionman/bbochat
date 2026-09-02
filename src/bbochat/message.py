@@ -28,6 +28,7 @@ class Message:
         self._partner: Partner | None = None
         self._pair: PairNew | None = None
         self.listeners: list[Listener] = []
+        self.selected_messages = {}
 
     @property
     def mode(self) -> ChatMode:
