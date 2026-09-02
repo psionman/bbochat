@@ -5,6 +5,7 @@
 2. Items being added to history when selected
 3. Initialise tkvars in frm_partner
 4. Create history panel with mousewheel support
+5. Implement last used text for each chat mode
 
 
 ## Version 0.0.8 01 September 2026

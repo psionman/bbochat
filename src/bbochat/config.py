@@ -19,12 +19,10 @@ Listener = Callable[[], None]
 DEFAULT_CONFIG = {
     "data_directory": USER_DATA_DIR,
     "last_partner": "",
-    "last_greeting": "",
-    "last_valediction": "",
-    "last_chat": "",
     "randomize_name_order": True,
     "show_tooltips": True,
     "tournament_notes_directory": str(Path(DOCS_DIR, APP_NAME)),
+    "last_used_text": {str(mode.value): "" for mode in ChatMode},
     "geometry": {
         "frm_main": "1100x540",
         "frm_edit_select": "500x500",
@@ -41,7 +39,7 @@ DEFAULT_CONFIG = {
         f"{ChatMode.CHAT.name}": "aqua",
         f"{ChatMode.CHAT_DETAIL.name}": "aqua",
     },
-    "vertical_sashes": [(250, 1), (465, 1), (720, 1)],
+    "vertical_sashes": [(219, 1), (494, 1), (773, 1), (1055, 1)],
     "horizontal_sashes": [(1, 165)],
     "notes_sashes": [(530, 1)],
     "css_body": {"name": "body", "color": "black", "font-size": 12},

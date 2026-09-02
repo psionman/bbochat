@@ -50,9 +50,15 @@ class TextSelectionFrame:
         self.config = config
         config.subscribe(self._on_config_change)
 
+        # last_value = (
+        #     self.config.config[self.config_key]
+        #     if self.config_key in self.config.config
+        #     else ""
+        # )
+        # print(mode.value, config.last_chat)
         last_value = (
-            self.config.config[self.config_key]
-            if self.config_key in self.config.config
+            config.last_used_text[str(mode.value)]
+            if str(mode.value) in config.last_used_text
             else ""
         )
         self.text_var = tk.StringVar(value=last_value)
@@ -234,8 +240,12 @@ class TextSelectionFrame:
         message_store.mode = self.mode
         message_store.selected_messages[self.mode] = self.text_var.get()
         message_store.message = self.text_var.get()
-        self.config.update(self.config_key, self.text_var.get())
-        self.config.save()
+        config.config["last_used_text"][str(self.mode.value)] = (
+            self.text_var.get()
+        )
+
+        print("Updating config", config.config["last_used_text"])
+        config.save()
 
     def populate_text_items(self, selected_item: str = "") -> None:
         self.listbox.delete(0, tk.END)

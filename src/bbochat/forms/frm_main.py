@@ -77,11 +77,11 @@ class AppFrame:
         self.name_1.trace_add("write", self._update_clipboard)
         self.name_2.trace_add("write", self._update_clipboard)
 
-        self.last_mode_text = {
-            ChatMode.GREETINGS: config.last_greeting,
-            ChatMode.VALEDICTION: config.last_valediction,
-            ChatMode.CHAT: config.last_chat,
-        }
+        # self.last_mode_text = {
+        #     ChatMode.GREETINGS: config.last_greeting,
+        #     ChatMode.VALEDICTION: config.last_valediction,
+        #     ChatMode.CHAT: config.last_chat,
+        # }
 
         self.save_button = None
         self.delete_button = None
@@ -459,4 +459,4 @@ class AppFrame:
         self._save_sashes()
         self.root.destroy()
         # Need to do this because window_resize is called in close
-        self.config.save()
+        config.save()
