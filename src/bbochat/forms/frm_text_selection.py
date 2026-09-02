@@ -126,7 +126,7 @@ class TextSelectionFrame:
 
         entry = ttk.Entry(frame, textvariable=self.text_var)
         entry.grid(row=1, column=0, sticky=tk.EW)
-        colour = self.config.colours[self.mode.name]
+        colour = self.config.colours[str(self.mode.value)]
         entry_style = ttk.Style()
         entry_style.configure(
             f"{self.mode}.TEntry",

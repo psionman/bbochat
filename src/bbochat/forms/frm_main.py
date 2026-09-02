@@ -306,7 +306,7 @@ class AppFrame:
         self._set_clipboard_colour()
 
     def _set_clipboard_colour(self):
-        colour = config.colours[self.mode.name]
+        colour = config.colours[str(self.mode.value)]
         entry_style = ttk.Style()
         entry_style.configure(
             "clipboard_entry.TEntry",

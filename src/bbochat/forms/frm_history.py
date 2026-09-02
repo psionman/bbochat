@@ -63,7 +63,7 @@ class HistoryPanel:
     def _radio_button_style(self, mode: ChatMode) -> str:
         if mode in self.radiobutton_styles:
             return self.radiobutton_styles[mode]
-        colour = config.colours[mode.name]
+        colour = config.colours[str(mode.value)]
         style = ttk.Style(self.root)
         style_name = f"{colour.lstrip('#')}.TRadiobutton"
         style.configure(style_name, background=colour)

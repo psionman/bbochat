@@ -56,8 +56,8 @@ class ConfigFrame:
         )
 
         # Colour items
-        for key, chat_mode in ChatMode.__members__.items():
-            colour = config.colours.get(key, "#000000")
+        for chat_mode in ChatMode.__members__.values():
+            colour = config.colours.get(str(chat_mode.value), "#000000")
             setattr(self, chat_mode.name, tk.StringVar(value=colour))
             setattr(self, f"{chat_mode.name}_original", colour)
 
@@ -128,7 +128,7 @@ class ConfigFrame:
 
         row += 1
         for mode in ChatMode:
-            self._add_colour_widgets(frame, row, mode.name)
+            self._add_colour_widgets(frame, row, mode)
             row += 1
 
         row += 1
@@ -174,49 +174,42 @@ class ConfigFrame:
         return frame
 
     def _add_colour_widgets(
-        self, frame: tk.Frame, row: int, colour_key: str
+        self, frame: tk.Frame, row: int, mode: ChatMode
     ) -> None:
-        label = ttk.Label(frame, text=colour_key.capitalize())
+        colour_key = mode.name
+        label = ttk.Label(frame, text=mode.name.capitalize())
         label.grid(row=row, column=0, sticky=tk.E, padx=PAD, pady=PAD)
 
         entry = ttk.Entry(
             frame, textvariable=getattr(self, colour_key), width=10
         )
         entry.grid(row=row, column=1, sticky=tk.EW)
-        # entry.bind(
-        #     "<FocusOut>",
-        #     lambda e, k=colour_key: self._validate_colour_change(k),
-        # )
-        self.colour_entries[colour_key] = entry
+        self.colour_entries[str(mode.value)] = entry
 
         colour = getattr(self, colour_key).get()
         self.style.configure(f"{colour}.TLabel", background=colour)
 
-        # label = ColourLabel(
-        #     frame,
-        #     width=10,
-        #     style=f"{colour}.TLabel",
-        #     colour=colour,
-        # )
-        # label.grid(row=row, column=2, sticky=tk.W, padx=PAD)
         button = IconButton(
             frame,
             txt.SELECT,
             "palette",
-            lambda k=colour_key: self._get_color(k),
+            lambda k=mode: self._get_color(k),
             icon_path=ICON_DIR,
         )
         button.grid(row=row, column=3, padx=PAD, pady=(0, 5), sticky=tk.W)
 
     def _button_frame(self, master: ttk.Frame) -> tk.Frame:
         frame = ButtonFrame(master, tk.HORIZONTAL)
-        frame.buttons = [
+        frame.buttons = self._frame_buttons(frame)
+        frame.enable(False)
+        return frame
+
+    def _frame_buttons(self, frame: ButtonFrame) -> tk.Frame:
+        return [
             frame.icon_button("save", self._save_config, True),
             frame.icon_button("revert", self._restore_defaults, True),
             frame.icon_button("exit", self._dismiss),
         ]
-        frame.enable(False)
-        return frame
 
     def _get_data_directory(self) -> str:
         """Return a directory."""
@@ -252,11 +245,12 @@ class ConfigFrame:
 
     def _get_color(self, mode: str) -> None:
         colour = askcolor(
-            initialcolor=self.colours[mode],
-            title=f"{mode.capitalize()} colour",
+            parent=self.root,
+            initialcolor=self.colours[str(mode.value)],
+            title=f"{mode.name.capitalize()} colour",
         )
         if colour[1]:
-            self.colours[mode] = colour[1]
+            self.colours[mode.value] = colour[1]
             self._update_mode_colours()
             self._check_value_changed()
 
@@ -264,14 +258,15 @@ class ConfigFrame:
         for mode, entry in self.colour_entries.items():
             self._update_mode_colour(mode, entry)
 
-    def _update_mode_colour(self, mode: str, entry: ttk.Entry) -> None:
+    def _update_mode_colour(self, mode: int, entry: ttk.Entry) -> None:
         colour = self.colours[mode]
-        entry_style = ttk.Style()
+        key = ChatMode(int(mode)).name
+        entry_style = ttk.Style(self.root)
         entry_style.configure(
-            f"style_{mode}.TEntry",
+            f"style_{key}.TEntry",
             fieldbackground=colour,
         )
-        entry.configure(style=f"style_{mode}.TEntry")
+        entry.configure(style=f"style_{key}.TEntry")
 
     def _check_value_changed(self, *args) -> None:
         enable = bool(self._value_changed())
