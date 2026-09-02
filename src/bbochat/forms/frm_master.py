@@ -22,7 +22,6 @@ class MasterFrame:
         message_store.subscribe(self._populate_history_frame)
 
         self.chat = data_store.chat
-        self.chat_line = parent.chat_line
         self.radiobutton_styles = {}
         self.history_selection = tk.StringVar()
 

@@ -14,7 +14,6 @@ class ChatFrame:
         self.root = parent.root
         self.config_key = f"last_{mode}"
 
-        self.chat_line = parent.chat_line
         self.chat_frame = self._main_frame(master)
 
     def _main_frame(self, master: ttk.Frame) -> ttk.PanedWindow:

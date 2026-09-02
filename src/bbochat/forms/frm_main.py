@@ -57,7 +57,21 @@ class AppFrame:
         self.partners_names = sorted(list(self.partners.keys()))
 
         # tk variables
-        self._create_tk_variables()
+        self.clipboard = tk.StringVar()
+
+        # Main
+        self.search = tk.StringVar()
+        self.username_1 = tk.StringVar()
+        self.username_2 = tk.StringVar()
+        self.name_1 = tk.StringVar()
+        self.name_2 = tk.StringVar()
+        self.randomize = tk.BooleanVar(value=config.randomize_name_order)
+
+        # Partners
+        self.my_name_text = tk.StringVar(value=data_store.my_name)
+        self.partners_display_name = tk.StringVar()
+
+        # Trace variables
         self.username_1.trace_add("write", self._pair_username_change)
         self.username_2.trace_add("write", self._pair_username_change)
         self.name_1.trace_add("write", self._update_clipboard)
@@ -98,32 +112,6 @@ class AppFrame:
             message_store.selected_messages[ChatMode.GREETINGS] = (
                 self.partner.greeting
             )
-
-    def _create_tk_variables(self) -> None:
-        self.clipboard = tk.StringVar()
-
-        # Main
-        self.search = tk.StringVar()
-        self.username_1 = tk.StringVar()
-        self.username_2 = tk.StringVar()
-        self.name_1 = tk.StringVar()
-        self.name_2 = tk.StringVar()
-        self.randomize = tk.BooleanVar(value=config.randomize_name_order)
-
-        greeting = self.partner.greeting if self.partner else ""
-        self.greeting = tk.StringVar(value=greeting)
-        # self.greetings_list = tk.StringVar(value=data_store.greetings)
-        self.valediction = tk.StringVar(value=config.last_valediction)
-        # self.chat_list = tk.StringVar(value=data_store.chat)
-        self.system = tk.StringVar()
-        self.chat_line = tk.StringVar()
-
-        # Partners
-        self.partners_list = tk.StringVar(value=self.partners_names)
-        self.selected_partner = tk.StringVar(value=config.last_partner)
-        self.my_name_text = tk.StringVar(value=data_store.my_name)
-        self.partners_name = tk.StringVar(value="")
-        self.partners_username = tk.StringVar()
 
     def _show(self):
         root = self.root
@@ -227,7 +215,7 @@ class AppFrame:
         label.grid(row=2, column=0, sticky=tk.E, pady=PAD)
 
         entry = ttk.Entry(
-            frame, textvariable=self.partners_username, state="readonly"
+            frame, textvariable=self.partners_display_name, state="readonly"
         )
         entry.grid(row=2, column=1, sticky=tk.W, padx=PAD, pady=PAD)
 
@@ -331,9 +319,10 @@ class AppFrame:
         self.update_clipboard()
 
     def _chat_message_publish(self) -> None:
+        print("Chat message publish")
         self.my_name_text.set(message_store.my_name)
         self.partner = message_store.partner
-        self.partners_username.set(
+        self.partners_display_name.set(
             f"{self.partner.username}, {self.partner.name}"
         )
 
@@ -342,9 +331,6 @@ class AppFrame:
             self.username_2.set(message_store.pair.player_2.username)
 
         if self.last_message != message_store.message:
-            # input(
-            #     f"Message changed from {self.last_message} to {message_store.message}"
-            # )
             message = message_store.output_message()
             self.update_clipboard(message, message_store.mode)
             self.clipboard.set(message)

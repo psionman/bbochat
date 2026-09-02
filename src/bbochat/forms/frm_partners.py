@@ -20,22 +20,17 @@ txt = Text()
 
 class PartnerFrame:
     def __init__(self, parent, master):
-        self.parent = parent
         self.root = parent.root
         self.partner = parent.partner
-        self.partners = data_store.partners
         self.greetings = data_store.greetings
-        self.partners_names = self.parent.partners_names
+        self.partners_names = sorted(list(data_store.partners.keys()))
         self.last_partner = config.last_partner
-        self.greeting = parent.greeting
 
         # tk variables
-        self.partners_list = parent.partners_list
-        self.selected_partner = parent.selected_partner
-        self.partners_name = parent.partners_name
-        self.system = parent.system
-        # self.partners_username = parent.partners_username
-        self.partners_names = parent.partners_names
+        self.partners_list = tk.StringVar(value=sorted(self.partners_names))
+        self.partners_name = tk.StringVar()
+        self.system = tk.StringVar()
+        self.greeting = tk.StringVar()
 
         self.partners_frame = self._get_partners_frame(master)
         self.partners_frame.grid(row=0, column=0, sticky=tk.EW)
@@ -149,10 +144,10 @@ class PartnerFrame:
         selected_index = event.widget.curselection()
         if not selected_index:
             return
-        partners_names = sorted(list(self.partners))
+        partners_names = sorted(list(data_store.partners))
         user_name = partners_names[selected_index[0]]
 
-        self.partner = self.partners[user_name]
+        self.partner = data_store.partners[user_name]
         # TODO: Update the tournament tab with the new partner
         # self.parent.tournament_tab.change_partner(self.partner)
         self._update_partner_values()
@@ -186,7 +181,7 @@ class PartnerFrame:
         if not selection:
             return
 
-        self.partner = self.partners[selection[0]]
+        self.partner = data_store.partners[selection[0]]
         self.context_menu.enable()
 
     def _new(self, *args) -> None:
@@ -197,8 +192,8 @@ class PartnerFrame:
         if dlg.status != Status.OK:
             return
         self.partner = dlg.partner
-        self.partners[self.partner.username] = self.partner
-        partners_names = sorted(list(self.partners))
+        data_store.partners[self.partner.username] = self.partner
+        partners_names = sorted(list(data_store.partners))
         self.partners_list.set(partners_names)
 
         if selection := self.listbox.curselection():
@@ -222,13 +217,15 @@ class PartnerFrame:
     def _delete(self, *args) -> None:
         if not messagebox.askyesno(self, txt.DELETE_TITLE, txt.DELETE_ITEM):
             return
-        self.partners.pop(self.partner.username)
-        if self.partners:
-            self.partner = self.partners[sorted(list(self.partners))[0]]
+        data_store.partners.pop(self.partner.username)
+        if data_store.partners:
+            self.partner = data_store.partners[
+                sorted(list(data_store.partners))[0]
+            ]
         else:
             self.partner = Partner()
         self._update_partner_values()
-        self.partners_list.set(sorted(list(self.partners)))
+        self.partners_list.set(sorted(list(data_store.partners)))
         data_store.save()
 
     def _save(self, *args) -> None:
@@ -236,7 +233,7 @@ class PartnerFrame:
         self.partner.system = self.system.get()
         self.partner.greeting = self.greeting.get()
         self.partner.notes = self.notes_text.get(0.0, tk.END)
-        self.partners[self.partner.username] = self.partner
+        data_store.partners[self.partner.username] = self.partner
         self._update_partner_values()
         data_store.save()
         messagebox.showinfo(self, "", "Partner saved")

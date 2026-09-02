@@ -226,8 +226,11 @@ class TextSelectionFrame:
         display_list.insert(index, new_text)
 
     def _use_item(self, *args) -> None:
+        if not self.text_var.get():
+            return
         if self.text_var.get() and self.text_var.get()[0] == "#":
-            self.text_var.set("")
+            return
+
         message_store.mode = self.mode
         message_store.selected_messages[self.mode] = self.text_var.get()
         message_store.message = self.text_var.get()
