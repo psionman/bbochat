@@ -57,8 +57,15 @@ class HistoryPanel:
                 variable=self.history_selection,
                 value=text,
                 style=style_name,
+                command=self._history_selected,
             )
             button.grid(row=row, column=0, padx=PAD, pady=2, sticky=tk.W)
+
+    def _history_selected(self) -> None:
+        message = self.history_selection.get()
+        mode = message_store.history[message]
+        message_store.mode = mode
+        message_store.message = message
 
     def _radio_button_style(self, mode: ChatMode) -> str:
         if mode in self.radiobutton_styles:

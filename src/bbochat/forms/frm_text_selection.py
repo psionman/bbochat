@@ -243,8 +243,6 @@ class TextSelectionFrame:
         config.config["last_used_text"][str(self.mode.value)] = (
             self.text_var.get()
         )
-
-        print("Updating config", config.config["last_used_text"])
         config.save()
 
     def populate_text_items(self, selected_item: str = "") -> None:
