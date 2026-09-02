@@ -47,6 +47,7 @@ class DataStore:
             "players": {},
             "greeting": [],
             "valediction": [],
+            "history": [],
             "chat": {},
             "notes": {},
             "my_name": "",
@@ -63,13 +64,23 @@ class DataStore:
             "chat": lambda x: x,
             "notes": lambda x: x,
             "my_name": lambda x: x,
+            "history": lambda x: x or [],
         }
+
+        for key, default in self.data_sets.items():
+            self.data_sets.setdefault(key, default)
+
         for data_set, getter in data_sets.items():
             if data_set in application_data:
                 setattr(self, data_set, getter(application_data[data_set]))
                 self.data_sets[data_set] = getattr(self, data_set)
-        # print(self.data_sets["valedictions"])
-        # self.valediction = self.data_sets["valedictions"]
+
+            value = application_data.get(data_set, self.data_sets[data_set])
+            value = getter(value)
+
+            setattr(self, data_set, value)
+            self.data_sets[data_set] = value
+
         self._notify()
 
     def _read_data_file(self) -> str | int | None:
@@ -116,6 +127,7 @@ class DataStore:
         return pairs
 
     def save(self):
+        print(f"Saving data...{self.history}")
         output = {
             "partners": {
                 partner.username: partner.serialize()
@@ -131,6 +143,7 @@ class DataStore:
             "chat": self.data_sets["chat"],
             "notes": self.data_sets["notes"],
             "my_name": self.my_name,
+            "history": self.history,
         }
         json_data = self._data_to_json(output)
         self._notify()

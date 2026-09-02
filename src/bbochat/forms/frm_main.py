@@ -47,8 +47,10 @@ class AppFrame:
         self.mode = ChatMode.GREETINGS
 
         data_store.subscribe(self._on_data_change)
-        self.data_server = data_store
         message_store.my_name = data_store.my_name
+        message_store.history = {
+            message[0]: ChatMode(message[1]) for message in data_store.history
+        }
 
         self.pair = []
 
@@ -422,6 +424,13 @@ class AppFrame:
 
         self.button_frame.enable(True)
 
+    def _save_history(self) -> None:
+        data_store.history = [
+            (message, mode.value)
+            for message, mode in message_store.history.items()
+        ]
+        data_store.save()
+
     def _save_sashes(self) -> None:
         vertical_sashes = [
             self.master_tab.master_frame.sash_coord(index)
@@ -457,6 +466,7 @@ class AppFrame:
         #     if response:
         #         self.tournament_tab.save_notes()
         self._save_sashes()
+        self._save_history()
         self.root.destroy()
         # Need to do this because window_resize is called in close
         config.save()
