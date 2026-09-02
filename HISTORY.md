@@ -7,6 +7,7 @@
 4. Create history panel with mousewheel support
 5. Implement last used text for each chat mode
 6. Change mode colours key to mode.value
+7. Click on pair assigns correct message 
 
 
 ## Version 0.0.8 01 September 2026

@@ -103,7 +103,7 @@ class TextSelectionFrame:
         return frame
 
     def _on_focus_in(self, event=None):
-        colour = self.config.colours[self.mode.name]
+        colour = self.config.colours[str(self.mode.value)]
         self.listbox.config(selectbackground=colour)
 
     def _on_focus_out(self, event=None):

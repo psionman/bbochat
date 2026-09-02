@@ -329,10 +329,10 @@ class AppFrame:
             self.username_1.set(message_store.pair.player_1.username)
             self.username_2.set(message_store.pair.player_2.username)
 
-        if self.last_message != message_store.message:
-            message = message_store.output_message()
-            self.update_clipboard(message, message_store.mode)
-            self.clipboard.set(message)
+        # if self.last_message != message_store.message:
+        message = message_store.output_message()
+        self.update_clipboard(message, message_store.mode)
+        self.clipboard.set(message)
         self.last_message = message_store.message
 
     def update_clipboard(

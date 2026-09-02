@@ -49,7 +49,6 @@ class Message:
     def message(self, value: str) -> None:
         self._message = value
         self._add_to_history()
-        self._notify()
 
     @property
     def my_name(self) -> str:
@@ -80,7 +79,6 @@ class Message:
     @pair.setter
     def pair(self, value: PairNew) -> None:
         self._pair = value
-        self._notify()
 
     @property
     def randomize(self) -> bool:
