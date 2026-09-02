@@ -127,7 +127,6 @@ class DataStore:
         return pairs
 
     def save(self):
-        print(f"Saving data...{self.history}")
         output = {
             "partners": {
                 partner.username: partner.serialize()

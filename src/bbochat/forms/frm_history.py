@@ -1,14 +1,18 @@
 # forms/frm_history.py
 
 import tkinter as tk
-from tkinter import ttk
+from tkinter import messagebox, ttk
 
 from psiutils.constants import PAD
+from psiutils.menus import Menu, MenuItem
 from psiutils.widgets import ScrollingCanvas
 
 from bbochat.config import config
 from bbochat.constants import ChatMode
 from bbochat.message import message_store
+from bbochat.text import Text
+
+txt = Text()
 
 
 class HistoryPanel:
@@ -22,6 +26,8 @@ class HistoryPanel:
 
         self.main_frame = self._history_panel(master)
         self._populate_history_frame()
+
+        self.context_menu = self._context_menu()
 
         self.root.bind_all("<Button-4>", self._on_mousewheel)
         self.root.bind_all("<Button-5>", self._on_mousewheel)
@@ -44,6 +50,14 @@ class HistoryPanel:
         self.history_frame.grid(row=row, column=0, sticky=tk.NSEW)
         return frame
 
+    def _context_menu(self) -> tk.Menu:
+        menu_items = [
+            MenuItem(txt.DELETE, self._delete_item, True),
+        ]
+        context_menu = Menu(self.root, menu_items)
+        context_menu.enable(False)
+        return context_menu
+
     def _populate_history_frame(self) -> None:
         frame = self.history_frame.content
         for child in frame.winfo_children():
@@ -59,13 +73,30 @@ class HistoryPanel:
                 style=style_name,
                 command=self._history_selected,
             )
+            button.bind("<Button-3>", self._show_context_menu)
             button.grid(row=row, column=0, padx=PAD, pady=2, sticky=tk.W)
+
+    def _delete_item(self, *args) -> None:
+        message = self.history_selection.get()
+        dlg = messagebox.askokcancel(
+            "Remove from history", f"Remove {message}"
+        )
+        if not dlg:
+            return
+        message_store.history.pop(message)
+        message_store.message = list(message_store.history)[0]
+
+    def _show_context_menu(self, event: tk.Event) -> None:
+        self.context_menu.tk_popup(event.x_root, event.y_root)
 
     def _history_selected(self) -> None:
         message = self.history_selection.get()
         mode = message_store.history[message]
         message_store.mode = mode
         message_store.message = message
+        if len(message_store.history) <= 1:
+            return
+        self.context_menu.enable()
 
     def _radio_button_style(self, mode: ChatMode) -> str:
         if mode in self.radiobutton_styles:
