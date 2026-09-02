@@ -319,7 +319,6 @@ class AppFrame:
         self.update_clipboard()
 
     def _chat_message_publish(self) -> None:
-        print("Chat message publish")
         self.my_name_text.set(message_store.my_name)
         self.partner = message_store.partner
         self.partners_display_name.set(

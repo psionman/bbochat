@@ -4,6 +4,7 @@
 1. Load last partner's greeting on startup
 2. Items being added to history when selected
 3. Initialise tkvars in frm_partner
+4. Create history panel with mousewheel support
 
 
 ## Version 0.0.8 01 September 2026
