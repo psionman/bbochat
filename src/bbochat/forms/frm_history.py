@@ -25,12 +25,13 @@ class HistoryPanel:
         self.history_selection = tk.StringVar()
 
         self.main_frame = self._history_panel(master)
-        self._populate_history_frame()
 
         self.context_menu = self._context_menu()
 
         self.root.bind_all("<Button-4>", self._on_mousewheel)
         self.root.bind_all("<Button-5>", self._on_mousewheel)
+
+        self._populate_history_frame()
 
     def _history_panel(self, master) -> ttk.Frame:
         frame = ttk.Frame(master)
@@ -64,6 +65,9 @@ class HistoryPanel:
             child.destroy()
 
         for row, (text, mode) in enumerate(message_store.history.items()):
+            if row == 0:
+                self.history_selection.set(text)
+                self.context_menu.enable()
             style_name = self._radio_button_style(ChatMode(mode))
             label = ttk.Label(frame, text="", style=style_name, width=4)
             label.grid(row=row, column=0, sticky=tk.E, padx=PAD, pady=PAD)
