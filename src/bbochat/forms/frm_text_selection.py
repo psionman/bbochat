@@ -3,6 +3,7 @@
 import tkinter as tk
 from tkinter import ttk
 
+from bbochat.message_store import message_store
 from psiutils import messagebox
 from psiutils.buttons import IconButton
 from psiutils.constants import PAD, Status
@@ -14,7 +15,6 @@ from bbochat.config import config
 from bbochat.constants import MODE_TEXT, ChatMode
 from bbochat.forms.frm_edit_select import EditSelectFrame
 from bbochat.forms.frm_text_dialog import TextDialogFrame
-from bbochat.message import message_store
 from bbochat.mode_data import ModeData
 from bbochat.text import Text
 

@@ -17,8 +17,8 @@ DEFAULT_MODE = ChatMode.GREETINGS
 Listener = Callable[[], None]
 
 
-class Message:
-    """Message class."""
+class MessageStore:
+    """MessageStore class."""
 
     def __init__(self) -> None:
         self._mode: ChatMode = DEFAULT_MODE
@@ -145,6 +145,8 @@ class Message:
         return message
 
     def _add_to_history(self) -> None:
+        if self.mode == ChatMode.CHAT:
+            return
         if self.message in self.history:
             self.history.pop(self.message)
         self.history = {self.message: self.mode, **self.history}
@@ -170,4 +172,4 @@ class Message:
             self._notifying = False
 
 
-message_store = Message()
+message_store = MessageStore()

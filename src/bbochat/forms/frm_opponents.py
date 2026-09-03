@@ -3,12 +3,12 @@
 import tkinter as tk
 from tkinter import ttk
 
+from bbochat.message_store import message_store
 from psiutils.constants import PAD
 from psiutils.treeview import sort_treeview
 
 from bbochat.constants import ChatMode
 from bbochat.data_store import data_store
-from bbochat.message import message_store
 from bbochat.pair import PairNew
 
 PAIR_TREE_COLUMNS = (

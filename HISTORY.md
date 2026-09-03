@@ -11,6 +11,8 @@
 8. Clicking on history item assigns message
 9. Save history on close
 10. Delete item from history
+11. Don't add CHAT mode messages to history
+12. Rename message.py to message_store.py
 
 
 

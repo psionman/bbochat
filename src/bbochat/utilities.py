@@ -11,7 +11,7 @@ from tkinterweb import HtmlFrame
 
 from bbochat.constants import APP_TITLE, USER_DATA_DIR
 from bbochat.data_store import data_store
-from bbochat.message import message_store
+from bbochat.message_store import message_store
 
 SUIT_CONVERSION = {
     "S": ("&spades;", "black"),

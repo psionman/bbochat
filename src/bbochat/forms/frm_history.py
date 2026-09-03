@@ -3,6 +3,7 @@
 import tkinter as tk
 from tkinter import messagebox, ttk
 
+from bbochat.message_store import message_store
 from psiutils.buttons import IconButton
 from psiutils.constants import PAD
 from psiutils.menus import Menu, MenuItem
@@ -10,7 +11,6 @@ from psiutils.widgets import ScrollingCanvas
 
 from bbochat.config import config
 from bbochat.constants import ChatMode
-from bbochat.message import message_store
 from bbochat.text import Text
 
 txt = Text()
@@ -58,7 +58,7 @@ class HistoryPanel:
         delete_button.grid(row=row, column=0, padx=PAD, pady=PAD)
         return frame
 
-    def _context_menu(self) -> tk.Menu:
+    def _context_menu(self) -> Menu:
         menu_items = [
             MenuItem(txt.DELETE, self._delete_item, True),
         ]

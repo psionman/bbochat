@@ -6,6 +6,7 @@ from pathlib import Path
 from tkinter import ttk
 
 import clipboard
+from bbochat.message_store import message_store
 from psiutils import messagebox
 from psiutils.buttons import IconButton
 from psiutils.constants import PAD
@@ -20,7 +21,6 @@ from bbochat.forms.frm_notes import NotesFrame
 from bbochat.forms.frm_partners import PartnerFrame
 from bbochat.forms.frm_tournament import TournamentFrame
 from bbochat.main_menu import MainMenu
-from bbochat.message import message_store
 from bbochat.pair import PairNew
 from bbochat.player import Player
 from bbochat.text import Text
