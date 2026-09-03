@@ -3,6 +3,7 @@
 import tkinter as tk
 from tkinter import messagebox, ttk
 
+from psiutils.buttons import IconButton
 from psiutils.constants import PAD
 from psiutils.menus import Menu, MenuItem
 from psiutils.widgets import ScrollingCanvas
@@ -49,6 +50,12 @@ class HistoryPanel:
             borderwidth=2,
         )
         self.history_frame.grid(row=row, column=0, sticky=tk.NSEW)
+
+        row += 1
+        delete_button = IconButton(
+            frame, "Delete", "delete", command=self._delete_item
+        )
+        delete_button.grid(row=row, column=0, padx=PAD, pady=PAD)
         return frame
 
     def _context_menu(self) -> tk.Menu:
@@ -84,11 +91,12 @@ class HistoryPanel:
 
     def _delete_item(self, *args) -> None:
         message = self.history_selection.get()
-        dlg = messagebox.askokcancel(
-            "Remove from history", f"Remove {message}"
-        )
-        if not dlg:
-            return
+        if config.confirm_history_delete:
+            dlg = messagebox.askokcancel(
+                "Remove from history", f"Remove {message}"
+            )
+            if not dlg:
+                return
         message_store.history.pop(message)
         first_item = list(message_store.history.keys())[0]
         message_store.mode = message_store.history[first_item]
