@@ -65,16 +65,18 @@ class HistoryPanel:
 
         for row, (text, mode) in enumerate(message_store.history.items()):
             style_name = self._radio_button_style(ChatMode(mode))
+            label = ttk.Label(frame, text="", style=style_name, width=4)
+            label.grid(row=row, column=0, sticky=tk.E, padx=PAD, pady=PAD)
             button = ttk.Radiobutton(
                 frame,
                 text=text,
                 variable=self.history_selection,
                 value=text,
-                style=style_name,
+                # style=style_name,
                 command=self._history_selected,
             )
             button.bind("<Button-3>", self._show_context_menu)
-            button.grid(row=row, column=0, padx=PAD, pady=2, sticky=tk.W)
+            button.grid(row=row, column=1, padx=PAD, pady=2, sticky=tk.W)
 
     def _delete_item(self, *args) -> None:
         message = self.history_selection.get()
@@ -84,7 +86,9 @@ class HistoryPanel:
         if not dlg:
             return
         message_store.history.pop(message)
-        message_store.message = list(message_store.history)[0]
+        first_item = list(message_store.history.keys())[0]
+        message_store.mode = message_store.history[first_item]
+        self.context_menu.enable(False)
 
     def _show_context_menu(self, event: tk.Event) -> None:
         self.context_menu.tk_popup(event.x_root, event.y_root)
@@ -103,7 +107,7 @@ class HistoryPanel:
             return self.radiobutton_styles[mode]
         colour = config.colours[str(mode.value)]
         style = ttk.Style(self.root)
-        style_name = f"{colour.lstrip('#')}.TRadiobutton"
+        style_name = f"{colour.lstrip('#')}.TLabel"
         style.configure(style_name, background=colour)
         self.radiobutton_styles[mode] = style_name
         return style_name
