@@ -47,6 +47,9 @@ class ConfigFrame:
 
         # tk variables
         self.data_directory = tk.StringVar(value=config.data_directory)
+        self.confirm_history_delete = tk.BooleanVar(
+            value=config.confirm_history_delete
+        )
         self.randomize_name_order = tk.BooleanVar(
             value=config.randomize_name_order
         )
@@ -66,6 +69,9 @@ class ConfigFrame:
             "write", self._check_value_changed
         )
         self.randomize_name_order.trace_add("write", self._check_value_changed)
+        self.confirm_history_delete.trace_add(
+            "write", self._check_value_changed
+        )
         self.show_tooltips.trace_add("write", self._check_value_changed)
 
         self.colour_entries = {}
@@ -107,6 +113,14 @@ class ConfigFrame:
         row = 0
         separator = separator_frame(frame, "Options")
         separator.grid(row=row, column=0, columnspan=5, sticky=tk.EW, padx=PAD)
+
+        row += 1
+        check_button = ttk.Checkbutton(
+            frame,
+            text="Confirm history delete",
+            variable=self.confirm_history_delete,
+        )
+        check_button.grid(row=row, column=1, columnspan=4, sticky=tk.W)
 
         row += 1
         check_button = ttk.Checkbutton(
@@ -234,9 +248,11 @@ class ConfigFrame:
     def _value_changed(self) -> bool:
         name_order = config.randomize_name_order
         notes_directory = config.tournament_notes_directory
+        confirm_delete = config.confirm_history_delete
         return (
             self.data_directory.get() != config.data_directory
             or self.tournament_notes_directory.get() != notes_directory
+            or self.confirm_history_delete.get() != confirm_delete
             or self.randomize_name_order.get() != name_order
             or self.show_tooltips.get() != config.show_tooltips
             or self.colours != config.colours
@@ -274,11 +290,13 @@ class ConfigFrame:
 
     def _save_config(self, *args) -> None:
         name_order = self.randomize_name_order.get()
+        confirm_delete = self.confirm_history_delete.get()
         config.update("data_directory", self.data_directory.get())
         config.update(
             "tournament_notes_directory", self.tournament_notes_directory.get()
         )
         config.update("randomize_name_order", name_order)
+        config.update("confirm_history_delete", confirm_delete)
         config.update("show_tooltips", self.show_tooltips.get())
         config.update("colours", dict(self.colours))
         config.update("css", dict(self.css))
@@ -316,6 +334,7 @@ class ConfigFrame:
         self.randomize_name_order.set(config.randomize_name_order)
         self.show_tooltips.set(config.show_tooltips)
         self.tournament_notes_directory.set(config.tournament_notes_directory)
+        self.confirm_history_delete.set(config.confirm_history_delete)
 
         self._update_mode_colours()
         # self.display_html()

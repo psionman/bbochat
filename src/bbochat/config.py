@@ -21,6 +21,7 @@ DEFAULT_CONFIG = {
     "last_partner": "",
     "randomize_name_order": True,
     "show_tooltips": True,
+    "confirm_history_delete": True,
     "tournament_notes_directory": str(Path(DOCS_DIR, APP_NAME)),
     "last_used_text": {str(mode.value): "" for mode in ChatMode},
     "geometry": {
