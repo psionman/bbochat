@@ -3,7 +3,6 @@
 import tkinter as tk
 from tkinter import ttk
 
-from bbochat.message_store import message_store
 from psiutils import messagebox
 from psiutils.buttons import IconButton
 from psiutils.constants import PAD, Status
@@ -15,7 +14,9 @@ from bbochat.config import config
 from bbochat.constants import MODE_TEXT, ChatMode
 from bbochat.forms.frm_edit_select import EditSelectFrame
 from bbochat.forms.frm_text_dialog import TextDialogFrame
+from bbochat.message_store import message_store
 from bbochat.mode_data import ModeData
+from bbochat.state import state
 from bbochat.text import Text
 
 txt = Text()
@@ -57,8 +58,8 @@ class TextSelectionFrame:
         # )
         # print(mode.value, config.last_chat)
         last_value = (
-            config.last_used_text[str(mode.value)]
-            if str(mode.value) in config.last_used_text
+            state.last_used_text[str(mode.value)]
+            if str(mode.value) in state.last_used_text
             else ""
         )
         self.text_var = tk.StringVar(value=last_value)
@@ -240,10 +241,8 @@ class TextSelectionFrame:
         message_store.mode = self.mode
         message_store.selected_messages[self.mode] = self.text_var.get()
         message_store.message = self.text_var.get()
-        config.config["last_used_text"][str(self.mode.value)] = (
-            self.text_var.get()
-        )
-        config.save()
+        state.last_used_text[str(self.mode.value)] = self.text_var.get()
+        state.save()
 
     def populate_text_items(self, selected_item: str = "") -> None:
         self.listbox.delete(0, tk.END)
