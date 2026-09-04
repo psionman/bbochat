@@ -14,7 +14,6 @@ from psiutils.constants import PAD
 from psiutils.widgets import PsiText, Tooltip
 
 from bbochat.buttons import ButtonFrame
-from bbochat.config import config
 from bbochat.constants import (
     DATA_DIR,
     FRAME_WIDTH,
@@ -24,6 +23,7 @@ from bbochat.constants import (
 )
 from bbochat.data_store import Partner
 from bbochat.forms.frm_report import ReportFrame
+from bbochat.state import state
 from bbochat.text import Text
 from bbochat.utilities import get_notes_content
 
@@ -53,8 +53,8 @@ class TournamentFrame:
 
         self.notes_frame = self._get_notes_frame(master)
 
-        if config.notes_sashes:
-            for index, sash in enumerate(config.notes_sashes):
+        if "notes_sashes" in state.sashes:
+            for index, sash in enumerate(state.sashes["notes_sashes"]):
                 self.notes_panel.sash_place(index, sash[0], 0)
 
         self.change_partner(self.partner)

@@ -1,0 +1,48 @@
+[geometry]
+frm_main = "1333x727+2364+282"
+frm_edit_select = "500x500"
+frm_config = "700x540+2579+360"
+frm_config_css = "500x400"
+frm_text_dialog = "500x150"
+frm_partner_edit = "500x500+2630+388"
+frm_report = "880x550"
+frm_notes_edit = "880x550"
+
+[sashes]
+vertical_sashes = [
+    [
+        219,
+        1,
+    ],
+    [
+        526,
+        1,
+    ],
+    [
+        773,
+        1,
+    ],
+    [
+        1055,
+        1,
+    ],
+]
+horizontal_sashes = [
+    [
+        1,
+        165,
+    ],
+]
+notes_sashes = [
+    [
+        530,
+        1,
+    ],
+]
+history_sashes = [
+    [
+        530,
+        1,
+    ],
+]
+confirm_history_delete = true

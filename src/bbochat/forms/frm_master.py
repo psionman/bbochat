@@ -3,7 +3,6 @@
 import tkinter as tk
 from tkinter import ttk
 
-from bbochat.config import config
 from bbochat.constants import FRAME_WIDTH, ChatMode
 from bbochat.data_store import data_store
 from bbochat.forms.frm_chat import ChatFrame
@@ -11,6 +10,7 @@ from bbochat.forms.frm_history import HistoryPanel
 from bbochat.forms.frm_opponents import OpponentsFrame
 from bbochat.forms.frm_text_selection import TextSelectionFrame
 from bbochat.mode_data import ModeData
+from bbochat.state import state
 
 
 class MasterFrame:
@@ -20,12 +20,12 @@ class MasterFrame:
 
         self.master_frame = self._master_frame(master)
 
-        if config.vertical_sashes:
-            for index, sash in enumerate(config.vertical_sashes):
+        if state.sashes["vertical_sashes"]:
+            for index, sash in enumerate(state.sashes["vertical_sashes"]):
                 self.master_frame.sash_place(index, sash[0], 0)
 
-        if config.horizontal_sashes:
-            for index, sash in enumerate(config.horizontal_sashes):
+        if state.sashes["horizontal_sashes"]:
+            for index, sash in enumerate(state.sashes["horizontal_sashes"]):
                 self.chat_panel.sash_place(index, 0, sash[1])
 
     def _master_frame(self, master) -> ttk.PanedWindow:

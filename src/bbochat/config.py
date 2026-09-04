@@ -29,17 +29,6 @@ FIELDS = {
     "confirm_history_delete": ConfigField(bool, True),
 }
 
-DEFAULT_GEOMETRY = {
-    "frm_main": "1100x540",
-    "frm_edit_select": "500x500",
-    "frm_config": "700x540",
-    "frm_config_css": "500x400",
-    "frm_text_dialog": "500x150",
-    "frm_partner_edit": "500x500",
-    "frm_report": "880x550",
-    "frm_notes_edit": "880x550",
-}
-
 DEFAULT_COLOURS = {
     ChatMode.GREETINGS.value: "limegreen",
     ChatMode.VALEDICTION.value: "salmon",
@@ -48,14 +37,8 @@ DEFAULT_COLOURS = {
 }
 
 DEFAULT_CONFIG = {
-    "last_partner": "",
     "last_used_text": {str(mode.value): "" for mode in ChatMode},
-    "geometry": DEFAULT_GEOMETRY,
     "colours": DEFAULT_COLOURS,
-    "vertical_sashes": [(219, 1), (494, 1), (773, 1), (1055, 1)],
-    "horizontal_sashes": [(1, 165)],
-    "notes_sashes": [(530, 1)],
-    "history_sashes": [(530, 1)],
     "css_body": {"name": "body", "color": "black", "font-size": 12},
     "css_h1": {"name": "h1", "color": "green", "font-size": 20},
     "css_h2": {"name": "h2", "color": "green", "font-size": 18},

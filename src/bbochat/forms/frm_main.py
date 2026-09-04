@@ -23,6 +23,7 @@ from bbochat.main_menu import MainMenu
 from bbochat.message_store import message_store
 from bbochat.pair import PairNew
 from bbochat.player import Player
+from bbochat.state import state
 from bbochat.text import Text
 from bbochat.utilities import get_my_name
 
@@ -107,18 +108,12 @@ class AppFrame:
         message_store.randomize = config.randomize_name_order
         message_store.subscribe(self._chat_message_publish)
         self.last_message = ""
-
-        if config.last_partner and config.last_partner in self.partners:
-            self.partner = self.partners[config.last_partner]
-            message_store.partner = self.partner
-            message_store.selected_messages[ChatMode.GREETINGS] = (
-                self.partner.greeting
-            )
+        self._get_last_partner()
 
     def _show(self):
         root = self.root
         root.protocol("WM_DELETE_WINDOW", self._dismiss)
-        root.geometry(config.geometry[Path(__file__).stem])
+        root.geometry(state.geometry[Path(__file__).stem])
         root.title(FRAME_TITLE)
 
         root.rowconfigure(0, weight=1)
@@ -299,6 +294,15 @@ class AppFrame:
         self.mode = ChatMode.CHAT
         self.update_clipboard()
 
+    def _get_last_partner(self) -> None:
+        last_partner = state.session.get("last_partner")
+        if last_partner and last_partner in self.partners:
+            self.partner = self.partners[last_partner]
+            message_store.partner = self.partner
+            message_store.selected_messages[ChatMode.GREETINGS] = (
+                self.partner.greeting
+            )
+
     def _get_my_name(self) -> None:
         get_my_name()
 
@@ -444,11 +448,10 @@ class AppFrame:
             self.tournament_tab.notes_panel.sash_coord(index)
             for index in range(NOTES_FRAME_COUNT)
         ]
-        config.update("vertical_sashes", vertical_sashes)
-        config.update("horizontal_sashes", horizontal_sashes)
-        config.update("notes_sashes", notes_sashes)
-        config.save()
-        self.config = config
+        state.sashes["vertical_sashes"] = vertical_sashes
+        state.sashes["horizontal_sashes"] = horizontal_sashes
+        state.sashes["notes_sashes"] = notes_sashes
+        state.save()
 
     def _on_data_change(self) -> None:
         # self.name_1.set(data_store.player_1.name)
