@@ -38,5 +38,9 @@ class State:
         with open(state_file, "wb") as f:
             tomli_w.dump(data, f)
 
+    def update(self, key: str, value: any):
+        self.__dict__[key] = value
+        self.save()
+
 
 state = State()

@@ -12,6 +12,7 @@ from psiutils.widgets import Tooltip
 from bbochat.buttons import ButtonFrame
 from bbochat.config import config
 from bbochat.constants import APP_TITLE
+from bbochat.state import state
 from bbochat.text import Text
 
 txt = Text()
@@ -51,12 +52,12 @@ class TextDialogFrame:
 
     def _show(self) -> None:
         root = self.root
-        root.geometry(config.geometry[Path(__file__).stem])
+        root.geometry(state.geometry[Path(__file__).stem])
         root.title(f"{APP_TITLE} - {self.title}")
 
         root.update_idletasks()
         root.bind(
-            "<Configure>", lambda e: window_resize(root, __file__, config)
+            "<Configure>", lambda e: window_resize(root, __file__, state)
         )
 
         root.bind("<Control-x>", self._dismiss)

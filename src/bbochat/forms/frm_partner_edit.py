@@ -9,10 +9,10 @@ from psiutils.utilities import window_resize
 from psiutils.widgets import clickable_widget
 
 from bbochat.buttons import ButtonFrame
-from bbochat.config import config
 from bbochat.constants import ICON_FILE
 from bbochat.data_store import Partner, data_store
 from bbochat.message_store import message_store
+from bbochat.state import state
 
 FRAME_TITLE = "New partner"
 
@@ -53,7 +53,7 @@ class PartnerEditFrame:
 
     def _show(self) -> None:
         root = self.root
-        root.geometry(config.geometry[Path(__file__).stem])
+        root.geometry(state.geometry[Path(__file__).stem])
         root.title(f"{self.mode.name.capitalize()} partner")
         root.iconphoto(False, tk.PhotoImage(file=ICON_FILE))
         root.wait_visibility()
@@ -78,7 +78,7 @@ class PartnerEditFrame:
         self.root.update_idletasks()
         root.bind("<Control-x>", self._dismiss)
         root.bind(
-            "<Configure>", lambda e: window_resize(root, __file__, config)
+            "<Configure>", lambda e: window_resize(root, __file__, state)
         )
 
     def _main_frame(self, master: ttk.Frame) -> ttk.Frame:

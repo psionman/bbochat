@@ -37,7 +37,6 @@ DEFAULT_COLOURS = {
 }
 
 DEFAULT_CONFIG = {
-    "last_used_text": {str(mode.value): "" for mode in ChatMode},
     "colours": DEFAULT_COLOURS,
     "css_body": {"name": "body", "color": "black", "font-size": 12},
     "css_h1": {"name": "h1", "color": "green", "font-size": 20},
@@ -72,7 +71,6 @@ class TomlConfig(BaseTomlConfig):
         if test_config != self.last_config:
             self.last_config = test_config.copy()
         super().save()
-        # self._notify()
 
     # -- observer pattern for UI refresh -----------------------------
     def subscribe(self, listener: Listener) -> None:

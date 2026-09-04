@@ -14,8 +14,8 @@ from psiutils.utilities import window_resize
 from psiutils.widgets import HAND
 
 from bbochat.buttons import ButtonFrame
-from bbochat.config import config
 from bbochat.forms.frm_text_dialog import TextDialogFrame
+from bbochat.state import state
 from bbochat.text import Text
 
 txt = Text()
@@ -75,7 +75,7 @@ class EditSelectFrame:
 
     def _show(self) -> None:
         root = self.root
-        root.geometry(config.geometry[Path(__file__).stem])
+        root.geometry(state.geometry[Path(__file__).stem])
         root.title(FRAME_TITLE)
 
         root.bind("<Control-x>", self._dismiss)
@@ -92,7 +92,7 @@ class EditSelectFrame:
 
         self.root.update_idletasks()
         root.bind(
-            "<Configure>", lambda e: window_resize(root, __file__, config)
+            "<Configure>", lambda e: window_resize(root, __file__, state)
         )
 
     def _main_frame(self, master: ttk.Frame) -> ttk.Frame:

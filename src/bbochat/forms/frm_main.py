@@ -141,7 +141,7 @@ class AppFrame:
         root.bind("<Control-v>", self._valediction)
         root.bind("<Control-c>", self._chat)
         root.bind(
-            "<Configure>", lambda e: window_resize(root, __file__, config)
+            "<Configure>", lambda e: window_resize(root, __file__, state)
         )
 
     def _main_frame(self, master: ttk.Frame) -> ttk.Frame:

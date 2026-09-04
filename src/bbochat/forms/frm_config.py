@@ -15,6 +15,7 @@ from bbochat.buttons import ButtonFrame
 from bbochat.config import FIELDS, config, get_config
 from bbochat.constants import HTML_TEST, ICON_DIR, ChatMode
 from bbochat.forms.frm_config_css import ConfigCssFrame
+from bbochat.state import state
 from bbochat.text import Text
 from bbochat.utilities import display_html
 
@@ -61,24 +62,24 @@ class ConfigFrame:
 
         self.display_html()
 
-    def _stringvar(self, value: str) -> tk.StringVar:
-        stringvar = tk.StringVar(value=value)
-        stringvar.trace_add("write", self._check_value_changed)
-        return stringvar
+    # def _stringvar(self, value: str) -> tk.StringVar:
+    #     stringvar = tk.StringVar(value=value)
+    #     stringvar.trace_add("write", self._check_value_changed)
+    #     return stringvar
 
-    def _intvar(self, value: int) -> tk.IntVar:
-        intvar = tk.IntVar(value=value)
-        intvar.trace_add("write", self._check_value_changed)
-        return intvar
+    # def _intvar(self, value: int) -> tk.IntVar:
+    #     intvar = tk.IntVar(value=value)
+    #     intvar.trace_add("write", self._check_value_changed)
+    #     return intvar
 
-    def _boolvar(self, value: bool) -> tk.BooleanVar:
-        boolvar = tk.BooleanVar(value=value)
-        boolvar.trace_add("write", self._check_value_changed)
-        return boolvar
+    # def _boolvar(self, value: bool) -> tk.BooleanVar:
+    #     boolvar = tk.BooleanVar(value=value)
+    #     boolvar.trace_add("write", self._check_value_changed)
+    #     return boolvar
 
     def _show(self) -> None:
         root = self.root
-        root.geometry(config.geometry[Path(__file__).stem])
+        root.geometry(state.geometry[Path(__file__).stem])
         root.title(txt.CONFIG)
 
         root.bind("<Control-x>", self._dismiss)
@@ -99,7 +100,7 @@ class ConfigFrame:
 
         self.root.update_idletasks()
         root.bind(
-            "<Configure>", lambda e: window_resize(root, __file__, config)
+            "<Configure>", lambda e: window_resize(root, __file__, state)
         )
 
     def _main_frame(self, master: ttk.Frame) -> ttk.Frame:
@@ -260,8 +261,11 @@ class ConfigFrame:
             self._update_mode_colour(mode, entry)
 
     def _update_mode_colour(self, mode: int, entry: ttk.Entry) -> None:
-        colour = self.colours[mode]
-        key = ChatMode(int(mode)).name
+        print("xxx", mode, type(mode))
+        for key in self.colours.keys():
+            print(key, type(key))
+        colour = self.colours[str(mode)]
+        key = ChatMode(str(mode)).name
         entry_style = ttk.Style(self.root)
         entry_style.configure(
             f"style_{key}.TEntry",

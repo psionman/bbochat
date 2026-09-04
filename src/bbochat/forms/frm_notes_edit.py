@@ -8,9 +8,9 @@ from psiutils.constants import PAD, Mode, Status
 from psiutils.utilities import window_resize
 
 from bbochat.buttons import ButtonFrame
-from bbochat.config import config
 from bbochat.constants import APP_TITLE
 from bbochat.data_store import data_store
+from bbochat.state import state
 
 
 class NotesEditFrame:
@@ -35,7 +35,7 @@ class NotesEditFrame:
 
     def show(self) -> None:
         root = self.root
-        root.geometry(config.geometry[Path(__file__).stem])
+        root.geometry(state.geometry[Path(__file__).stem])
         root.title(self.title)
 
         root.bind("<Control-x>", self._dismiss)
@@ -56,7 +56,7 @@ class NotesEditFrame:
 
         self.root.update_idletasks()
         root.bind(
-            "<Configure>", lambda e: window_resize(root, __file__, config)
+            "<Configure>", lambda e: window_resize(root, __file__, state)
         )
 
     def _main_frame(self, master: ttk.Frame) -> ttk.Frame:

@@ -10,8 +10,8 @@ from psiutils.utilities import window_resize
 from tkinterweb import HtmlFrame
 
 from bbochat.buttons import ButtonFrame
-from bbochat.config import config
 from bbochat.constants import APP_TITLE
+from bbochat.state import state
 
 FRAME_TITLE = f"{APP_TITLE} - Report"
 
@@ -33,7 +33,7 @@ class ReportFrame:
 
     def _show(self) -> None:
         root = self.root
-        root.geometry(config.geometry[Path(__file__).stem])
+        root.geometry(state.geometry[Path(__file__).stem])
         root.title(FRAME_TITLE)
         root.bind(
             "<Configure>",

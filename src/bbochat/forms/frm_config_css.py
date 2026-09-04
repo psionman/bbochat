@@ -12,8 +12,8 @@ from psiutils.widgets import clickable_widget
 from tkinterweb import HtmlFrame
 
 from bbochat.buttons import ButtonFrame
-from bbochat.config import config
 from bbochat.constants import APP_TITLE, HTML_TEST
+from bbochat.state import state
 from bbochat.text import Text
 from bbochat.utilities import display_html
 
@@ -64,7 +64,7 @@ class ConfigCssFrame:
 
     def _show(self) -> None:
         root = self.root
-        root.geometry(config.geometry[Path(__file__).stem])
+        root.geometry(state.geometry[Path(__file__).stem])
         root.title(FRAME_TITLE)
         root.bind(
             "<Configure>",
