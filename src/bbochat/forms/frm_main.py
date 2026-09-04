@@ -45,6 +45,7 @@ class AppFrame:
         self.root = root
         self.config = None  # Used to save sashes (see self._dismiss)
         config.subscribe(self._on_config_change)
+        self._resize_after_id = None
         self.mode = ChatMode.GREETINGS
 
         data_store.subscribe(self._on_data_change)
@@ -129,9 +130,9 @@ class AppFrame:
         self.button_frame.grid(
             row=1, column=0, sticky=tk.EW, padx=PAD, pady=PAD
         )
-        self._bind_window_events()
         sizegrip = ttk.Sizegrip(root)
         sizegrip.grid(sticky=tk.SE)
+        self._bind_window_events()
 
     def _bind_window_events(self):
         self.root.update_idletasks()
@@ -140,8 +141,13 @@ class AppFrame:
         root.bind("<Control-g>", self._greeting)
         root.bind("<Control-v>", self._valediction)
         root.bind("<Control-c>", self._chat)
-        root.bind(
-            "<Configure>", lambda e: window_resize(root, __file__, state)
+        root.bind("<Configure>", self._on_configure)
+
+    def _on_configure(self, event):
+        if self._resize_after_id:
+            self.root.after_cancel(self._resize_after_id)
+        self._resize_after_id = self.root.after(
+            300, lambda: window_resize(self.root, __file__, state)
         )
 
     def _main_frame(self, master: ttk.Frame) -> ttk.Frame:

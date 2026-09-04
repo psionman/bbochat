@@ -3,7 +3,6 @@
 import tkinter as tk
 from tkinter import messagebox, ttk
 
-from bbochat.message_store import message_store
 from psiutils.buttons import IconButton
 from psiutils.constants import PAD
 from psiutils.menus import Menu, MenuItem
@@ -11,6 +10,8 @@ from psiutils.widgets import ScrollingCanvas
 
 from bbochat.config import config
 from bbochat.constants import ChatMode
+from bbochat.message_store import message_store
+from bbochat.state import state
 from bbochat.text import Text
 
 txt = Text()
@@ -60,6 +61,7 @@ class HistoryPanel:
 
     def _context_menu(self) -> Menu:
         menu_items = [
+            MenuItem("Pin", self._pin_item, True),
             MenuItem(txt.DELETE, self._delete_item, True),
         ]
         context_menu = Menu(self.root, menu_items)
@@ -88,6 +90,11 @@ class HistoryPanel:
             )
             button.bind("<Button-3>", self._show_context_menu)
             button.grid(row=row, column=1, padx=PAD, pady=2, sticky=tk.W)
+
+    def _pin_item(self, *args) -> None:
+        message = self.history_selection.get()
+        state.pinned_items.append(message)
+        state.save()
 
     def _delete_item(self, *args) -> None:
         message = self.history_selection.get()
