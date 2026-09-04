@@ -4,7 +4,6 @@ import tkinter as tk
 from pathlib import Path
 from tkinter import ttk
 
-from bbochat.message_store import message_store
 from psiutils.constants import PAD, PADB, PADR, Mode, Status
 from psiutils.utilities import window_resize
 from psiutils.widgets import clickable_widget
@@ -13,6 +12,7 @@ from bbochat.buttons import ButtonFrame
 from bbochat.config import config
 from bbochat.constants import ICON_FILE
 from bbochat.data_store import Partner, data_store
+from bbochat.message_store import message_store
 
 FRAME_TITLE = "New partner"
 
@@ -21,7 +21,7 @@ class PartnerEditFrame:
     def __init__(self, parent: tk.Frame, mode: int, partner: Partner = None):
         self.root = tk.Toplevel(parent.root)
         self.mode = mode
-        self.partners = parent.partners
+        self.partners = data_store.partners
         self.greetings = data_store.greetings
         self.status = Status.NULL
 

@@ -29,6 +29,7 @@ dependencies = [
     { name = "clipboard" },
     { name = "dotenv" },
     { name = "emoji" },
+    { name = "platformdirs" },
     { name = "psiutils" },
     { name = "python-dateutil" },
     { name = "tkhtmlview" },
@@ -46,7 +47,8 @@ requires-dist = [
     { name = "clipboard", specifier = ">=0.0.4" },
     { name = "dotenv", specifier = ">=0.9.9" },
     { name = "emoji", specifier = ">=2.15.0" },
-    { name = "psiutils", specifier = ">=1.0.8" },
+    { name = "platformdirs", specifier = ">=4.11.7" },
+    { name = "psiutils", editable = "../psi-utilities/psiutils" },
     { name = "python-dateutil", specifier = ">=2.9.0.post0" },
     { name = "tkhtmlview", specifier = ">=0.3.2" },
     { name = "userpaths", specifier = ">=0.1.3" },
@@ -341,6 +343,15 @@ wheels = [
 ]
 
 [[package]]
+name = "platformdirs"
+version = "4.11.7"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/69/b7/802a56eca9f2fac455b8bab5375a2647b0f0e14a2cd63ef077de3c4a7658/platformdirs-4.11.7.tar.gz", hash = "sha256:4f41487eeeeeb07f3a6625e61d9bc0ae6809f92d3386dbd74392fbb76108104d", size = 35127, upload-time = "2026-09-01T13:35:10.502Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/27/6e/80993e10a0482f630cef528635789233224f36b1ffd11592aa15d13ff9ce/platformdirs-4.11.7-py3-none-any.whl", hash = "sha256:8a02cb259042c79d1cd0450facc2fe6dc9d303ae7901afbe33bf8ea0b188cef6", size = 23938, upload-time = "2026-09-01T13:35:09.02Z" },
+]
+
+[[package]]
 name = "pluggy"
 version = "1.6.0"
 source = { registry = "https://pypi.org/simple" }
@@ -366,7 +377,7 @@ wheels = [
 
 [[package]]
 name = "psiconfig"
-version = "0.0.16"
+version = "0.0.17"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "iniconfig" },
@@ -374,16 +385,17 @@ dependencies = [
     { name = "pluggy" },
     { name = "psi-toml" },
     { name = "pygments" },
+    { name = "ruff" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/09/ed/13ff73965fba6d8f0f0e0a6347d93189039bac2997b10c1df24d309b1241/psiconfig-0.0.16.tar.gz", hash = "sha256:a58c1078efd7fe67304204fc2cac1126ce4615aaebc62440e2b33957ec3adc35", size = 3179, upload-time = "2025-09-22T10:56:00.645Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/d0/39/1229a124e54611379440c39c63789d64d4268cf96080012395afdc366677/psiconfig-0.0.17.tar.gz", hash = "sha256:883a1d995b649717e92acc3a00379f22b1a3d08b7bdb62386a5c8fdf11483d91", size = 3726, upload-time = "2026-09-03T18:12:52.559Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/72/a8/4153f0bc1a8ab506531e2f849c7344390b629508767f302a0dc707b7ff05/psiconfig-0.0.16-py3-none-any.whl", hash = "sha256:27e87dd996c5be88fa2c34d2abf95a3feef06ab3c388c453b40902693f1f5d0a", size = 5392, upload-time = "2025-09-22T10:55:59.753Z" },
+    { url = "https://files.pythonhosted.org/packages/d1/29/d9c51b7c60fc4f584caf17c08639b4f050676c67f50de03f39b6c90ecb7f/psiconfig-0.0.17-py3-none-any.whl", hash = "sha256:a7e1206f0eead6ac7391a01621962d9173d96ffd2f80a2e8df0675c7298146a6", size = 5721, upload-time = "2026-09-03T18:12:51.55Z" },
 ]
 
 [[package]]
 name = "psiutils"
 version = "1.0.8"
-source = { registry = "https://pypi.org/simple" }
+source = { editable = "../psi-utilities/psiutils" }
 dependencies = [
     { name = "appdirs" },
     { name = "iniconfig" },
@@ -404,10 +416,31 @@ dependencies = [
     { name = "tomli" },
     { name = "tomli-w" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/43/09/9c51a5fcc80d448f3c400cda13ed17e00d3cf147e3d9cdf5de515b2f670a/psiutils-1.0.8.tar.gz", hash = "sha256:01fff134abbf327c61ef3bca0694b06e7487101a38a943ede05bac26e0cc132f", size = 237670, upload-time = "2026-08-31T11:03:18.974Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/06/7b/98710aba543376e4bed9136bdecc423049e6582cd3888f06b6e36cf6a2a7/psiutils-1.0.8-py3-none-any.whl", hash = "sha256:069b790168f3e85c37fe10266c46e4782f1f9c6c2aa59ed6003adf21d68d0715", size = 265667, upload-time = "2026-08-31T11:03:17.569Z" },
+
+[package.metadata]
+requires-dist = [
+    { name = "appdirs", specifier = ">=1.4.4" },
+    { name = "iniconfig", specifier = ">=2.1.0" },
+    { name = "markdown", specifier = ">=3.8.2" },
+    { name = "packaging", specifier = ">=25.0" },
+    { name = "pillow", specifier = ">=11.3.0" },
+    { name = "pluggy", specifier = ">=1.6.0" },
+    { name = "psi-toml", specifier = ">=0.0.12" },
+    { name = "psiconfig", specifier = ">=0.0.14" },
+    { name = "pycairo", specifier = ">=1.28.0" },
+    { name = "pygments", specifier = ">=2.19.2" },
+    { name = "pytest", specifier = ">=9.0.2" },
+    { name = "ruff", specifier = ">=0.15.15" },
+    { name = "structlog", specifier = ">=25.4.0" },
+    { name = "tkcalendar", specifier = ">=1.6.1" },
+    { name = "tkinterweb", specifier = ">=4.4.4" },
+    { name = "tkinterweb-tkhtml", specifier = ">=1.1.1" },
+    { name = "tomli", specifier = ">=2.2.1" },
+    { name = "tomli-w", specifier = ">=1.2.0" },
 ]
+
+[package.metadata.requires-dev]
+dev = [{ name = "pytest" }]
 
 [[package]]
 name = "pycairo"

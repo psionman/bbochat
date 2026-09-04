@@ -88,7 +88,7 @@ def get_notes_content(notes_path: str) -> dict[str]:
     with contextlib.suppress(FileNotFoundError):
         with open(notes_path) as f_notes:
             return json.load(f_notes)
-    return {}
+    return {"board_notes": "", "general_notes": ""}
 
 
 def get_my_name() -> None:

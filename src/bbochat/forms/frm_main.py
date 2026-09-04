@@ -6,7 +6,6 @@ from pathlib import Path
 from tkinter import ttk
 
 import clipboard
-from bbochat.message_store import message_store
 from psiutils import messagebox
 from psiutils.buttons import IconButton
 from psiutils.constants import PAD
@@ -21,6 +20,7 @@ from bbochat.forms.frm_notes import NotesFrame
 from bbochat.forms.frm_partners import PartnerFrame
 from bbochat.forms.frm_tournament import TournamentFrame
 from bbochat.main_menu import MainMenu
+from bbochat.message_store import message_store
 from bbochat.pair import PairNew
 from bbochat.player import Player
 from bbochat.text import Text
@@ -458,13 +458,13 @@ class AppFrame:
         pass
 
     def _dismiss(self, *args) -> None:
-        # if self.tournament_tab.notes_changed():
-        #     response = tk.messagebox.askyesno(
-        #         "Save Notes",
-        #         "Do you want to save the board notes?",
-        #     )
-        #     if response:
-        #         self.tournament_tab.save_notes()
+        if self.tournament_tab.notes_changed():
+            response = tk.messagebox.askyesno(
+                "Save Notes",
+                "Do you want to save the board notes?",
+            )
+            if response:
+                self.tournament_tab.save_notes()
         self._save_sashes()
         self._save_history()
         self.root.destroy()

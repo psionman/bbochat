@@ -1,10 +1,10 @@
 """Constants for the BBOChat app."""
 
-from enum import Enum, IntEnum
+from enum import Enum
 from pathlib import Path
 
 import userpaths
-from appdirs import user_config_dir, user_data_dir
+from platformdirs import user_config_dir, user_data_dir, user_state_dir
 
 # General
 AUTHOR = "Jeff Watkins"
@@ -19,6 +19,7 @@ CONFIG_DIR = user_config_dir(APP_NAME, APP_AUTHOR)
 CONFIG_PATH = Path(CONFIG_DIR, "config.toml")
 USER_DATA_DIR = user_data_dir(APP_NAME, APP_AUTHOR)
 DOCS_DIR = userpaths.get_my_documents()
+STATE_DIR = user_state_dir(APP_NAME, APP_AUTHOR)
 
 # GUI
 APP_TITLE = "BBO Chat"

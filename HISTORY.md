@@ -14,8 +14,6 @@
 11. Don't add CHAT mode messages to history
 12. Rename message.py to message_store.py
 
-
-
 ## Version 0.0.8 01 September 2026
 1. Implement message.py as dynamic data repository
 

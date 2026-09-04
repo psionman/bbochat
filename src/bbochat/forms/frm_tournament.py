@@ -31,7 +31,7 @@ txt = Text()
 
 
 class TournamentFrame:
-    def __init__(self, parent, master):
+    def __init__(self, parent, master: ttk.Notebook):
         self.root = parent.root
         self.partner = parent.partner
         self.report_date = datetime.now()
@@ -189,7 +189,7 @@ class TournamentFrame:
 
         with open(self.notes_path.get(), "w", encoding="utf-8") as f_notes:
             json.dump(notes, f_notes)
-
+        self.original_notes = self._get_current_notes()
         self._value_changed()
 
     def _open_file(self, *args) -> None:

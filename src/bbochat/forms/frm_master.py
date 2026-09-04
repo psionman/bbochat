@@ -14,7 +14,7 @@ from bbochat.mode_data import ModeData
 
 
 class MasterFrame:
-    def __init__(self, parent, master):
+    def __init__(self, parent, master: ttk.Notebook):
         self.root = parent.root
         self.chat = data_store.chat
 

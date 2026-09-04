@@ -3,7 +3,6 @@
 import tkinter as tk
 from tkinter import ttk
 
-from bbochat.message_store import message_store
 from psiutils import messagebox
 from psiutils.constants import PAD, PADT, Mode, Status
 from psiutils.menus import Menu, MenuItem
@@ -13,13 +12,14 @@ from bbochat.buttons import ButtonFrame
 from bbochat.config import config
 from bbochat.data_store import Partner, data_store
 from bbochat.forms.frm_partner_edit import PartnerEditFrame
+from bbochat.message_store import message_store
 from bbochat.text import Text
 
 txt = Text()
 
 
 class PartnerFrame:
-    def __init__(self, parent, master):
+    def __init__(self, parent, master: ttk.Notebook):
         self.root = parent.root
         self.partner = parent.partner
         self.greetings = data_store.greetings

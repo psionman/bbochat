@@ -18,7 +18,7 @@ txt = Text()
 
 
 class NotesFrame:
-    def __init__(self, parent, master):
+    def __init__(self, parent, master: ttk.Notebook):
         self.root = parent.root
         self.notes = data_store.notes
         self.category = ""

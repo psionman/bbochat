@@ -3,6 +3,7 @@
 from collections.abc import Callable
 from pathlib import Path
 
+from psiconfig import ConfigField
 from psiconfig import TomlConfig as BaseTomlConfig
 
 from bbochat.constants import (
@@ -16,33 +17,45 @@ from bbochat.constants import (
 Listener = Callable[[], None]
 
 
+# FIELDS for config, and to create tkinter variables in frm_config.py
+# e.g. self.data_directory is a tk.StringVar
+FIELDS = {
+    "data_directory": ConfigField(str, USER_DATA_DIR),
+    "tournament_notes_directory": ConfigField(
+        str, str(Path(DOCS_DIR, APP_NAME))
+    ),
+    "randomize_name_order": ConfigField(bool, True),
+    "show_tooltips": ConfigField(bool, True),
+    "confirm_history_delete": ConfigField(bool, True),
+}
+
+DEFAULT_GEOMETRY = {
+    "frm_main": "1100x540",
+    "frm_edit_select": "500x500",
+    "frm_config": "700x540",
+    "frm_config_css": "500x400",
+    "frm_text_dialog": "500x150",
+    "frm_partner_edit": "500x500",
+    "frm_report": "880x550",
+    "frm_notes_edit": "880x550",
+}
+
+DEFAULT_COLOURS = {
+    ChatMode.GREETINGS.value: "limegreen",
+    ChatMode.VALEDICTION.value: "salmon",
+    ChatMode.CHAT.value: "aqua",
+    ChatMode.CHAT_DETAIL.value: "aqua",
+}
+
 DEFAULT_CONFIG = {
-    "data_directory": USER_DATA_DIR,
     "last_partner": "",
-    "randomize_name_order": True,
-    "show_tooltips": True,
-    "confirm_history_delete": True,
-    "tournament_notes_directory": str(Path(DOCS_DIR, APP_NAME)),
     "last_used_text": {str(mode.value): "" for mode in ChatMode},
-    "geometry": {
-        "frm_main": "1100x540",
-        "frm_edit_select": "500x500",
-        "frm_config": "700x540",
-        "frm_config_css": "500x400",
-        "frm_text_dialog": "500x150",
-        "frm_partner_edit": "500x500",
-        "frm_report": "880x550",
-        "frm_notes_edit": "880x550",
-    },
-    "colours": {
-        "0": "limegreen",
-        "1": "salmon",
-        "2": "aqua",
-        "3": "aqua",
-    },
+    "geometry": DEFAULT_GEOMETRY,
+    "colours": DEFAULT_COLOURS,
     "vertical_sashes": [(219, 1), (494, 1), (773, 1), (1055, 1)],
     "horizontal_sashes": [(1, 165)],
     "notes_sashes": [(530, 1)],
+    "history_sashes": [(530, 1)],
     "css_body": {"name": "body", "color": "black", "font-size": 12},
     "css_h1": {"name": "h1", "color": "green", "font-size": 20},
     "css_h2": {"name": "h2", "color": "green", "font-size": 18},
@@ -54,6 +67,9 @@ DEFAULT_CONFIG = {
         "font-weight": "normal",
     },
 }
+
+for name, field in FIELDS.items():
+    DEFAULT_CONFIG[name] = field.default_value
 
 
 class TomlConfig(BaseTomlConfig):

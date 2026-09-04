@@ -10,8 +10,9 @@ from psiutils.utilities import window_resize
 from psiutils.widgets import separator_frame
 from tkinterweb import HtmlFrame
 
+from bbochat import logger
 from bbochat.buttons import ButtonFrame
-from bbochat.config import config, get_config
+from bbochat.config import FIELDS, config, get_config
 from bbochat.constants import HTML_TEST, ICON_DIR, ChatMode
 from bbochat.forms.frm_config_css import ConfigCssFrame
 from bbochat.text import Text
@@ -45,18 +46,8 @@ class ConfigFrame:
         self.chat_entry = None
         self.html_frame = None
 
-        # tk variables
-        self.data_directory = tk.StringVar(value=config.data_directory)
-        self.confirm_history_delete = tk.BooleanVar(
-            value=config.confirm_history_delete
-        )
-        self.randomize_name_order = tk.BooleanVar(
-            value=config.randomize_name_order
-        )
-        self.show_tooltips = tk.BooleanVar(value=config.show_tooltips)
-        self.tournament_notes_directory = tk.StringVar(
-            value=config.tournament_notes_directory
-        )
+        # Assign tk variables and check for changes
+        config.assign_tk_variables(self, FIELDS, self._check_value_changed)
 
         # Colour items
         for chat_mode in ChatMode.__members__.values():
@@ -64,21 +55,26 @@ class ConfigFrame:
             setattr(self, chat_mode.name, tk.StringVar(value=colour))
             setattr(self, f"{chat_mode.name}_original", colour)
 
-        self.data_directory.trace_add("write", self._check_value_changed)
-        self.tournament_notes_directory.trace_add(
-            "write", self._check_value_changed
-        )
-        self.randomize_name_order.trace_add("write", self._check_value_changed)
-        self.confirm_history_delete.trace_add(
-            "write", self._check_value_changed
-        )
-        self.show_tooltips.trace_add("write", self._check_value_changed)
-
         self.colour_entries = {}
         self._show()
         self._update_mode_colours()
 
         self.display_html()
+
+    def _stringvar(self, value: str) -> tk.StringVar:
+        stringvar = tk.StringVar(value=value)
+        stringvar.trace_add("write", self._check_value_changed)
+        return stringvar
+
+    def _intvar(self, value: int) -> tk.IntVar:
+        intvar = tk.IntVar(value=value)
+        intvar.trace_add("write", self._check_value_changed)
+        return intvar
+
+    def _boolvar(self, value: bool) -> tk.BooleanVar:
+        boolvar = tk.BooleanVar(value=value)
+        boolvar.trace_add("write", self._check_value_changed)
+        return boolvar
 
     def _show(self) -> None:
         root = self.root
@@ -215,14 +211,17 @@ class ConfigFrame:
     def _button_frame(self, master: ttk.Frame) -> tk.Frame:
         frame = ButtonFrame(master, tk.HORIZONTAL)
         frame.buttons = self._frame_buttons(frame)
+        self.save_button = frame.get_button("save")
         frame.enable(False)
         return frame
 
     def _frame_buttons(self, frame: ButtonFrame) -> tk.Frame:
         return [
-            frame.icon_button("save", self._save_config, True),
-            frame.icon_button("revert", self._restore_defaults, True),
-            frame.icon_button("exit", self._dismiss),
+            frame.icon_button("save", self._save_config, True, tag="save"),
+            frame.icon_button(
+                "revert", self._restore_defaults, True, tag="revert"
+            ),
+            frame.icon_button("close", self._dismiss, tag="exit"),
         ]
 
     def _get_data_directory(self) -> str:
@@ -244,20 +243,6 @@ class ConfigFrame:
         )
         self.tournament_notes_directory.set(directory)
         return directory
-
-    def _value_changed(self) -> bool:
-        name_order = config.randomize_name_order
-        notes_directory = config.tournament_notes_directory
-        confirm_delete = config.confirm_history_delete
-        return (
-            self.data_directory.get() != config.data_directory
-            or self.tournament_notes_directory.get() != notes_directory
-            or self.confirm_history_delete.get() != confirm_delete
-            or self.randomize_name_order.get() != name_order
-            or self.show_tooltips.get() != config.show_tooltips
-            or self.colours != config.colours
-            or self.css != config.css
-        )
 
     def _get_color(self, mode: str) -> None:
         colour = askcolor(
@@ -284,26 +269,6 @@ class ConfigFrame:
         )
         entry.configure(style=f"style_{key}.TEntry")
 
-    def _check_value_changed(self, *args) -> None:
-        enable = bool(self._value_changed())
-        self.button_frame.enable(enable)
-
-    def _save_config(self, *args) -> None:
-        name_order = self.randomize_name_order.get()
-        confirm_delete = self.confirm_history_delete.get()
-        config.update("data_directory", self.data_directory.get())
-        config.update(
-            "tournament_notes_directory", self.tournament_notes_directory.get()
-        )
-        config.update("randomize_name_order", name_order)
-        config.update("confirm_history_delete", confirm_delete)
-        config.update("show_tooltips", self.show_tooltips.get())
-        config.update("colours", dict(self.colours))
-        config.update("css", dict(self.css))
-        config.save()
-        # config = get_config()
-        self._dismiss()
-
     def display_html(self) -> None:
         display_html(self.html_frame, HTML_TEST, self.css)
 
@@ -319,6 +284,42 @@ class ConfigFrame:
         self.css = dlg.css
         self.display_html()
         self._check_value_changed()
+
+    def _check_value_changed(self, *args) -> bool:
+        """
+        Enable or disable form buttons based on changes in configuration.
+        """
+        enable = bool(self._config_changes())
+        self.button_frame.enable(enable)
+
+    def _save_config(self):
+        changes = {
+            field: f"(old value={change[0]}, new_value={change[1]})"
+            for field, change in self._config_changes().items()
+        }
+
+        for field in FIELDS:
+            config.update(field, getattr(self, field).get())
+
+        logger.info("Config saved", changes=changes)
+        self.save_button.disable()
+        config.save()
+        self._dismiss()
+
+    def _config_changes(self) -> dict:
+        stored = config.config
+        return {
+            field: (stored[field], getattr(self, field).get())
+            for field in FIELDS
+            if stored[field] != getattr(self, field).get()
+        }
+
+    def _set_config(self, *args) -> None:
+        if self.dialog_opened:
+            self.dialog_opened = False
+            return
+        for field in FIELDS:
+            getattr(self, field).set(config.config[field])
 
     def _restore_defaults(self, *args) -> None:
         message = " Restore defaults (cannot undo)?"
