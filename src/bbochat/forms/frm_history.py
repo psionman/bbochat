@@ -174,7 +174,7 @@ class HistoryPanel:
         if text not in message_store.pinned:
             message_store.pinned[text] = mode
             state.save()
-        message_store.history.pop(text)
+        # message_store.history.pop(text)
         first_item = list(message_store.history.keys())[0]
         message_store.mode = message_store.history[first_item]
         self.history_selection.set(first_item)
@@ -227,7 +227,6 @@ class HistoryPanel:
         mode = message_store.pinned[message]
         message_store.mode = mode
         message_store.message = message
-        print("pin selected", message)
         self.history_selection.set("")
 
     def _history_selected(self) -> None:
