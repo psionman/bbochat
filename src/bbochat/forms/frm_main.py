@@ -35,6 +35,7 @@ DEFAULT_MODE = ChatMode.GREETINGS
 VERTICAL_FRAME_COUNT = 4
 HORIZONTAL_FRAME_COUNT = 1
 NOTES_FRAME_COUNT = 1
+HISTORY_SASH_COUNT = 1
 
 # Handles cases when size gets corrupted, e.g. after stop on error
 DEFAULT_GEOMETRY = "1250x700"
@@ -53,7 +54,9 @@ class AppFrame:
         message_store.history = {
             message[0]: ChatMode(message[1]) for message in data_store.history
         }
-
+        message_store.pinned = {
+            message[0]: ChatMode(message[1]) for message in state.pinned_items
+        }
         self.pair = []
 
         self.partner = None
@@ -331,7 +334,7 @@ class AppFrame:
         self.update_clipboard()
 
     def _chat_message_publish(self) -> None:
-        self.my_name_text.set(message_store.my_name)
+        # self.my_name_text.set(message_store.my_name)
         self.partner = message_store.partner
         self.partners_display_name.set(
             f"{self.partner.username}, {self.partner.name}"
@@ -342,7 +345,7 @@ class AppFrame:
             self.username_2.set(message_store.pair.player_2.username)
 
         # if self.last_message != message_store.message:
-        message = message_store.output_message()
+        message = message_store.render_message()
         self.update_clipboard(message, message_store.mode)
         self.clipboard.set(message)
         self.last_message = message_store.message
@@ -454,9 +457,14 @@ class AppFrame:
             self.tournament_tab.notes_panel.sash_coord(index)
             for index in range(NOTES_FRAME_COUNT)
         ]
+        history_sashes = [
+            self.master_tab.history_panel.main_frame.sash_coord(index)
+            for index in range(HISTORY_SASH_COUNT)
+        ]
         state.sashes["vertical_sashes"] = vertical_sashes
         state.sashes["horizontal_sashes"] = horizontal_sashes
         state.sashes["notes_sashes"] = notes_sashes
+        state.sashes["history_sashes"] = history_sashes
         state.save()
 
     def _on_data_change(self) -> None:

@@ -24,7 +24,7 @@ class State:
         self.sashes = data.get("sashes", {})
         self.session = data.get("session", {})
         self.last_used_text = data.get("last_used_text", {})
-        self.pinned_items = data.get("pinned_items", [])
+        self.pinned_items = data.get("pinned_items", {})
 
     def serialize(self):
         return {

@@ -38,8 +38,8 @@ class MasterFrame:
         self.search_entry = opponents_frame.search_entry
         frame.add(self.players_frame, width=FRAME_WIDTH)
 
-        history_panel = HistoryPanel(self, frame)
-        frame.add(history_panel.main_frame, width=FRAME_WIDTH)
+        self.history_panel = HistoryPanel(self, frame)
+        frame.add(self.history_panel.main_frame, width=FRAME_WIDTH)
 
         mode = ChatMode.GREETINGS
         data_set = data_store.data_sets[mode.name.lower()]

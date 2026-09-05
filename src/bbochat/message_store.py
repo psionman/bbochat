@@ -30,6 +30,7 @@ class MessageStore:
         self.listeners: list[Listener] = []
         self.selected_messages = {}
         self.history = {}
+        self.pinned = {}
         self._notifying = False
 
     @property
@@ -133,7 +134,7 @@ class MessageStore:
             return f"{opp_1} and {opp_2}" if opp_2 else opp_1
         return opp_2
 
-    def output_message(self) -> str:
+    def render_message(self) -> str:
         names, system = self._get_names_and_system()
         opps = self._get_opps()
 
@@ -147,9 +148,10 @@ class MessageStore:
     def _add_to_history(self) -> None:
         if self.mode == ChatMode.CHAT:
             return
-        if self.message in self.history:
-            self.history.pop(self.message)
-        self.history = {self.message: self.mode, **self.history}
+        if self.message not in self.pinned:
+            if self.message in self.history:
+                self.history.pop(self.message)
+            self.history = {self.message: self.mode, **self.history}
         self._notify()
 
     # -- observer pattern for UI refresh -----------------------------
