@@ -31,12 +31,6 @@ class MessageStore:
         self._pair: PairNew | None = None
         self.listeners: list[Listener] = []
         self.selected_messages = {}
-        # self.history = {
-        #     item[0]: ChatMode(item[1]) for item in data_store.history
-        # }
-        # self.pinned = {
-        #     item[0]: ChatMode(item[1]) for item in state.pinned_items
-        # }
         self._notifying = False
 
     @property
@@ -149,15 +143,18 @@ class MessageStore:
         message = message.replace("<system>", system)
         message = self._insert_emojis(message)
         clipboard.copy(message)
+        self._notify()
         return message
 
     def _add_to_history(self) -> None:
         if self.mode == ChatMode.CHAT:
             return
-        if self.message not in state.pinned_items:
+        if (
+            self.message not in state.pinned_items
+            and self.message not in state.history
+        ):
             state.history = {self.message: self.mode, **state.history}
-            state.save()
-        self._notify()
+            self._notify()
 
     # -- observer pattern for UI refresh -----------------------------
     def subscribe(self, listener: Listener) -> None:

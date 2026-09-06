@@ -26,7 +26,7 @@ class DataStore:
         self.pairs = []
         self.greetings = []
         self.valedictions = []
-        # self.chat = []
+        self.chat = {}
         self.notes = {}
         self.my_name = ""
         self._listeners = []
@@ -47,7 +47,6 @@ class DataStore:
             "players": {},
             "greeting": [],
             "valediction": [],
-            "history": [],
             "chat": {},
             "notes": {},
             "my_name": "",
@@ -64,7 +63,6 @@ class DataStore:
             "chat": lambda x: x,
             "notes": lambda x: x,
             "my_name": lambda x: x,
-            "history": lambda x: x or [],
         }
 
         for key, default in self.data_sets.items():
@@ -142,7 +140,6 @@ class DataStore:
             "chat": self.data_sets["chat"],
             "notes": self.data_sets["notes"],
             "my_name": self.my_name,
-            "history": self.history,
         }
         json_data = self._data_to_json(output)
         self._notify()
@@ -186,4 +183,3 @@ class DataStore:
 
 # Module-level singleton - this is the instance everyone imports.
 data_store = DataStore()
-# data_store.read()

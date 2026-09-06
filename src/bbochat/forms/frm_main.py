@@ -49,7 +49,6 @@ class AppFrame:
         self._resize_after_id = None
         self.mode = ChatMode.GREETINGS
 
-        data_store.subscribe(self._on_data_change)
         self.pair = []
 
         self.partner = None
@@ -453,13 +452,6 @@ class AppFrame:
         state.sashes["history_sashes"] = history_sashes
         state.save()
 
-    def _on_data_change(self) -> None:
-        # self.name_1.set(data_store.player_1.name)
-        # self.name_2.set(data_store.player_2.name)
-        # self.username_1.set(data_store.player_1.username)
-        # self.username_2.set(data_store.player_2.username)
-        pass
-
     def _dismiss(self, *args) -> None:
         if self.tournament_tab.notes_changed():
             response = tk.messagebox.askyesno(
@@ -470,6 +462,7 @@ class AppFrame:
                 self.tournament_tab.save_notes()
         self._save_sashes()
         # self._save_history()
+        state.save()
         self.root.destroy()
         # Need to do this because window_resize is called in close
         config.save()

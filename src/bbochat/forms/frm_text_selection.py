@@ -50,16 +50,9 @@ class TextSelectionFrame:
         self.config_key = f"last_{self.mode.name.lower()}"
         self.config = config
         config.subscribe(self._on_config_change)
-
-        # last_value = (
-        #     self.config.config[self.config_key]
-        #     if self.config_key in self.config.config
-        #     else ""
-        # )
-        # print(mode.value, config.last_chat)
         last_value = (
-            state.last_used_text[str(mode.value)]
-            if str(mode.value) in state.last_used_text
+            state.last_used_text[mode.value]
+            if mode.value in state.last_used_text
             else ""
         )
         self.text_var = tk.StringVar(value=last_value)
@@ -241,7 +234,7 @@ class TextSelectionFrame:
         message_store.mode = self.mode
         message_store.selected_messages[self.mode] = self.text_var.get()
         message_store.message = self.text_var.get()
-        state.last_used_text[str(self.mode.value)] = self.text_var.get()
+        state.last_used_text[self.mode.value] = self.text_var.get()
         state.save()
 
     def populate_text_items(self, selected_item: str = "") -> None:

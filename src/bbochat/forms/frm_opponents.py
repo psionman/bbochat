@@ -3,13 +3,14 @@
 import tkinter as tk
 from tkinter import ttk
 
-from bbochat.message_store import message_store
 from psiutils.constants import PAD
 from psiutils.treeview import sort_treeview
 
 from bbochat.constants import ChatMode
 from bbochat.data_store import data_store
+from bbochat.message_store import message_store
 from bbochat.pair import PairNew
+from bbochat.state import state
 
 PAIR_TREE_COLUMNS = (
     ("username1", "Opp 1", 100),
@@ -90,6 +91,8 @@ class OpponentsFrame:
         self._populate_pair_tree()
 
     def _pair_tree_clicked(self, *args) -> None:
+        print("oopps", state.last_used_text)
+        # print(state.last_used_text[ChatMode.GREETINGS.value])
         selected_item = self.pair_tree.selection()
         values = self.pair_tree.item(selected_item)["values"]
         if not values:
@@ -99,6 +102,5 @@ class OpponentsFrame:
 
         message_store.pair = PairNew(player_1, player_2)
         message_store.mode = ChatMode.GREETINGS
-        message_store.message = message_store.selected_messages[
-            ChatMode.GREETINGS
-        ]
+        message_store.message = state.last_used_text[ChatMode.GREETINGS.value]
+        message_store.render_message()

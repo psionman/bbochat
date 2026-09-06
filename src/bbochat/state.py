@@ -6,9 +6,9 @@ import tomllib
 from bbochat.constants import STATE_DIR, ChatMode
 
 DEFAULT_GEOMETRY = {
-    "frm_main": "1154x101",
+    "frm_main": "1312x755",
     "frm_edit_select": "500x500",
-    "frm_config": "700x540+2920",
+    "frm_config": "700x540",
     "frm_config_css": "500x400",
     "frm_text_dialog": "500x150",
     "frm_partner_edit": "500x500",
@@ -49,6 +49,9 @@ class State:
         if not self.session:
             self.session["last_partner"] = DEFAULT_PARTNER
         self.last_used_text = data.get("last_used_text", {})
+        self.last_used_text = {
+            int(key): value for key, value in self.last_used_text.items()
+        }
         if not self.last_used_text:
             self.last_used_text = {}
 
@@ -58,20 +61,15 @@ class State:
         self.pinned_items = {
             item[0]: ChatMode(item[1]) for item in data.get("pinned_items")
         }
-        # self.pinned_items = data.get("pinned_items", {})
-        if not self.pinned_items:
-            self.pinned_items = []
-        # self.history = data.get("history", {})
-        # if not self.history:
-        #     self.history = []
 
     def serialize(self):
         return {
             "session": self.session,
-            "last_used_text": self.last_used_text,
+            "last_used_text": {
+                str(mode): item for mode, item in self.last_used_text.items()
+            },
             "pinned_items": [
-                (item, mode.value)
-                for (item, mode) in self.pinned_items.items()
+                (item, mode.value) for item, mode in self.pinned_items.items()
             ],
             "history": [
                 (item, mode.value) for item, mode in self.history.items()
