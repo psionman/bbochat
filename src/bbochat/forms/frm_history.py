@@ -229,7 +229,6 @@ class HistoryPanel:
         mode = state.pinned_items[message]
         message_store.mode = mode
         message_store.message = message
-        message_store.render_message()
         self.history_selection.set("")
 
     def _history_selected(self) -> None:
@@ -237,7 +236,6 @@ class HistoryPanel:
         mode = state.history[message]
         message_store.mode = mode
         message_store.message = message
-        message_store.render_message()
         state.history.pop(message)
         state.history = {message: mode, **state.history}
         self._populate_panels()

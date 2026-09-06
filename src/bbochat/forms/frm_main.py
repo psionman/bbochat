@@ -330,7 +330,6 @@ class AppFrame:
             self.username_1.set(message_store.pair.player_1.username)
             self.username_2.set(message_store.pair.player_2.username)
 
-        # if self.last_message != message_store.message:
         message = message_store.render_message()
         self.update_clipboard(message, message_store.mode)
         self.clipboard.set(message)
@@ -362,9 +361,7 @@ class AppFrame:
             data_store.pairs.append(pair)
 
         self.save()
-        # self.search.set("")
         self.pair_tree.delete(*self.pair_tree.get_children())
-        # self.search.set(self.username_1.get())
         self.search_entry.focus_set()
         self.master_tab.opponents_frame.name_search()
         message_store.pair = pair
@@ -386,9 +383,7 @@ class AppFrame:
         self.username_1.set("")
         self.username_2.set("")
         self._pair_username_change()
-        # self.search.set("")
         self.pair_tree.delete(*self.pair_tree.get_children())
-        # self.search.set(self.username_1.get())
         self.search_entry.focus_set()
 
     def _on_randomize_change(self) -> None:
@@ -461,7 +456,6 @@ class AppFrame:
             if response:
                 self.tournament_tab.save_notes()
         self._save_sashes()
-        # self._save_history()
         state.save()
         self.root.destroy()
         # Need to do this because window_resize is called in close

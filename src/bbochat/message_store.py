@@ -50,6 +50,7 @@ class MessageStore:
     def message(self, value: str) -> None:
         self._message = value
         self._add_to_history()
+        self.render_message()
 
     @property
     def my_name(self) -> str:
