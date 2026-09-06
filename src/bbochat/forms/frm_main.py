@@ -50,13 +50,6 @@ class AppFrame:
         self.mode = ChatMode.GREETINGS
 
         data_store.subscribe(self._on_data_change)
-        message_store.my_name = data_store.my_name
-        message_store.history = {
-            message[0]: ChatMode(message[1]) for message in data_store.history
-        }
-        message_store.pinned = {
-            message[0]: ChatMode(message[1]) for message in state.pinned_items
-        }
         self.pair = []
 
         self.partner = None
@@ -83,12 +76,6 @@ class AppFrame:
         self.username_2.trace_add("write", self._pair_username_change)
         self.name_1.trace_add("write", self._update_clipboard)
         self.name_2.trace_add("write", self._update_clipboard)
-
-        # self.last_mode_text = {
-        #     ChatMode.GREETINGS: config.last_greeting,
-        #     ChatMode.VALEDICTION: config.last_valediction,
-        #     ChatMode.CHAT: config.last_chat,
-        # }
 
         self.save_button = None
         self.delete_button = None
@@ -438,11 +425,10 @@ class AppFrame:
         self.button_frame.enable(True)
 
     def _save_history(self) -> None:
-        data_store.history = [
-            (message, mode.value)
-            for message, mode in message_store.history.items()
+        state.history = [
+            (message, mode.value) for message, mode in state.history.items()
         ]
-        data_store.save()
+        state.save()
 
     def _save_sashes(self) -> None:
         vertical_sashes = [
@@ -483,7 +469,7 @@ class AppFrame:
             if response:
                 self.tournament_tab.save_notes()
         self._save_sashes()
-        self._save_history()
+        # self._save_history()
         self.root.destroy()
         # Need to do this because window_resize is called in close
         config.save()

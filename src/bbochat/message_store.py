@@ -9,8 +9,10 @@ import clipboard
 import emoji
 
 from bbochat.constants import ChatMode
+from bbochat.data_store import data_store
 from bbochat.pair import PairNew
 from bbochat.partner import Partner
+from bbochat.state import state
 
 DEFAULT_MODE = ChatMode.GREETINGS
 
@@ -24,13 +26,17 @@ class MessageStore:
         self._mode: ChatMode = DEFAULT_MODE
         self._message: str = ""
         self._randomize: bool = False
-        self._my_name: str = ""
+        self._my_name: str = data_store.my_name
         self._partner: Partner | None = None
         self._pair: PairNew | None = None
         self.listeners: list[Listener] = []
         self.selected_messages = {}
-        self.history = {}
-        self.pinned = {}
+        # self.history = {
+        #     item[0]: ChatMode(item[1]) for item in data_store.history
+        # }
+        # self.pinned = {
+        #     item[0]: ChatMode(item[1]) for item in state.pinned_items
+        # }
         self._notifying = False
 
     @property
@@ -148,10 +154,9 @@ class MessageStore:
     def _add_to_history(self) -> None:
         if self.mode == ChatMode.CHAT:
             return
-        if self.message not in self.pinned:
-            if self.message in self.history:
-                self.history.pop(self.message)
-            self.history = {self.message: self.mode, **self.history}
+        if self.message not in state.pinned_items:
+            state.history = {self.message: self.mode, **state.history}
+            state.save()
         self._notify()
 
     # -- observer pattern for UI refresh -----------------------------

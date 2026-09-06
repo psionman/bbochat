@@ -121,7 +121,7 @@ class HistoryPanel:
     def _populate_history_frame(self) -> None:
         info = PanelPopulateInfo(
             "history",
-            data_source=message_store.history,
+            data_source=state.history,
             tk_variable=self.history_selection,
             canvas=self.history_frame,
             click_command=self._history_selected,
@@ -132,7 +132,7 @@ class HistoryPanel:
     def _populate_pinned_frame(self) -> None:
         info = PanelPopulateInfo(
             "pinned",
-            data_source=message_store.pinned,
+            data_source=state.pinned_items,
             tk_variable=self.pinned_selection,
             canvas=self.pinned_frame,
             click_command=self._pin_selected,
@@ -170,18 +170,18 @@ class HistoryPanel:
 
     def _pin_item(self, *args) -> None:
         text = self.history_selection.get()
-        mode = message_store.history[text]
-        if text not in message_store.pinned:
-            message_store.pinned[text] = mode
+        mode = state.history[text]
+        if text not in state.pinned_items:
+            state.pinned_items[text] = mode
+            state.history.pop(text)
             state.save()
-        # message_store.history.pop(text)
-        first_item = list(message_store.history.keys())[0]
-        message_store.mode = message_store.history[first_item]
+        first_item = list(state.history.keys())[0]
+        message_store.mode = state.history[first_item]
         self.history_selection.set(first_item)
         self._populate_panels()
 
     def _delete_pinned_item(self, *args) -> None:
-        if len(message_store.pinned) < 1:
+        if len(state.pinned_items) < 1:
             return
         message = self.pinned_selection.get()
         if config.confirm_history_delete:
@@ -190,10 +190,12 @@ class HistoryPanel:
             )
             if not dlg:
                 return
-        message_store.pinned.pop(message)
+        state.pinned_items.pop(message)
+        state.save()
+        self._populate_panels()
 
     def _delete_history_item(self, *args) -> None:
-        if len(message_store.history) < 1:
+        if len(state.history) < 1:
             return
         message = self.history_selection.get()
         if config.confirm_history_delete:
@@ -202,14 +204,14 @@ class HistoryPanel:
             )
             if not dlg:
                 return
-        message_store.history.pop(message)
-
+        state.history.pop(message)
+        state.save()
         self.history_context_menu.enable(False)
         self._populate_panels()
-        if len(message_store.history) < 1:
+        if len(state.history) < 1:
             return
-        first_item = list(message_store.history.keys())[0]
-        message_store.mode = message_store.history[first_item]
+        first_item = list(state.history.keys())[0]
+        message_store.mode = state.history[first_item]
         self.history_selection.set(first_item)
 
     def _show_history_context_menu(self, event: tk.Event) -> None:
@@ -224,17 +226,20 @@ class HistoryPanel:
 
     def _pin_selected(self) -> None:
         message = self.pinned_selection.get()
-        mode = message_store.pinned[message]
+        mode = state.pinned_items[message]
         message_store.mode = mode
         message_store.message = message
         self.history_selection.set("")
 
     def _history_selected(self) -> None:
         message = self.history_selection.get()
-        mode = message_store.history[message]
+        mode = state.history[message]
         message_store.mode = mode
         message_store.message = message
-        if len(message_store.history) <= 1:
+        state.history.pop(message)
+        state.history = {message: mode, **state.history}
+        self._populate_panels()
+        if len(state.history) <= 1:
             return
         self.pinned_selection.set("")
         self.history_context_menu.enable()
