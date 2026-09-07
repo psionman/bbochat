@@ -7,13 +7,12 @@ from tkinter import ttk
 
 from bidict import bidict
 from psiutils import messagebox
-from psiutils.buttons import IconButton
 from psiutils.constants import PAD, Status
 from psiutils.menus import Menu, MenuItem
 from psiutils.utilities import window_resize
 from psiutils.widgets import HAND
 
-from bbochat.buttons import ButtonFrame
+from bbochat.buttons import ButtonFrame, IconButton
 from bbochat.forms.frm_text_dialog import TextDialogFrame
 from bbochat.state import state
 from bbochat.text import Text
@@ -131,17 +130,18 @@ class EditSelectFrame:
 
     def _button_frame(self, master: ttk.Frame) -> tk.Frame:
         frame = ButtonFrame(master, tk.VERTICAL)
-        self.save_button = IconButton(
-            frame, txt.SAVE, "save", self._save_data, True
-        )
-        frame.buttons = [
+        frame.buttons = self._frame_buttons(frame)
+        self.save_button = frame.get_button("save")
+        return frame
+
+    def _frame_buttons(self, frame: ButtonFrame) -> list[IconButton]:
+        return [
             frame.icon_button("new", self._new_item),
             frame.icon_button("edit", self._edit_item, True),
             frame.icon_button("delete", self._delete_item, True),
-            self.save_button,
+            frame.icon_button("save", self._save_data, True, tag="save"),
             frame.icon_button("exit", self._dismiss),
         ]
-        return frame
 
     def _context_menu(self) -> tk.Menu:
         menu_items = [

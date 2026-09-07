@@ -7,17 +7,15 @@ from datetime import datetime
 from pathlib import Path
 from tkinter import filedialog, ttk
 
-from dateutil.parser import parse  # type: ignore
+from dateutil.parser import parse
 from psiutils import messagebox
-from psiutils.buttons import IconButton
 from psiutils.constants import PAD
 from psiutils.widgets import PsiText, Tooltip
 
-from bbochat.buttons import ButtonFrame
+from bbochat.buttons import ButtonFrame, IconButton
 from bbochat.constants import (
     DATA_DIR,
     FRAME_WIDTH,
-    ICON_DIR,
     TXT_FILE_TYPES,
     YYYYMMDD,
 )
@@ -35,7 +33,6 @@ class TournamentFrame:
         self.root = parent.root
         self.partner = parent.partner
         self.report_date = datetime.now()
-        self.report_button = None
         self.board_notes = None
         self.original_notes = {}
         self.general_notes = None
@@ -90,11 +87,6 @@ class TournamentFrame:
 
     def _button_frame(self, master: ttk.Frame) -> ttk.Frame:
         frame = ButtonFrame(master, tk.HORIZONTAL)
-        self.report_button = IconButton(
-            frame, txt.REPORT, "report", self._report, True
-        )
-        help_button = IconButton(frame, txt.HELP, "help", icon_path=ICON_DIR)
-
         help_button = ttk.Button(
             frame,
             text=txt.HELP,
@@ -105,21 +97,26 @@ class TournamentFrame:
             wrap_length=3500,
             vertical_offset=0,
         )
-        open_todays = IconButton(
-            frame, f"{txt.OPEN} today's", "open", self._open_todays_file
-        )
-        frame.buttons = [
-            frame.icon_button("open", self._open_file),
-            open_todays,
-            frame.icon_button("save", self.save_notes, True),
-            # help_button,
-        ]
+        frame.buttons = self._frame_buttons(frame)
 
         # TODO sort out tooltip on IconButton
         help_button.grid(row=0, column=9, padx=PAD)
 
         frame.disable()
         return frame
+
+    def _frame_buttons(self, frame: ButtonFrame) -> list[IconButton]:
+        open_todays = IconButton(
+            frame,
+            f"{txt.OPEN} today's",
+            "document-open",
+            self._open_todays_file,
+        )
+        return [
+            frame.icon_button("open-document", self._open_file),
+            open_todays,
+            frame.icon_button("save", self.save_notes, True),
+        ]
 
     def _notes_panel(self, master: ttk.Frame) -> ttk.PanedWindow:
         frame = tk.PanedWindow(
@@ -252,6 +249,3 @@ class TournamentFrame:
         self.button_frame.disable()
         if f"{board_notes}{general_notes}".replace("\n", ""):
             self.button_frame.enable()
-        self.report_button.disable()
-        if f"{board_notes}{general_notes}":
-            self.report_button.enable()

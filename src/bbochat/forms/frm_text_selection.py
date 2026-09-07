@@ -4,12 +4,11 @@ import tkinter as tk
 from tkinter import ttk
 
 from psiutils import messagebox
-from psiutils.buttons import IconButton
 from psiutils.constants import PAD, Status
 from psiutils.menus import Menu, MenuItem
 from psiutils.widgets import HAND
 
-from bbochat.buttons import ButtonFrame
+from bbochat.buttons import ButtonFrame, IconButton
 from bbochat.config import config
 from bbochat.constants import MODE_TEXT, ChatMode
 from bbochat.forms.frm_edit_select import EditSelectFrame
@@ -115,11 +114,10 @@ class TextSelectionFrame:
             for widget in frame.winfo_children():
                 widget.destroy()
 
-        label = ttk.Label(frame, text=f"Selected {self.mode_text}")
-        label.grid(row=0, column=0, pady=PAD)
-
+        row = 0
         entry = ttk.Entry(frame, textvariable=self.text_var)
-        entry.grid(row=1, column=0, sticky=tk.EW)
+        entry.grid(row=row, column=0, sticky=tk.EW)
+
         colour = self.config.colours[str(self.mode.value)]
         entry_style = ttk.Style()
         entry_style.configure(
@@ -129,16 +127,24 @@ class TextSelectionFrame:
         entry.configure(style=f"{self.mode}.TEntry")
         entry.bind("<Key>", lambda e: "break")
 
-        button_frame = ButtonFrame(frame, tk.HORIZONTAL)
-        use_button = IconButton(button_frame, txt.USE, "done", self._use_item)
-        use_button.widget.configure(style=f"{self.mode}.TButton")
-        button_frame.buttons = [
-            use_button,
-            IconButton(button_frame, txt.EDIT, "edit", self._edit_all),
-        ]
-        button_frame.grid(row=2, column=0, pady=PAD)
+        row += 1
+        button_frame = self._button_frame(frame)
+        button_frame.grid(row=row, column=0, padx=PAD, pady=PAD, sticky=tk.EW)
 
         return frame
+
+    def _button_frame(self, frame: ttk.Frame) -> ButtonFrame:
+        button_frame = ButtonFrame(frame, tk.HORIZONTAL)
+        button_frame.buttons = self._frame_buttons(button_frame)
+        return button_frame
+
+    def _frame_buttons(self, frame: ttk.Frame) -> list[IconButton]:
+        use_button = IconButton(frame, txt.USE, "done", self._use_item)
+        # use_button.widget.configure(style=f"{self.mode}.TButton")
+        return [
+            use_button,
+            IconButton(frame, txt.EDIT, "edit", self._edit_all),
+        ]
 
     def _item_selected(self, event: tk.Event) -> None:
         selection = event.widget.curselection()

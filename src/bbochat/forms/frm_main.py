@@ -7,11 +7,10 @@ from tkinter import ttk
 
 import clipboard
 from psiutils import messagebox
-from psiutils.buttons import IconButton
 from psiutils.constants import PAD
 from psiutils.utilities import window_resize
 
-from bbochat.buttons import ButtonFrame
+from bbochat.buttons import ButtonFrame, IconButton
 from bbochat.config import config
 from bbochat.constants import ChatMode
 from bbochat.data_store import data_store
@@ -272,7 +271,7 @@ class AppFrame:
     def _button_frame(self, master: ttk.Frame) -> ttk.Frame:
         frame = ButtonFrame(master, tk.HORIZONTAL)
         frame.buttons = [
-            frame.icon_button("close", self._dismiss),
+            frame.icon_button("cancel", self._dismiss),
         ]
         frame.enable(False)
         return frame

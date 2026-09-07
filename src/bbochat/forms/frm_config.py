@@ -4,14 +4,13 @@ from tkinter import filedialog, ttk
 from tkinter.colorchooser import askcolor
 
 from psiutils import messagebox
-from psiutils.buttons import IconButton
 from psiutils.constants import PAD, PADT, Status
 from psiutils.utilities import window_resize
 from psiutils.widgets import separator_frame
 from tkinterweb import HtmlFrame
 
 from bbochat import logger
-from bbochat.buttons import ButtonFrame
+from bbochat.buttons import ButtonFrame, IconButton
 from bbochat.config import FIELDS, config, get_config
 from bbochat.constants import HTML_TEST, ICON_DIR, ChatMode
 from bbochat.forms.frm_config_css import ConfigCssFrame

@@ -5,11 +5,11 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from tkinter import messagebox, ttk
 
-from psiutils.buttons import IconButton
 from psiutils.constants import PAD
 from psiutils.menus import Menu, MenuItem
 from psiutils.widgets import ScrollingCanvas
 
+from bbochat.buttons import IconButton
 from bbochat.config import config
 from bbochat.constants import ChatMode
 from bbochat.message_store import message_store
