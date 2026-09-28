@@ -1,5 +1,9 @@
 # BBO Chat - History
 
+## Version 0.0.10 28 September 2026
+1. Add small delay to state save to prevent judder
+2. Get geometry from state
+
 ## Version 0.0.9 02 September 2026
 1. Load last partner's greeting on startup
 2. Items being added to history when selected

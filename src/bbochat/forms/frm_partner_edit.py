@@ -1,7 +1,6 @@
 """PartnerEditFrame for BBO Chat."""
 
 import tkinter as tk
-from pathlib import Path
 from tkinter import ttk
 
 from psiutils.constants import PAD, PADB, PADR, Mode, Status
@@ -53,7 +52,7 @@ class PartnerEditFrame:
 
     def _show(self) -> None:
         root = self.root
-        root.geometry(state.geometry[Path(__file__).stem])
+        root.geometry(state.get_geometry(__file__))
         root.title(f"{self.mode.name.capitalize()} partner")
         root.iconphoto(False, tk.PhotoImage(file=ICON_FILE))
         root.wait_visibility()

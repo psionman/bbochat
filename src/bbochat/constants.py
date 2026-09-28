@@ -6,25 +6,26 @@ from pathlib import Path
 import userpaths
 from platformdirs import user_config_dir, user_data_dir, user_state_dir
 
-# General
-AUTHOR = "Jeff Watkins"
-APP_NAME = "bbochat"
-APP_AUTHOR = "psionman"
-# HTML_DIR = resolve_path('html', __file__)
-HELP_URI = ""
-DATA_DIR = str(Path(user_data_dir(APP_NAME, AUTHOR)))
-# Config
-CONFIG_DIR = user_config_dir(APP_NAME, APP_AUTHOR)
-CONFIG_PATH = Path(CONFIG_DIR, "config.toml")
-USER_DATA_DIR = user_data_dir(APP_NAME, APP_AUTHOR)
-DOCS_DIR = userpaths.get_my_documents()
-STATE_DIR = user_state_dir(APP_NAME, APP_AUTHOR)
-PSIUTILS_DIR = user_data_dir("psiutils", APP_AUTHOR)
+from bbochat import __app_name__, __author__
 
-# Buttons
+# General
+HELP_URI = ""
+DATA_DIR = str(Path(user_data_dir(__app_name__, __author__)))
+
+# Config
+CONFIG_DIR = user_config_dir(__app_name__, __author__)
+CONFIG_PATH = Path(CONFIG_DIR, "config.toml")
+USER_DATA_DIR = user_data_dir(__app_name__, __author__)
+DOCS_DIR = userpaths.get_my_documents()
+STATE_DIR = user_state_dir(__app_name__, __author__)
+PSIUTILS_DIR = user_data_dir("psiutils", __author__)
+
+# Buttons and text
+PSIUTILS_DIR = user_data_dir("psiutils", __author__)
 BUTTONS_DIR = Path(PSIUTILS_DIR, "buttons")
 BUTTON_ICON_PATH = str(Path(BUTTONS_DIR, "icons"))
 BUTTON_CONFIG_PATH = str(Path(BUTTONS_DIR, "buttons.json"))
+TEXT_FILE = Path(PSIUTILS_DIR, "text", "text.json")
 
 
 # GUI

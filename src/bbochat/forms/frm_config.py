@@ -1,5 +1,4 @@
 import tkinter as tk
-from pathlib import Path
 from tkinter import filedialog, ttk
 from tkinter.colorchooser import askcolor
 
@@ -63,7 +62,7 @@ class ConfigFrame:
 
     def _show(self) -> None:
         root = self.root
-        root.geometry(state.geometry[Path(__file__).stem])
+        root.geometry(state.get_geometry(__file__))
         root.title(txt.CONFIG)
 
         root.bind("<Control-x>", self._dismiss)

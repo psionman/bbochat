@@ -1,4 +1,6 @@
+# state.py
 from pathlib import Path
+from time import sleep
 
 import tomli_w
 import tomllib
@@ -23,6 +25,7 @@ DEFAULT_SASHES = {
 }
 
 DEFAULT_PARTNER = "eirikr"
+DEFAULT_SIZE = "500x600"
 
 
 class State:
@@ -37,12 +40,19 @@ class State:
 
     def get_state(self) -> Path:
         state_file = Path(STATE_DIR, "state.toml")
-        with open(state_file, "rb") as f:
-            data = tomllib.load(f)
-        self.geometry = data.get("geometry", {})
+        try:
+            with open(state_file, "rb") as f:
+                data = tomllib.load(f)
+        except FileNotFoundError:
+            state_file.parent.mkdir(parents=True, exist_ok=True)
+            state_file.touch()
+            data = {}
+
+        self.geometry = data.get("geometry", DEFAULT_GEOMETRY)
         if not self.geometry:
             self.geometry = DEFAULT_GEOMETRY
-        self.sashes = data.get("sashes", {})
+
+        self.sashes = data.get("sashes", DEFAULT_SASHES)
         if not self.sashes:
             self.sashes = DEFAULT_SASHES
         self.session = data.get("session", {})
@@ -56,11 +66,14 @@ class State:
             self.last_used_text = {}
 
         self.history = {
-            item[0]: ChatMode(item[1]) for item in data.get("history")
+            item[0]: ChatMode(item[1]) for item in data.get("history", {})
         }
         self.pinned_items = {
-            item[0]: ChatMode(item[1]) for item in data.get("pinned_items")
+            item[0]: ChatMode(item[1]) for item in data.get("pinned_items", {})
         }
+
+    def get_geometry(self, module_path: str) -> str:
+        return self.geometry.get(Path(module_path).stem, DEFAULT_SIZE)
 
     def serialize(self):
         return {
@@ -79,6 +92,7 @@ class State:
         }
 
     def save(self):
+        sleep(0.001)  # prevent judder
         data = self.serialize()
         state_file = Path(STATE_DIR, "state.toml")
         with open(state_file, "wb") as f:

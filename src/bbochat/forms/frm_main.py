@@ -2,7 +2,6 @@
 
 import contextlib
 import tkinter as tk
-from pathlib import Path
 from tkinter import ttk
 
 import clipboard
@@ -102,7 +101,7 @@ class AppFrame:
     def _show(self):
         root = self.root
         root.protocol("WM_DELETE_WINDOW", self._dismiss)
-        root.geometry(state.geometry[Path(__file__).stem])
+        root.geometry(state.get_geometry(__file__))
         root.title(FRAME_TITLE)
 
         root.rowconfigure(0, weight=1)
@@ -174,7 +173,7 @@ class AppFrame:
         self.clipboard_entry.bind("<KeyRelease>", self.copy_to_clipboard)
 
         button = IconButton(
-            frame, "Copy", "copy_clipboard", self.copy_to_clipboard
+            frame, "Copy", "copy-clipboard", self.copy_to_clipboard
         )
         button.grid(row=0, column=2, padx=PAD)
 
@@ -271,7 +270,7 @@ class AppFrame:
     def _button_frame(self, master: ttk.Frame) -> ttk.Frame:
         frame = ButtonFrame(master, tk.HORIZONTAL)
         frame.buttons = [
-            frame.icon_button("cancel", self._dismiss),
+            frame.icon_button("cancel", self._dismiss, icon_colour="red"),
         ]
         frame.enable(False)
         return frame

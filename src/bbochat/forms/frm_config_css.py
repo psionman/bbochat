@@ -2,7 +2,6 @@
 
 import tkinter as tk
 from copy import deepcopy
-from pathlib import Path
 from tkinter import ttk
 from tkinter.colorchooser import askcolor
 
@@ -64,7 +63,7 @@ class ConfigCssFrame:
 
     def _show(self) -> None:
         root = self.root
-        root.geometry(state.geometry[Path(__file__).stem])
+        root.geometry(state.get_geometry(__file__))
         root.title(FRAME_TITLE)
         root.bind(
             "<Configure>",

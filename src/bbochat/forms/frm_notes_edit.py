@@ -1,7 +1,6 @@
 """Notes Edit dialog for BBO Chat."""
 
 import tkinter as tk
-from pathlib import Path
 from tkinter import ttk
 
 from psiutils.constants import PAD, Mode, Status
@@ -35,7 +34,7 @@ class NotesEditFrame:
 
     def show(self) -> None:
         root = self.root
-        root.geometry(state.geometry[Path(__file__).stem])
+        root.geometry(state.get_geometry(__file__))
         root.title(self.title)
 
         root.bind("<Control-x>", self._dismiss)

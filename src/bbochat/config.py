@@ -6,8 +6,8 @@ from pathlib import Path
 from psiconfig import ConfigField
 from psiconfig import TomlConfig as BaseTomlConfig
 
+from bbochat import __app_name__
 from bbochat.constants import (
-    APP_NAME,
     CONFIG_PATH,
     DOCS_DIR,
     USER_DATA_DIR,
@@ -22,7 +22,7 @@ Listener = Callable[[], None]
 FIELDS = {
     "data_directory": ConfigField(str, USER_DATA_DIR),
     "tournament_notes_directory": ConfigField(
-        str, str(Path(DOCS_DIR, APP_NAME))
+        str, str(Path(DOCS_DIR, __app_name__))
     ),
     "randomize_name_order": ConfigField(bool, True),
     "show_tooltips": ConfigField(bool, True),

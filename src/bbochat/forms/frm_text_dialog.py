@@ -1,7 +1,6 @@
 """Text entry dialog."""
 
 import tkinter as tk
-from pathlib import Path
 from tkinter import ttk
 
 import emoji
@@ -52,7 +51,7 @@ class TextDialogFrame:
 
     def _show(self) -> None:
         root = self.root
-        root.geometry(state.geometry[Path(__file__).stem])
+        root.geometry(state.get_geometry(__file__))
         root.title(f"{APP_TITLE} - {self.title}")
 
         root.update_idletasks()

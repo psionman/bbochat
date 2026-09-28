@@ -2,7 +2,6 @@
 
 import re
 import tkinter as tk
-from pathlib import Path
 from tkinter import ttk
 
 from psiutils.constants import PAD
@@ -33,7 +32,7 @@ class ReportFrame:
 
     def _show(self) -> None:
         root = self.root
-        root.geometry(state.geometry[Path(__file__).stem])
+        root.geometry(state.get_geometry(__file__))
         root.title(FRAME_TITLE)
         root.bind(
             "<Configure>",

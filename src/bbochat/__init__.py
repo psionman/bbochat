@@ -4,10 +4,8 @@ from importlib.metadata import metadata, version
 
 from psiutils.utilities import psi_logger
 
-from bbochat.constants import APP_NAME
-
 # must be package name i.e. directory under /src/
-__app_name__ = APP_NAME
+__app_name__ = "bbochat"
 
 logger = psi_logger(__app_name__)
 
