@@ -198,12 +198,6 @@ class EditSelectFrame:
 
             self._add_item_to_list(len(self.display_list), dlg.text)
 
-        # print("-" * 50)
-        # for key, value in self.key_register.items():
-        #     print(f"{key}: {value}")
-        # for key, value in self.key_register.inverse.items():
-        #     print(f"{key}: {value}")
-
     def _edit_item(self, *args) -> None:
         dlg = TextDialogFrame(self, "Edit", self.selected_text)
         dlg.root.transient(self.root)
@@ -214,9 +208,6 @@ class EditSelectFrame:
 
         # Update the changes dictionary
         self.changes[self.selected_text] = (self.selected_text, dlg.text)
-
-        # if self.text_register:
-        #     self._update_item_register(old_text, dlg.text)
 
         index = self.display_list.index(self.selected_text)
         self.display_list.remove(self.selected_text)

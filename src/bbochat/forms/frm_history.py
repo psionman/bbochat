@@ -169,7 +169,6 @@ class HistoryPanel:
                 command=info.click_command,
             )
             if text == info.tk_variable.get():
-                print(f"Setting style for {text}")
                 button.configure(style="red-fg.TRadiobutton")
             button.bind("<Button-3>", info.context_menu_command)
             button.grid(row=row, column=1, padx=PAD, pady=2, sticky=tk.W)

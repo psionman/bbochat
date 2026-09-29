@@ -79,6 +79,7 @@ class MessageStore:
         self._partner = value
         if self._partner:
             self.message = self._partner.greeting
+            self._notify()
         else:
             self._notify()
 
