@@ -33,6 +33,13 @@ class MessageStore:
         self.selected_messages = {}
         self._notifying = False
 
+    def set(self, mode: ChatMode, message: str) -> None:
+        self._mode = mode
+        self._message = message
+        self._add_to_history()
+        self.render_message()
+        self._notify()
+
     @property
     def mode(self) -> ChatMode:
         return self._mode
@@ -72,7 +79,8 @@ class MessageStore:
         self._partner = value
         if self._partner:
             self.message = self._partner.greeting
-        self._notify()
+        else:
+            self._notify()
 
     @property
     def pair(self) -> PairNew:
@@ -89,7 +97,8 @@ class MessageStore:
     @randomize.setter
     def randomize(self, value: bool) -> None:
         self._randomize = value
-        self._notify()
+        if self.pair:
+            self._notify()
 
     def _get_names_and_system(self) -> tuple[str, str]:
         if self._partner:
@@ -144,7 +153,7 @@ class MessageStore:
         message = message.replace("<system>", system)
         message = self._insert_emojis(message)
         clipboard.copy(message)
-        self._notify()
+        # self._notify()
         return message
 
     def _add_to_history(self) -> None:
@@ -155,7 +164,7 @@ class MessageStore:
             and self.message not in state.history
         ):
             state.history = {self.message: self.mode, **state.history}
-            self._notify()
+            # self._notify()
 
     # -- observer pattern for UI refresh -----------------------------
     def subscribe(self, listener: Listener) -> None:

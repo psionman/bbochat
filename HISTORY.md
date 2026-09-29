@@ -3,6 +3,7 @@
 ## Version 0.0.11 29 September 2026
 1. replace enable(False) with disable()
 2. fix disable menus in history panel
+3. Radio button text red when item selected
 
 ## Version 0.0.10 28 September 2026
 1. Add small delay to state save to prevent judder

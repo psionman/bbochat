@@ -37,6 +37,7 @@ class HistoryPanel:
         self.root = parent.root
         message_store.subscribe(self._populate_panels)
         self.radiobutton_styles = {}
+        self._pinned_initialized = False
 
         # tk variables
         self.history_selection = tk.StringVar()
@@ -144,9 +145,15 @@ class HistoryPanel:
         frame = info.canvas.content
         self._delete_message_frame_children(frame)
         items = list(info.data_source.items())
-        if items and info.item_type == "pinned":
+        if (
+            items
+            and info.item_type == "pinned"
+            and not self._pinned_initialized
+        ):
             if not info.tk_variable.get():
                 info.tk_variable.set(items[0][0])
+            self._pinned_initialized = True
+        if items and info.item_type == "pinned":
             self.pinned_context_menu.enable()
 
         for row, (text, mode) in enumerate(items):
@@ -161,6 +168,9 @@ class HistoryPanel:
                 value=text,
                 command=info.click_command,
             )
+            if text == info.tk_variable.get():
+                print(f"Setting style for {text}")
+                button.configure(style="red-fg.TRadiobutton")
             button.bind("<Button-3>", info.context_menu_command)
             button.grid(row=row, column=1, padx=PAD, pady=2, sticky=tk.W)
 
@@ -178,7 +188,7 @@ class HistoryPanel:
         first_item = list(state.history.keys())[0]
         message_store.mode = state.history[first_item]
         self.history_selection.set(first_item)
-        self._populate_panels()
+        message_store.set(state.history[first_item], first_item)
 
     def _delete_pinned_item(self, *args) -> None:
         if len(state.pinned_items) < 1:
@@ -211,8 +221,8 @@ class HistoryPanel:
         if len(state.history) < 1:
             return
         first_item = list(state.history.keys())[0]
-        message_store.mode = state.history[first_item]
         self.history_selection.set(first_item)
+        message_store.set(state.history[first_item], first_item)
 
     def _show_history_context_menu(self, event: tk.Event) -> None:
         self.history_context_menu.tk_popup(event.x_root, event.y_root)
@@ -227,23 +237,28 @@ class HistoryPanel:
     def _pin_selected(self) -> None:
         message = self.pinned_selection.get()
         mode = state.pinned_items[message]
-        message_store.mode = mode
-        message_store.message = message
         self.history_selection.set("")
+
+        message_store.set(mode, message)
+
         self.history_context_menu.disable()
         self.pinned_context_menu.enable()
 
     def _history_selected(self) -> None:
         message = self.history_selection.get()
         mode = state.history[message]
-        message_store.mode = mode
-        message_store.message = message
+
+        # Move the selected message to the front of the history
         state.history.pop(message)
         state.history = {message: mode, **state.history}
-        self._populate_panels()
+
+        self.pinned_selection.set("")
+
+        message_store.set(mode, message)
+
         if len(state.history) <= 1:
             return
-        self.pinned_selection.set("")
+
         self.history_context_menu.enable()
         self.pinned_context_menu.disable()
 
