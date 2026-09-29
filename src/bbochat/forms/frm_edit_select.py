@@ -151,7 +151,7 @@ class EditSelectFrame:
             MenuItem(txt.MOVE_DOWN, self._move_down, dimmable=True),
         ]
         context_menu = Menu(self.root, menu_items)
-        context_menu.enable(False)
+        context_menu.disable()
         return context_menu
 
     def _select_item(self, event: tk.Event) -> None:

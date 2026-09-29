@@ -136,7 +136,7 @@ class PartnerFrame:
             frame.icon_button("edit", self._edit, True),
             frame.icon_button("delete", self._delete, True),
         ]
-        frame.enable(False)
+        frame.disable()
         return frame
 
     def _partner_selected(self, event: object = None) -> None:
@@ -166,7 +166,7 @@ class PartnerFrame:
         self.notes_text.insert("0.0", self.partner.notes)
 
     def _partner_changed(self, *args) -> None:
-        self.button_frame.enable(False)
+        self.button_frame.disable()
         notes = self.notes_text.get("0.0", tk.END)
         if (
             self.system.get() != self.partner.system
@@ -245,7 +245,7 @@ class PartnerFrame:
             MenuItem(txt.DELETE, self._delete, dimmable=True),
         ]
         context_menu = Menu(self.root, menu_items)
-        context_menu.enable(False)
+        context_menu.disable()
         return context_menu
 
     def _show_context_menu(self, event: tk.Event) -> None:

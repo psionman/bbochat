@@ -86,7 +86,7 @@ class NotesFrame:
             frame.icon_button("edit", self._edit, True),
             frame.icon_button("delete", self._delete, True),
         ]
-        frame.enable(False)
+        frame.disable()
         return frame
 
     def _new(self, *args) -> None:
@@ -139,7 +139,7 @@ class NotesFrame:
             MenuItem(txt.DELETE, self._delete, dimmable=True),
         ]
         context_menu = Menu(self.root, menu_items)
-        context_menu.enable(False)
+        context_menu.disable()
         return context_menu
 
     def _show_context_menu(self, event: tk.Event) -> None:

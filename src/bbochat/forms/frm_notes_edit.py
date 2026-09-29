@@ -85,7 +85,7 @@ class NotesEditFrame:
             frame.icon_button("save", self._save, True),
             frame.icon_button("exit", self._dismiss),
         ]
-        frame.enable(False)
+        frame.disable()
         return frame
 
     def _text_changed(self, *args):

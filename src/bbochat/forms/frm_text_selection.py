@@ -258,7 +258,7 @@ class TextSelectionFrame:
             MenuItem(txt.DELETE, self._delete_item, dimmable=True),
         ]
         context_menu = Menu(self.root, menu_items)
-        context_menu.enable(False)
+        context_menu.disable()
         return context_menu
 
     def _on_config_change(self) -> None:

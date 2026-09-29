@@ -272,7 +272,6 @@ class AppFrame:
         frame.buttons = [
             frame.icon_button("cancel", self._dismiss, icon_colour="red"),
         ]
-        frame.enable(False)
         return frame
 
     def _greeting(self, *args) -> None:
@@ -411,7 +410,7 @@ class AppFrame:
 
     def enable_buttons(self, enable: bool = True) -> None:
         if not enable:
-            self.button_frame.enable(False)
+            self.button_frame.disable()
             return
 
         self.button_frame.enable(True)

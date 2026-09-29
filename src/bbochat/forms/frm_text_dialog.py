@@ -98,7 +98,7 @@ class TextDialogFrame:
             frame.icon_button(text, self._process, True),
             frame.icon_button("exit", self._dismiss),
         ]
-        frame.enable(False)
+        frame.disable()
         return frame
 
     def _get_entry(self, master: ttk.Frame) -> ttk.Entry:

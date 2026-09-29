@@ -106,7 +106,7 @@ class HistoryPanel:
             MenuItem(txt.DELETE, self._delete_pinned_item, True),
         ]
         context_menu = Menu(self.root, menu_items)
-        context_menu.enable(False)
+        context_menu.disable()
         return context_menu
 
     def _history_context_menu(self) -> Menu:
@@ -115,7 +115,7 @@ class HistoryPanel:
             MenuItem(txt.DELETE, self._delete_history_item, True),
         ]
         context_menu = Menu(self.root, menu_items)
-        context_menu.enable(False)
+        context_menu.disable()
         return context_menu
 
     def _populate_history_frame(self) -> None:
@@ -206,7 +206,7 @@ class HistoryPanel:
                 return
         state.history.pop(message)
         state.save()
-        self.history_context_menu.enable(False)
+        self.history_context_menu.disable()
         self._populate_panels()
         if len(state.history) < 1:
             return
@@ -230,6 +230,8 @@ class HistoryPanel:
         message_store.mode = mode
         message_store.message = message
         self.history_selection.set("")
+        self.history_context_menu.disable()
+        self.pinned_context_menu.enable()
 
     def _history_selected(self) -> None:
         message = self.history_selection.get()
@@ -243,6 +245,7 @@ class HistoryPanel:
             return
         self.pinned_selection.set("")
         self.history_context_menu.enable()
+        self.pinned_context_menu.disable()
 
     def _radio_button_style(self, mode: ChatMode) -> str:
         if mode in self.radiobutton_styles:

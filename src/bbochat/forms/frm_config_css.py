@@ -154,7 +154,7 @@ class ConfigCssFrame:
             frame.icon_button("use", self._ok, True),
             frame.icon_button("exit", self._dismiss),
         ]
-        frame.enable(False)
+        frame.disable()
         return frame
 
     def _element_selected(self, *args) -> None:

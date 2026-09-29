@@ -75,7 +75,7 @@ class ReportFrame:
         frame.buttons = [
             frame.icon_button("exit", self._dismiss),
         ]
-        frame.enable(False)
+        frame.disable()
         return frame
 
     def _create_report(self) -> str:

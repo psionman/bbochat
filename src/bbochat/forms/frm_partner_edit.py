@@ -135,7 +135,7 @@ class PartnerEditFrame:
             frame.icon_button("save", self._save, True),
             frame.icon_button("exit", self._dismiss),
         ]
-        frame.enable(False)
+        frame.disable()
         return frame
 
     def _value_changed(self, *args):  # *args essential here to make it work

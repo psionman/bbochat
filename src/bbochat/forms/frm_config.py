@@ -196,7 +196,7 @@ class ConfigFrame:
         frame = ButtonFrame(master, tk.HORIZONTAL)
         frame.buttons = self._frame_buttons(frame)
         self.save_button = frame.get_button("save")
-        frame.enable(False)
+        frame.disable()
         return frame
 
     def _frame_buttons(self, frame: ButtonFrame) -> tk.Frame:
