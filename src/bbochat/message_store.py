@@ -161,10 +161,9 @@ class MessageStore:
     def _add_to_history(self) -> None:
         if self.mode == ChatMode.CHAT:
             return
-        if (
-            self.message not in state.pinned_items
-            and self.message not in state.history
-        ):
+        if self.message in state.history:
+            state.history.pop(self.message)
+        if self.message not in state.pinned_items:
             state.history = {self.message: self.mode, **state.history}
 
     # -- observer pattern for UI refresh -----------------------------

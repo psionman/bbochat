@@ -156,6 +156,10 @@ class HistoryPanel:
             info.tk_variable.set(
                 state.last_used_text[message_store.mode.value]
             )
+            if state.last_used_text[message_store.mode.value] in state.history:
+                self.history_context_menu.enable()
+            else:
+                self.history_context_menu.disable()
 
         for row, (text, mode) in enumerate(items):
             label_style = self._label_style(ChatMode(mode))

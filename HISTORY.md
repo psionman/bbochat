@@ -1,5 +1,9 @@
 # BBO Chat - History
 
+## Version 0.0.13 30 September 2026
+1. reorder history items by most recently used
+2. fix enable context menu for selected item
+
 ## Version 0.0.12 30 September 2026
 1. selected item in history panel when opponents clicked
 2. refactor _populate_message_frame in frm_history.py
