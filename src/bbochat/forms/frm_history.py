@@ -53,10 +53,6 @@ class HistoryPanel:
 
         self._populate_panels()
 
-        if state.sashes["history_sashes"]:
-            for index, sash in enumerate(state.sashes["history_sashes"]):
-                self.main_frame.sash_place(index, 0, sash[1])
-
     def _main_frame(self, master: tk.Frame) -> tk.PanedWindow:
         frame = tk.PanedWindow(master, orient=tk.VERTICAL)
         frame.rowconfigure(0, weight=1)
@@ -66,6 +62,10 @@ class HistoryPanel:
 
         history_panel = self._history_panel(master)
         frame.add(history_panel, height=FRAME_HEIGHT)
+
+        if state.sashes["history_sashes"]:
+            for index, sash in enumerate(state.sashes["history_sashes"]):
+                frame.sash_place(index, 0, sash[1])
         return frame
 
     def _pinned_panel(self, master) -> ttk.Frame:
