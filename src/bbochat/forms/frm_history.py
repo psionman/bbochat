@@ -156,6 +156,11 @@ class HistoryPanel:
         if items and info.item_type == "pinned":
             self.pinned_context_menu.enable()
 
+        if message_store.opponents_clicked:
+            info.tk_variable.set(
+                state.last_used_text[ChatMode.GREETINGS.value]
+            )
+
         for row, (text, mode) in enumerate(items):
             style_name = self._radio_button_style(ChatMode(mode))
             label = ttk.Label(frame, text="", style=style_name, width=4)

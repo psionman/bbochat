@@ -99,5 +99,8 @@ class OpponentsFrame:
         player_2 = data_store.players[values[1]]
 
         message_store.pair = PairNew(player_1, player_2)
-        message_store.mode = ChatMode.GREETINGS
-        message_store.message = state.last_used_text[ChatMode.GREETINGS.value]
+        message_store.set(
+            ChatMode.GREETINGS,
+            state.last_used_text[ChatMode.GREETINGS.value],
+            opponents_clicked=True,
+        )

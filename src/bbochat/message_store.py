@@ -32,12 +32,16 @@ class MessageStore:
         self.listeners: list[Listener] = []
         self.selected_messages = {}
         self._notifying = False
+        self.opponents_clicked = False
 
-    def set(self, mode: ChatMode, message: str) -> None:
+    def set(
+        self, mode: ChatMode, message: str, opponents_clicked: bool = False
+    ) -> None:
         self._mode = mode
         self._message = message
         self._add_to_history()
         self.render_message()
+        self.opponents_clicked = opponents_clicked
         self._notify()
 
     @property
@@ -79,8 +83,6 @@ class MessageStore:
         self._partner = value
         if self._partner:
             self.message = self._partner.greeting
-            self._notify()
-        else:
             self._notify()
 
     @property
@@ -154,7 +156,6 @@ class MessageStore:
         message = message.replace("<system>", system)
         message = self._insert_emojis(message)
         clipboard.copy(message)
-        # self._notify()
         return message
 
     def _add_to_history(self) -> None:
@@ -165,7 +166,6 @@ class MessageStore:
             and self.message not in state.history
         ):
             state.history = {self.message: self.mode, **state.history}
-            # self._notify()
 
     # -- observer pattern for UI refresh -----------------------------
     def subscribe(self, listener: Listener) -> None:
@@ -185,6 +185,7 @@ class MessageStore:
                 listener()
         finally:
             self._notifying = False
+            self.opponents_clicked = False
 
 
 message_store = MessageStore()

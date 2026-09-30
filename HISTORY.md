@@ -1,5 +1,8 @@
 # BBO Chat - History
 
+## Version 0.0.12 30 September 2026
+1. selected item in history panel when opponents clicked
+
 ## Version 0.0.11 29 September 2026
 1. replace enable(False) with disable()
 2. fix disable menus in history panel
