@@ -30,11 +30,12 @@ DEFAULT_SIZE = "500x600"
 
 class State:
     def __init__(self):
-        self.geometry = {}
-        self.sashes = {}
-        self.session = {}
-        self.last_used_text = {}
-        self.pinned_items = []
+        self.geometry: dict[str, str] = {}
+        self.sashes: dict[str, list[list[int]]] = {}
+        self.session: dict[str, str] = {}
+        self.last_used_text: dict[int, str] = {}
+        self.pinned_items: dict[str, ChatMode] = {}
+        self.history: dict[str, ChatMode] = {}
 
         self.get_state()
 

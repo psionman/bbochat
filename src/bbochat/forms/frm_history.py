@@ -43,7 +43,7 @@ class HistoryPanel:
         self.history_selection = tk.StringVar()
         self.pinned_selection = tk.StringVar()
 
-        self.main_frame = self._main_frame(master)
+        self.main_frame = self._create_main_frame(master)
 
         self.history_context_menu = self._history_context_menu()
         self.pinned_context_menu = self._pinned_context_menu()
@@ -53,7 +53,7 @@ class HistoryPanel:
 
         self._populate_panels()
 
-    def _main_frame(self, master: tk.Frame) -> tk.PanedWindow:
+    def _create_main_frame(self, master: tk.Frame) -> tk.PanedWindow:
         frame = tk.PanedWindow(master, orient=tk.VERTICAL)
         frame.rowconfigure(0, weight=1)
 
@@ -152,9 +152,9 @@ class HistoryPanel:
         items = list(info.data_source.items())
         self._initialize_pinned(items, info)
 
-        if message_store.opponents_clicked:
+        if message_store.refresh_selected_item:
             info.tk_variable.set(
-                state.last_used_text[ChatMode.GREETINGS.value]
+                state.last_used_text[message_store.mode.value]
             )
 
         for row, (text, mode) in enumerate(items):

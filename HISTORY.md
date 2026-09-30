@@ -5,6 +5,7 @@
 2. refactor _populate_message_frame in frm_history.py
 3. fix message_store.set in frm_text_selection
 4. move sash placement to _main_frame in frm_history.py
+5 Selected item for all modes
 
 ## Version 0.0.11 29 September 2026
 1. replace enable(False) with disable()

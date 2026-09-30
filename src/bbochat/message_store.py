@@ -31,17 +31,17 @@ class MessageStore:
         self._pair: PairNew | None = None
         self.listeners: list[Listener] = []
         self._notifying = False
-        self.opponents_clicked = False
+        self.refresh_selected_item = False
 
     def set(
-        self, mode: ChatMode, message: str, opponents_clicked: bool = False
+        self, mode: ChatMode, message: str, refresh_selected_item: bool = False
     ) -> None:
         self._mode = mode
         self._message = message
         self._add_to_history()
         self.render_message()
-        self.opponents_clicked = opponents_clicked
         state.last_used_text[mode.value] = message
+        self.refresh_selected_item = refresh_selected_item
         self._notify()
 
     @property
@@ -185,7 +185,7 @@ class MessageStore:
                 listener()
         finally:
             self._notifying = False
-            self.opponents_clicked = False
+            self.refresh_selected_item = False
 
 
 message_store = MessageStore()

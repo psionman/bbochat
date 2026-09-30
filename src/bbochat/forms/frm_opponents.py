@@ -102,5 +102,5 @@ class OpponentsFrame:
         message_store.set(
             ChatMode.GREETINGS,
             state.last_used_text[ChatMode.GREETINGS.value],
-            opponents_clicked=True,
+            refresh_selected_item=True,
         )
