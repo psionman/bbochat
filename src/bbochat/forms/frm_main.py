@@ -291,9 +291,6 @@ class AppFrame:
         if last_partner and last_partner in self.partners:
             self.partner = self.partners[last_partner]
             message_store.partner = self.partner
-            message_store.selected_messages[ChatMode.GREETINGS] = (
-                self.partner.greeting
-            )
 
     def _get_my_name(self) -> None:
         get_my_name()

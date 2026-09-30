@@ -30,7 +30,6 @@ class MessageStore:
         self._partner: Partner | None = None
         self._pair: PairNew | None = None
         self.listeners: list[Listener] = []
-        self.selected_messages = {}
         self._notifying = False
         self.opponents_clicked = False
 
@@ -42,6 +41,7 @@ class MessageStore:
         self._add_to_history()
         self.render_message()
         self.opponents_clicked = opponents_clicked
+        state.last_used_text[mode.value] = message
         self._notify()
 
     @property

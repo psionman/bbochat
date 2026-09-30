@@ -237,10 +237,7 @@ class TextSelectionFrame:
         if self.text_var.get() and self.text_var.get()[0] == "#":
             return
 
-        message_store.mode = self.mode
-        message_store.selected_messages[self.mode] = self.text_var.get()
-        message_store.message = self.text_var.get()
-        state.last_used_text[self.mode.value] = self.text_var.get()
+        message_store.set(self.mode, self.text_var.get())
         state.save()
 
     def populate_text_items(self, selected_item: str = "") -> None:
