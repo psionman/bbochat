@@ -2,6 +2,7 @@
 
 ## Version 0.0.12 30 September 2026
 1. selected item in history panel when opponents clicked
+2. refactor _populate_message_frame in frm_history.py
 
 ## Version 0.0.11 29 September 2026
 1. replace enable(False) with disable()

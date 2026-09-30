@@ -36,7 +36,7 @@ class HistoryPanel:
     def __init__(self, parent, master: ttk.Frame) -> None:
         self.root = parent.root
         message_store.subscribe(self._populate_panels)
-        self.radiobutton_styles = {}
+        self.label_styles = {}
         self._pinned_initialized = False
 
         # tk variables
@@ -119,6 +119,10 @@ class HistoryPanel:
         context_menu.disable()
         return context_menu
 
+    def _populate_panels(self) -> None:
+        self._populate_history_frame()
+        self._populate_pinned_frame()
+
     def _populate_history_frame(self) -> None:
         info = PanelPopulateInfo(
             "history",
@@ -144,7 +148,44 @@ class HistoryPanel:
     def _populate_message_frame(self, info: PanelPopulateInfo) -> None:
         frame = info.canvas.content
         self._delete_message_frame_children(frame)
+
         items = list(info.data_source.items())
+        self._initialize_pinned(items, info)
+
+        if message_store.opponents_clicked:
+            info.tk_variable.set(
+                state.last_used_text[ChatMode.GREETINGS.value]
+            )
+
+        for row, (text, mode) in enumerate(items):
+            label_style = self._label_style(ChatMode(mode))
+            label = ttk.Label(frame, text="", style=label_style, width=4)
+            label.grid(row=row, column=0, sticky=tk.E, padx=PAD, pady=PAD)
+
+            button = self._create_radio_button(frame, text, info)
+            button.grid(row=row, column=1, padx=PAD, pady=2, sticky=tk.W)
+
+    def _create_radio_button(
+        self,
+        frame: tk.Widget,
+        text: str,
+        info: PanelPopulateInfo,
+    ) -> ttk.Radiobutton:
+        button = ttk.Radiobutton(
+            frame,
+            text=text,
+            variable=info.tk_variable,
+            value=text,
+            command=info.click_command,
+        )
+        if text == info.tk_variable.get():
+            button.configure(style="red-fg.TRadiobutton")
+        button.bind("<Button-3>", info.context_menu_command)
+        return button
+
+    def _initialize_pinned(
+        self, items: list[tuple[str, int]], info: PanelPopulateInfo
+    ) -> None:
         if (
             items
             and info.item_type == "pinned"
@@ -153,30 +194,6 @@ class HistoryPanel:
             if not info.tk_variable.get():
                 info.tk_variable.set(items[0][0])
             self._pinned_initialized = True
-        if items and info.item_type == "pinned":
-            self.pinned_context_menu.enable()
-
-        if message_store.opponents_clicked:
-            info.tk_variable.set(
-                state.last_used_text[ChatMode.GREETINGS.value]
-            )
-
-        for row, (text, mode) in enumerate(items):
-            style_name = self._radio_button_style(ChatMode(mode))
-            label = ttk.Label(frame, text="", style=style_name, width=4)
-            label.grid(row=row, column=0, sticky=tk.E, padx=PAD, pady=PAD)
-
-            button = ttk.Radiobutton(
-                frame,
-                text=text,
-                variable=info.tk_variable,
-                value=text,
-                command=info.click_command,
-            )
-            if text == info.tk_variable.get():
-                button.configure(style="red-fg.TRadiobutton")
-            button.bind("<Button-3>", info.context_menu_command)
-            button.grid(row=row, column=1, padx=PAD, pady=2, sticky=tk.W)
 
     def _delete_message_frame_children(self, frame: ScrollingCanvas) -> None:
         for child in frame.winfo_children():
@@ -234,10 +251,6 @@ class HistoryPanel:
     def _show_pinned_context_menu(self, event: tk.Event) -> None:
         self.pinned_context_menu.tk_popup(event.x_root, event.y_root)
 
-    def _populate_panels(self) -> None:
-        self._populate_history_frame()
-        self._populate_pinned_frame()
-
     def _pin_selected(self) -> None:
         message = self.pinned_selection.get()
         mode = state.pinned_items[message]
@@ -266,14 +279,14 @@ class HistoryPanel:
         self.history_context_menu.enable()
         self.pinned_context_menu.disable()
 
-    def _radio_button_style(self, mode: ChatMode) -> str:
-        if mode in self.radiobutton_styles:
-            return self.radiobutton_styles[mode]
+    def _label_style(self, mode: ChatMode) -> str:
+        if mode in self.label_styles:
+            return self.label_styles[mode]
         colour = config.colours[str(mode.value)]
         style = ttk.Style(self.root)
         style_name = f"{colour.lstrip('#')}.TLabel"
         style.configure(style_name, background=colour)
-        self.radiobutton_styles[mode] = style_name
+        self.label_styles[mode] = style_name
         return style_name
 
     def _on_mousewheel(self, event) -> None:
