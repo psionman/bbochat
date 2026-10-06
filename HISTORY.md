@@ -1,5 +1,8 @@
 # BBO Chat - History
 
+## Version 0.0.14 6 October 2026
+1. Add cancel to notes save
+
 ## Version 0.0.13 30 September 2026
 1. reorder history items by most recently used
 2. fix enable context menu for selected item
@@ -28,7 +31,7 @@
 4. Create history panel with mousewheel support
 5. Implement last used text for each chat mode
 6. Change mode colours key to mode.value
-7. Click on pair assigns correct message 
+7. Click on pair assigns correct message
 8. Clicking on history item assigns message
 9. Save history on close
 10. Delete item from history
@@ -67,6 +70,5 @@
 3. Added properties for name_1, name_2, username_1, username_2
 4. Used config.subscibe to pass colours through to forms
 
-## Version 0.0.0 12 Mar 2025 
+## Version 0.0.0 12 Mar 2025
 1. Initial commit
-

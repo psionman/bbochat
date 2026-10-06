@@ -443,12 +443,14 @@ class AppFrame:
 
     def _dismiss(self, *args) -> None:
         if self.tournament_tab.notes_changed():
-            response = tk.messagebox.askyesno(
+            response = tk.messagebox.askyesnocancel(
                 "Save Notes",
                 "Do you want to save the board notes?",
             )
-            if response:
+            if response is True:
                 self.tournament_tab.save_notes()
+            elif response is None:
+                return
         self._save_sashes()
         state.save()
         self.root.destroy()
