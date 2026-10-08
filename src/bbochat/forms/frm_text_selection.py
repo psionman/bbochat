@@ -33,13 +33,13 @@ class TextSelectionFrame:
         mode_data: ModeData,
         show_use_frame: bool = True,
         show_title: bool = True,
-        has_slave: bool = False,
+        slave_frame: any = None,
     ) -> None:
 
         self.root = parent.root
         self.show_use_frame = show_use_frame
         self.show_title = show_title
-        self.has_slave_frame = has_slave
+        self.slave_frame = slave_frame
         self.master_frame = None
         self.mode_data = mode_data
         self.mode = mode
@@ -156,14 +156,14 @@ class TextSelectionFrame:
         self.text_var.set(self.selected_text)
         self._use_item()
         self.context_menu.enable()
-        if self.has_slave_frame:
+        if self.slave_frame:
             # This is a master: it has a slave frame
             # This line breaks after edit all
-            self.has_slave_frame.display_list = self.mode_data.data_items[
+            self.slave_frame.display_list = self.mode_data.data_items[
                 self.selected_text
             ]
             self.mode_data.update_slave_data(
-                self.has_slave_frame, self.selected_text
+                self.slave_frame, self.selected_text
             )
 
     def _new_item(self, *args) -> None:
@@ -204,9 +204,9 @@ class TextSelectionFrame:
 
         self.mode_data.delete(self)
 
-        if self.has_slave_frame:
+        if self.slave_frame:
             # This is a master: it has a slave frame
-            self.has_slave_frame.populate_text_items()
+            self.slave_frame.populate_text_items()
 
         self.text_var.set("")
         self._use_item()

@@ -36,8 +36,9 @@ class ChatFrame:
     def _get_chat_slave(
         self, master: ttk.Frame, mode: str
     ) -> TextSelectionFrame:
-        mode_data = ModeData(source_data=None, has_master=True, slave=False)
-
+        mode_data = ModeData(
+            source_data=None, has_master=True, slave_frame=None
+        )
         return TextSelectionFrame(
             self,
             master,
@@ -45,7 +46,6 @@ class ChatFrame:
             mode_data,
             show_use_frame=True,
             show_title=False,
-            has_slave=False,
         )
 
     def _get_chat_master(
@@ -56,7 +56,7 @@ class ChatFrame:
         mode_data = ModeData(
             source_data=data_set,
             has_master=False,
-            slave=True,
+            slave_frame=chat_slave,
         )
 
         return TextSelectionFrame(
@@ -66,5 +66,5 @@ class ChatFrame:
             mode_data,
             show_use_frame=False,
             show_title=True,
-            has_slave=chat_slave,
+            slave_frame=chat_slave,
         )

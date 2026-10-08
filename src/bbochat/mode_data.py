@@ -19,19 +19,19 @@ class ModeData:
         self,
         source_data: list | dict = None,
         has_master: bool = False,
-        slave=None,
+        slave_frame=None,
     ):
 
         self.data_server = data_store
         self.has_master = has_master
-        self.slave = slave
+        self.slave_frame = slave_frame
         self.text_register = {}
         self.key_register = bidict()  # key <-> uid
 
         # slave (has slave) => self.data_items is a dict of text items,
         # otherwise a list of text
         if not source_data:
-            source_data = {} if slave else []
+            source_data = {} if slave_frame else []
         self.data_items = source_data
 
         # self.display_list_raw is a list of the data items
@@ -56,7 +56,7 @@ class ModeData:
     def add(self, frame, text) -> None:
         self.display_list_raw.append(text)
 
-        if self.slave:
+        if self.slave_frame:
             self.data_items[text] = []
         elif self.has_master:
             data = frame.master_frame.data.data
@@ -69,7 +69,7 @@ class ModeData:
     def amend(self, frame, old_value: str, new_value: str) -> None:
         self._update_display_list(self.display_list_raw, old_value, new_value)
 
-        if self.slave:
+        if self.slave_frame:
             self.data_items[new_value] = self.data_items[old_value]
             self.data_items.pop(old_value)
         elif self.has_master:
@@ -85,7 +85,7 @@ class ModeData:
     def delete(self, frame) -> None:
         self.display_list_raw.remove(frame.selected_text)
 
-        if self.slave:
+        if self.slave_frame:
             self.data_items.pop(frame.selected_text)
             self._delete_slave_data(frame.slave_frame)
         elif self.has_master:
@@ -98,7 +98,7 @@ class ModeData:
     def edit_all(self, frame, display_list_raw: list[str]) -> None:
         self.display_list_raw = display_list_raw
 
-        if self.slave:
+        if self.slave_frame:
             pass
         elif self.has_master:
             data = frame.master_frame.mode_data.data_items
@@ -140,7 +140,7 @@ class ModeData:
         """
         slave.mode_data.text_data = []
         slave.mode_data.display_list_raw = []
-        slave.mode_data.display_list = []
+        # slave.mode_data.display_list = []
 
         slave.populate_text_items()
 
@@ -178,7 +178,7 @@ class ModeData:
         self.data_server.save()
 
     def _build_registers(self) -> dict:
-        if not self.slave:
+        if not self.slave_frame:
             return {}, bidict()
 
         # text_register is a dict of text items (a list) keyed on uuids
