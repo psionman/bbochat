@@ -1,5 +1,8 @@
 # BBO Chat - History
 
+## Version 0.0.15 8 October 2026
+1. Change slave in  to has_slave
+
 ## Version 0.0.14 6 October 2026
 1. Add cancel to notes save
 

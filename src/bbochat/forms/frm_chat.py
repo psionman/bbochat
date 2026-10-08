@@ -45,7 +45,7 @@ class ChatFrame:
             mode_data,
             show_use_frame=True,
             show_title=False,
-            slave=None,
+            has_slave=False,
         )
 
     def _get_chat_master(
@@ -66,5 +66,5 @@ class ChatFrame:
             mode_data,
             show_use_frame=False,
             show_title=True,
-            slave=chat_slave,
+            has_slave=chat_slave,
         )

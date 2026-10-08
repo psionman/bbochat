@@ -33,13 +33,13 @@ class TextSelectionFrame:
         mode_data: ModeData,
         show_use_frame: bool = True,
         show_title: bool = True,
-        slave=None,
+        has_slave: bool = False,
     ) -> None:
 
         self.root = parent.root
         self.show_use_frame = show_use_frame
         self.show_title = show_title
-        self.has_slave_frame = slave
+        self.has_slave_frame = has_slave
         self.master_frame = None
         self.mode_data = mode_data
         self.mode = mode
