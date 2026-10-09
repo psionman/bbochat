@@ -17,7 +17,7 @@ from bbochat.text import Text
 txt = Text()
 
 
-class TextDialogFrame:
+class TextEditFrame:
     def __init__(
         self,
         parent: ttk.Frame,

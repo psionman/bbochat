@@ -12,7 +12,7 @@ from psiutils.utilities import window_resize
 from psiutils.widgets import HAND
 
 from bbochat.buttons import ButtonFrame, IconButton
-from bbochat.forms.frm_text_dialog import TextDialogFrame
+from bbochat.forms.frm_text_edit import TextEditFrame
 from bbochat.state import state
 from bbochat.text import Text
 
@@ -25,7 +25,6 @@ class EditSelectFrame:
     def __init__(self, parent) -> None:
         self.root = tk.Toplevel(parent.root)
         self.mode_data = parent.mode_data
-
         self.mode = parent.mode
 
         self.save_button = None
@@ -184,7 +183,7 @@ class EditSelectFrame:
         self._enable_buttons()
 
     def _new_item(self, *args) -> None:
-        dlg = TextDialogFrame(self, "New")
+        dlg = TextEditFrame(self, "New")
         dlg.root.transient(self.root)
         dlg.root.grab_set()
         self.root.wait_window(dlg.root)
@@ -199,7 +198,7 @@ class EditSelectFrame:
             self._add_item_to_list(len(self.display_list), dlg.text)
 
     def _edit_item(self, *args) -> None:
-        dlg = TextDialogFrame(self, "Edit", self.selected_text)
+        dlg = TextEditFrame(self, "Edit", self.selected_text)
         dlg.root.transient(self.root)
         dlg.root.grab_set()
         self.root.wait_window(dlg.root)

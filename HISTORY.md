@@ -2,7 +2,8 @@
 
 ## Version 0.0.15 8 October 2026
 1. Change slave in  to has_slave
-2. Delete chat item
+2. Fix bug in add in mode_data
+3. rename frm_text_dialog to frm_text_edit
 
 ## Version 0.0.14 6 October 2026
 1. Add cancel to notes save

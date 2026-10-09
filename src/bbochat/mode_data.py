@@ -59,7 +59,7 @@ class ModeData:
         if self.slave_frame:
             self.data_items[text] = []
         elif self.has_master:
-            data = frame.master_frame.data.data
+            data = frame.master_frame.mode_data.data_items
             data[frame.master_frame.selected_text].append(text)
         else:
             self.data_items.append(text)

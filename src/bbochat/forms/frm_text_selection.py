@@ -12,7 +12,7 @@ from bbochat.buttons import ButtonFrame, IconButton
 from bbochat.config import config
 from bbochat.constants import MODE_TEXT, ChatMode
 from bbochat.forms.frm_edit_select import EditSelectFrame
-from bbochat.forms.frm_text_dialog import TextDialogFrame
+from bbochat.forms.frm_text_edit import TextEditFrame
 from bbochat.message_store import message_store
 from bbochat.mode_data import ModeData
 from bbochat.state import state
@@ -167,7 +167,7 @@ class TextSelectionFrame:
             )
 
     def _new_item(self, *args) -> None:
-        dlg = TextDialogFrame(self, "New", show_save=True)
+        dlg = TextEditFrame(self, "New", show_save=True)
         dlg.root.transient(self.root)
         dlg.root.grab_set()
         self.root.wait_window(dlg.root)
@@ -183,7 +183,7 @@ class TextSelectionFrame:
         self.populate_text_items(dlg.text)
 
     def _edit_item(self, *args) -> None:
-        dlg = TextDialogFrame(self, "Edit", self.selected_text, show_save=True)
+        dlg = TextEditFrame(self, "Edit", self.selected_text, show_save=True)
         dlg.root.transient(self.root)
         dlg.root.grab_set()
         self.root.wait_window(dlg.root)
