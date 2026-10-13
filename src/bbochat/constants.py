@@ -18,9 +18,8 @@ CONFIG_PATH = Path(CONFIG_DIR, "config.toml")
 USER_DATA_DIR = user_data_dir(__app_name__, __author__)
 DOCS_DIR = userpaths.get_my_documents()
 STATE_DIR = user_state_dir(__app_name__, __author__)
-PSIUTILS_DIR = user_data_dir("psiutils", __author__)
 
-# Buttons and text
+# psiutils Buttons and text
 PSIUTILS_DIR = user_data_dir("psiutils", __author__)
 BUTTONS_DIR = Path(PSIUTILS_DIR, "buttons")
 BUTTON_ICON_PATH = str(Path(BUTTONS_DIR, "icons"))
@@ -30,10 +29,8 @@ TEXT_FILE = Path(PSIUTILS_DIR, "text", "text.json")
 
 # GUI
 APP_TITLE = "BBO Chat"
-ICON_DIR = f"{Path(__file__).parent}/icons/"
-ICON_FILE = Path(
-    Path(__file__).parent, "images", "chat-processing-outline.png"
-)
+ICON_DIR = Path(f"{Path(__file__).parent}", "assets", "icons")
+ICON_FILE = Path(ICON_DIR, "chat-processing-outline.png")
 
 # Dates
 YYYYMMDD = "%Y%m%d"
