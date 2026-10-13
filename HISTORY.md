@@ -1,5 +1,9 @@
 # BBO Chat - History
 
+## Version 0.0.16 13 October 2026
+1. Rename images/ icons to assets2
+2. Fix missing icons on frm_config
+
 ## Version 0.0.15 8 October 2026
 1. Change slave in  to has_slave
 2. Fix bug in add in mode_data

@@ -203,9 +203,9 @@ class ConfigFrame:
         return [
             frame.icon_button("save", self._save_config, True, tag="save"),
             frame.icon_button(
-                "revert", self._restore_defaults, True, tag="revert"
+                "restore-defaults", self._restore_defaults, True
             ),
-            frame.icon_button("close", self._dismiss, tag="exit"),
+            frame.icon_button("cancel", self._dismiss, tag="exit"),
         ]
 
     def _get_data_directory(self) -> str:
