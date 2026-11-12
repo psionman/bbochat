@@ -4,7 +4,7 @@ from tkinter.colorchooser import askcolor
 
 from psiutils import messagebox
 from psiutils.constants import PAD, PADT, Status
-from psiutils.utilities import window_resize
+from psiutils.utilities import restore_geometry, window_resize
 from psiutils.widgets import separator_frame
 from tkinterweb import HtmlFrame
 
@@ -62,7 +62,7 @@ class ConfigFrame:
 
     def _show(self) -> None:
         root = self.root
-        root.geometry(state.get_geometry(__file__))
+        restore_geometry(root, state, __file__)
         root.title(txt.CONFIG)
 
         root.bind("<Control-x>", self._dismiss)

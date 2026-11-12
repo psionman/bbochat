@@ -4,7 +4,7 @@ import tkinter as tk
 from tkinter import ttk
 
 from psiutils.constants import PAD, Mode, Status
-from psiutils.utilities import window_resize
+from psiutils.utilities import restore_geometry, window_resize
 
 from bbochat.buttons import ButtonFrame
 from bbochat.constants import APP_TITLE
@@ -34,7 +34,7 @@ class NotesEditFrame:
 
     def show(self) -> None:
         root = self.root
-        root.geometry(state.get_geometry(__file__))
+        restore_geometry(root, state, __file__)
         root.title(self.title)
 
         root.bind("<Control-x>", self._dismiss)

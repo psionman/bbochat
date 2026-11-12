@@ -8,7 +8,7 @@ from bidict import bidict
 from psiutils import messagebox
 from psiutils.constants import PAD, Status
 from psiutils.menus import Menu, MenuItem
-from psiutils.utilities import window_resize
+from psiutils.utilities import restore_geometry, window_resize
 from psiutils.widgets import HAND
 
 from bbochat.buttons import ButtonFrame, IconButton
@@ -72,7 +72,7 @@ class EditSelectFrame:
 
     def _show(self) -> None:
         root = self.root
-        root.geometry(state.get_geometry(__file__))
+        restore_geometry(root, state, __file__)
         root.title(FRAME_TITLE)
 
         root.bind("<Control-x>", self._dismiss)

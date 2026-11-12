@@ -7,7 +7,7 @@ from tkinter import ttk
 import clipboard
 from psiutils import messagebox
 from psiutils.constants import PAD
-from psiutils.utilities import window_resize
+from psiutils.utilities import restore_geometry, window_resize
 
 from bbochat.buttons import ButtonFrame, IconButton
 from bbochat.config import config
@@ -101,7 +101,7 @@ class AppFrame:
     def _show(self):
         root = self.root
         root.protocol("WM_DELETE_WINDOW", self._dismiss)
-        root.geometry(state.get_geometry(__file__))
+        restore_geometry(root, state, __file__)
         root.title(FRAME_TITLE)
 
         root.rowconfigure(0, weight=1)
